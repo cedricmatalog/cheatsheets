@@ -1,112 +1,112 @@
-# HTML Cheatsheet
+# Head First HTML Cheatsheet
 
-> A comprehensive reference guide for HTML based on the roadmap.sh HTML roadmap
+> Your brain on HTML. Here you'll learn HTML the way your brain likes to learn - with conversational style, puzzles, and practical examples that stick.
+
+---
+
+## How to Use This Cheatsheet
+
+**We think of this as learning, not a reference manual.** You'll find Q&A sections, "Watch It!" warnings, "Brain Power" exercises, and lots of conversation. It might seem strange at first, but your brain will thank you later.
+
+**The activities are NOT optional.** The exercises and challenges are part of the learning experience. Don't skip them.
+
+**The redundancy is intentional.** One distinct difference in a Head First cheatsheet is that we want you to really *get it*. And we want you to finish the guide remembering what you've learned. So you'll see some of the same concepts come up more than once.
 
 ---
 
 ## Table of Contents
 
-1. [Introduction](#1-introduction)
-2. [Your First HTML File](#2-your-first-html-file)
-3. [Basic Tags](#3-basic-tags)
-4. [Textual Tags](#4-textual-tags)
-5. [Lists and Types](#5-lists-and-types)
-6. [Table Tag](#6-table-tag)
-7. [Embedding Media](#7-embedding-media)
-8. [Using Forms](#8-using-forms)
-9. [Semantic Markup](#9-semantic-markup)
-10. [Styling Basics](#10-styling-basics)
-11. [Including JavaScript](#11-including-javascript)
-12. [Accessibility](#12-accessibility)
-13. [Basics of SEO](#13-basics-of-seo)
+1. [Introduction: How the Web Really Works](#1-introduction-how-the-web-really-works)
+2. [Getting Started: Your First HTML File](#2-getting-started-your-first-html-file)
+3. [Basic Tags: The Building Blocks](#3-basic-tags-the-building-blocks)
+4. [Working with Text: Making Words Come Alive](#4-working-with-text-making-words-come-alive)
+5. [Lists: Organizing Information](#5-lists-organizing-information)
+6. [Tables: Structured Data](#6-tables-structured-data)
+7. [Media Time: Images, Audio, and Video](#7-media-time-images-audio-and-video)
+8. [Forms: Talking to Your Users](#8-forms-talking-to-your-users)
+9. [Semantic HTML: Meaning Matters](#9-semantic-html-meaning-matters)
+10. [Styling: Making It Pretty](#10-styling-making-it-pretty)
+11. [JavaScript: Adding Behavior](#11-javascript-adding-behavior)
+12. [Accessibility: Building for Everyone](#12-accessibility-building-for-everyone)
+13. [SEO: Getting Found](#13-seo-getting-found)
 
 ---
 
-## 1. Introduction
+## 1. Introduction: How the Web Really Works
 
-### What are markup languages?
+### What's HTML, anyway?
 
-Markup languages are used to annotate text so that computers can process and display it. HTML (HyperText Markup Language) is the standard markup language for creating web pages.
+HTML stands for **HyperText Markup Language**, but what does that actually mean? Think of HTML as the skeleton of every webpage you've ever visited. It's not a programming language (it can't make decisions or do math), but it's incredibly powerful for *structuring* content.
 
-### What is HTTP?
+**HyperText** = Text with links (you know, those blue underlined things you click)
+**Markup** = Special tags that tell browsers how to display stuff
+**Language** = A set of rules for writing those tags
 
-HTTP (HyperText Transfer Protocol) is the protocol used for transmitting web pages over the internet. HTTPS is the secure version.
+### Brain Power
+🧠 Before you read on, think about this: When you visit a webpage, what actually happens? Write down your guess.
 
-### DNS (Domain Name System)
+### How the web really works (the short version)
 
-DNS translates domain names (like example.com) into IP addresses that computers use to identify each other.
+1. **You type a URL** in your browser (like `https://example.com`)
+2. **DNS translates** the domain name into an IP address (like finding someone's street address from their name)
+3. **Your browser sends an HTTP request** to that server (saying "Hey, send me that webpage!")
+4. **The server responds** with HTML, CSS, and JavaScript files
+5. **Your browser renders** everything into the beautiful (or not so beautiful) page you see
 
-### Domain names
+```
+You type URL → DNS lookup → HTTP Request → Server responds → Browser renders
+```
 
-A domain name is a unique address that identifies a website on the internet (e.g., google.com, github.com).
+### There are NO Dumb Questions
 
-### Browsers
+**Q: What's the difference between HTTP and HTTPS?**
+**A:** The 'S' stands for Secure. HTTPS encrypts the data between your browser and the server. Always use HTTPS for anything involving passwords, credit cards, or personal data.
 
-Web browsers (Chrome, Firefox, Safari, Edge) are applications that retrieve and display web pages.
+**Q: Do I need to understand DNS to write HTML?**
+**A:** Not really! But it helps to know the big picture. Focus on HTML first, you can dive deeper into networking later.
 
-### Hosting
+**Q: Is HTML case-sensitive?**
+**A:** Nope! `<DIV>`, `<Div>`, and `<div>` are all the same. But the convention is lowercase, so stick with that.
 
-Web hosting is a service that stores your website files and makes them accessible on the internet.
+### Watch It!
+⚠️ **Markup languages ≠ Programming languages**. HTML can't make decisions, can't loop, can't do calculations. For that, you need JavaScript. HTML is about structure and content, not logic.
 
-### What is SEO?
+### What you need to get started
 
-SEO (Search Engine Optimization) is the practice of optimizing websites to rank higher in search engine results.
+- A text editor (Notepad, VS Code, Sublime Text - pick your favorite)
+- A web browser (you already have one!)
+- Your brain (you've got that too!)
 
-### How the web works
-
-When you type a URL, your browser sends an HTTP request to a server, which responds with HTML, CSS, and JavaScript files that your browser renders as a web page.
+That's it. No special software, no expensive tools. Just text and a browser.
 
 ---
 
-## 2. Your First HTML File
+## 2. Getting Started: Your First HTML File
 
-### Tags and Attributes
+### The anatomy of an HTML element
 
-HTML uses tags enclosed in angle brackets. Most tags have opening and closing pairs.
-
-```html
-<tagname attribute="value">Content</tagname>
-```
-
-### Case Insensitivity
-
-HTML tags are case-insensitive, but lowercase is the standard convention.
+Every HTML element has the same basic structure:
 
 ```html
-<DIV> and <div> are the same, but use <div>
+<tagname attribute="value">Content goes here</tagname>
+ ↑                          ↑                  ↑
+Opening tag            The content        Closing tag
 ```
 
-### HTML Entities
-
-Special characters that need to be encoded:
-
-| Entity | Character | Description |
-|--------|-----------|-------------|
-| `&lt;` | < | Less than |
-| `&gt;` | > | Greater than |
-| `&amp;` | & | Ampersand |
-| `&quot;` | " | Quotation mark |
-| `&nbsp;` | (space) | Non-breaking space |
-| `&copy;` | © | Copyright |
-| `&reg;` | ® | Registered trademark |
-| `&trade;` | ™ | Trademark |
-
-### HTML Comments
+Some tags are **self-closing** (they don't have content):
 
 ```html
-<!-- This is a comment and won't be displayed -->
+<img src="photo.jpg" alt="My photo">
+<br>
+<hr>
 ```
 
-### Whitespaces
+### Brain Power
+🧠 Why do you think some tags need closing tags and others don't? What's the pattern?
 
-Multiple spaces and line breaks are collapsed into a single space in HTML.
+### Your first HTML file
 
-```html
-<p>This    has     many     spaces</p>
-<!-- Displays as: This has many spaces -->
-```
-
-### Basic HTML Structure
+Let's build a simple webpage. Open your text editor and type this:
 
 ```html
 <!DOCTYPE html>
@@ -114,350 +114,550 @@ Multiple spaces and line breaks are collapsed into a single space in HTML.
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Title</title>
+    <title>My First Webpage</title>
 </head>
 <body>
-    <!-- Your content here -->
+    <h1>Hello, World!</h1>
+    <p>This is my first webpage. Pretty cool, huh?</p>
 </body>
 </html>
 ```
 
----
+Save it as `index.html` and open it in your browser. Congratulations! You're officially a web developer.
 
-## 3. Basic Tags
-
-### Document Structure
-
-#### `<!DOCTYPE html>`
-Declares the document type and HTML version.
-
-#### `<html>`
-Root element of an HTML page.
+### Let's break it down
 
 ```html
-<html lang="en"></html>
+<!DOCTYPE html>
 ```
+This tells the browser "Hey, this is HTML5!" Always put this at the very top.
 
-#### `<head>`
-Contains metadata about the document.
+```html
+<html lang="en">
+```
+The root element. Everything goes inside here. `lang="en"` tells screen readers the language is English.
 
-#### `<meta>`
-Defines metadata like character set, viewport, description.
+```html
+<head>
+```
+The head contains *metadata* - information about the page, not content that users see.
 
 ```html
 <meta charset="UTF-8">
-<meta name="description" content="Page description">
-<meta name="keywords" content="HTML, CSS, JavaScript">
-<meta name="author" content="Your Name">
 ```
-
-#### `<title>`
-Sets the page title shown in browser tab.
+This ensures your page displays characters correctly (including emojis! 😀)
 
 ```html
-<title>My Website</title>
+<title>My First Webpage</title>
 ```
-
-#### `<body>`
-Contains the visible page content.
-
-### Text Content Tags
-
-#### `<h1>` to `<h6>`
-Heading tags, from most important (h1) to least important (h6).
+What shows up in the browser tab. Super important for SEO!
 
 ```html
-<h1>Main Heading</h1>
-<h2>Subheading</h2>
-<h3>Sub-subheading</h3>
-<h4>Level 4 Heading</h4>
-<h5>Level 5 Heading</h5>
-<h6>Level 6 Heading</h6>
+<body>
 ```
+Everything users actually see goes here.
 
-#### `<p>`
-Paragraph tag.
+### HTML Entities: Special characters need special treatment
+
+Want to display `<` or `>` on your page? You can't just type them - the browser will think they're tags! Use entities instead:
+
+| What You Want | What You Type | Entity Name |
+|---------------|---------------|-------------|
+| < | `&lt;` | Less than |
+| > | `&gt;` | Greater than |
+| & | `&amp;` | Ampersand |
+| " | `&quot;` | Quote |
+| (space) | `&nbsp;` | Non-breaking space |
+| © | `&copy;` | Copyright |
 
 ```html
-<p>This is a paragraph of text.</p>
+<p>The formula is: 5 &lt; 10 &amp; 10 &gt; 5</p>
+<!-- Displays as: The formula is: 5 < 10 & 10 > 5 -->
 ```
 
-#### `<br>`
-Line break (self-closing tag).
+### Comments: Notes to yourself (and other developers)
 
 ```html
-<p>Line one<br>Line two</p>
+<!-- This is a comment. Browsers ignore it completely. -->
+<!-- Use comments to explain tricky code or leave TODOs -->
 ```
 
-#### `<hr>`
-Horizontal rule (divider line).
+### Watch It!
+⚠️ **Comments are visible in the page source!** Anyone can right-click and "View Source" to see your comments. Don't put passwords or sensitive info in comments.
+
+### Whitespace: The browser's gonna smoosh it anyway
 
 ```html
-<hr>
+<p>This    has     many     spaces</p>
+<p>This has many spaces</p>
 ```
 
-#### `<b>` / `<strong>`
-Bold text. Use `<strong>` for semantic importance.
+Both render exactly the same! The browser collapses multiple spaces into one. Same goes for line breaks.
 
-```html
-<b>Bold text</b>
-<strong>Important text</strong>
-```
-
-#### `<i>` / `<em>`
-Italic text. Use `<em>` for emphasis.
-
-```html
-<i>Italic text</i>
-<em>Emphasized text</em>
-```
-
-#### `<mark>`
-Highlighted text.
-
-```html
-<mark>Highlighted text</mark>
-```
-
-#### `<sub>`
-Subscript text.
-
-```html
-H<sub>2</sub>O
-```
-
-#### `<sup>`
-Superscript text.
-
-```html
-x<sup>2</sup>
-```
-
-#### `<pre>`
-Preformatted text (preserves spaces and line breaks).
+**Want to preserve formatting?** Use the `<pre>` tag:
 
 ```html
 <pre>
     This    preserves
-        all   formatting
+        all   your
+            formatting!
 </pre>
 ```
 
----
+### Exercise: Fix This HTML
 
-## 4. Textual Tags
-
-### Grouping Text
-
-#### `<div>`
-Block-level container for grouping content.
+What's wrong with this code?
 
 ```html
-<div class="container">
-    <p>Content here</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Page
+</head>
+<body>
+    <h1>Welcome</h1>
+    <p>I love HTML & CSS!</p>
+    <img src="photo.jpg">
+</body>
+```
+
+**Answers:**
+1. Missing closing `</title>` tag
+2. `&` should be `&amp;`
+3. `<img>` should have an `alt` attribute for accessibility
+4. Missing closing `</html>` tag
+
+### There are NO Dumb Questions
+
+**Q: Why do I need `<!DOCTYPE html>`? Can't I just skip it?**
+**A:** Technically yes, but browsers might render your page in "quirks mode" which causes weird bugs. Just include it. It's one line.
+
+**Q: What's the difference between `<head>` and `<header>`?**
+**A:** Totally different! `<head>` is metadata (title, meta tags, links to CSS). `<header>` is a semantic tag for the top of your page content (logo, navigation).
+
+**Q: Can I have multiple `<html>` tags?**
+**A:** No! One per page. It's the root element - there can only be one.
+
+---
+
+## 3. Basic Tags: The Building Blocks
+
+### Headings: Size matters
+
+HTML has six levels of headings, from `<h1>` (biggest, most important) to `<h6>` (smallest, least important).
+
+```html
+<h1>Most Important - Use Only Once Per Page</h1>
+<h2>Major Section Heading</h2>
+<h3>Subsection Heading</h3>
+<h4>Sub-subsection</h4>
+<h5>Rarely Used</h5>
+<h6>Almost Never Used</h6>
+```
+
+### Watch It!
+⚠️ **Don't skip heading levels!** Don't go from `<h1>` to `<h4>`. Screen readers use headings to navigate. Think of them as a table of contents, not font sizes.
+
+### Brain Power
+🧠 Why do you think you should only have one `<h1>` per page? Think about SEO and accessibility.
+
+### Paragraphs: The workhorse of the web
+
+```html
+<p>This is a paragraph. Most of your text will be in paragraphs.</p>
+<p>Each paragraph gets its own line with space above and below.</p>
+```
+
+### Line breaks and horizontal rules
+
+```html
+<p>First line<br>Second line</p>
+
+<p>Above the line</p>
+<hr>
+<p>Below the line</p>
+```
+
+`<br>` is for line breaks within text. `<hr>` is a horizontal rule (divider).
+
+### Text formatting: Bold, italic, and more
+
+```html
+<!-- Bold text -->
+<b>This is bold</b>
+<strong>This is important (also bold, but with meaning)</strong>
+
+<!-- Italic text -->
+<i>This is italic</i>
+<em>This is emphasized (also italic, but with meaning)</em>
+
+<!-- Other formatting -->
+<mark>Highlighted text</mark>
+<small>Fine print</small>
+<del>Deleted text</del>
+<ins>Inserted text</ins>
+<sub>Subscript: H<sub>2</sub>O</sub>
+<sup>Superscript: E=mc<sup>2</sup></sup>
+```
+
+### b vs strong, i vs em: What's the difference?
+
+**Short answer:** Use `<strong>` and `<em>` instead of `<b>` and `<i>`.
+
+**Longer answer:** `<b>` and `<i>` are *presentational* - they just make text bold/italic. `<strong>` and `<em>` are *semantic* - they convey meaning. Screen readers will emphasize `<strong>` and `<em>` differently. Search engines care about meaning, not presentation.
+
+### Sharpen your pencil
+
+Match the tag to its purpose:
+
+1. `<h1>` → _____
+2. `<p>` → _____
+3. `<strong>` → _____
+4. `<mark>` → _____
+5. `<sub>` → _____
+
+A. Highlighted text
+B. Main heading
+C. Important text
+D. Paragraph
+E. Subscript
+
+**Answers:** 1-B, 2-D, 3-C, 4-A, 5-E
+
+---
+
+## 4. Working with Text: Making Words Come Alive
+
+### The `<div>` and `<span>`: Containers for everything
+
+```html
+<div>
+    <h2>This is a section</h2>
+    <p>Divs are block-level containers.</p>
+</div>
+
+<p>You can style <span style="color: red;">individual words</span> with span.</p>
+```
+
+**Key difference:**
+- `<div>` = Block-level (takes full width, starts on new line)
+- `<span>` = Inline (only takes needed width, stays in line)
+
+### Brain Power
+🧠 When would you use `<div>` vs `<span>`? Think about layout vs. inline styling.
+
+### The Big Three Attributes: id, class, and style
+
+```html
+<!-- id: Unique identifier (only one per page) -->
+<div id="header">Site Header</div>
+
+<!-- class: Reusable identifier (use multiple times) -->
+<p class="highlight">Important paragraph</p>
+<p class="highlight">Another important paragraph</p>
+
+<!-- style: Inline CSS (avoid if possible) -->
+<p style="color: blue; font-size: 18px;">Styled text</p>
+```
+
+### Watch It!
+⚠️ **IDs must be unique!** You can't have two elements with `id="header"`. But you can have a million elements with `class="highlight"`.
+
+### Data attributes: Your own custom attributes
+
+Want to store custom data on elements? Use data attributes!
+
+```html
+<div data-user-id="12345" data-role="admin" data-status="active">
+    User Information
 </div>
 ```
 
-#### `<span>`
-Inline container for styling or grouping text.
-
-```html
-<p>This is <span style="color: red;">red text</span>.</p>
+You can access these in JavaScript:
+```javascript
+let userId = element.dataset.userId; // "12345"
 ```
 
-### Standard Attributes
-
-#### `id`
-Unique identifier for an element.
+### Links: The "hyper" in hypertext
 
 ```html
-<div id="header"></div>
-```
-
-#### `class`
-One or more class names for styling.
-
-```html
-<p class="important highlight">Text</p>
-```
-
-#### `style`
-Inline CSS styling.
-
-```html
-<p style="color: blue; font-size: 16px;">Styled text</p>
-```
-
-#### Data Attributes
-Custom data attributes for storing extra information.
-
-```html
-<div data-user-id="12345" data-role="admin">User Info</div>
-```
-
-### Links
-
-#### `<a>`
-Anchor tag for hyperlinks.
-
-```html
-<!-- External link -->
+<!-- Basic link -->
 <a href="https://example.com">Visit Example</a>
 
-<!-- Link in new tab -->
+<!-- Open in new tab -->
 <a href="https://example.com" target="_blank">Open in new tab</a>
 
 <!-- Email link -->
-<a href="mailto:email@example.com">Send Email</a>
+<a href="mailto:hello@example.com">Send us an email</a>
 
 <!-- Phone link -->
-<a href="tel:+1234567890">Call Us</a>
+<a href="tel:+1234567890">Call us</a>
 
-<!-- Anchor link (same page) -->
-<a href="#section1">Go to Section 1</a>
+<!-- Anchor link (jump to section) -->
+<a href="#section2">Jump to Section 2</a>
+<!-- Later in the page: -->
+<h2 id="section2">Section 2</h2>
 
 <!-- Download link -->
-<a href="file.pdf" download>Download PDF</a>
+<a href="document.pdf" download>Download PDF</a>
 ```
+
+### Watch It!
+⚠️ **Always use descriptive link text!** Don't write "click here". Write "Download our annual report" instead. It's better for accessibility and SEO.
+
+### There are NO Dumb Questions
+
+**Q: What's `target="_blank"` and why do I see it everywhere?**
+**A:** It opens the link in a new tab. Use it for external links, but sparingly - let users decide how to open links.
+
+**Q: Can I have a link inside a link?**
+**A:** Nope! Links can't be nested. HTML won't allow it.
+
+**Q: What happens if I link to `#top`?**
+**A:** It jumps to the top of the page. You don't need an element with `id="top"` - it's a special anchor.
+
+### Interview: The `<a>` Tag
+
+**Head First: Welcome, `<a>` tag! Thanks for joining us.**
+
+`<a>` Tag: Happy to be here! I'm the most important tag on the web, you know.
+
+**HF: Bold claim! Why do you say that?**
+
+`<a>`: Without me, there's no "hyper" in hypertext. No links, no web. Just isolated documents.
+
+**HF: Fair point. What's your `href` attribute do?**
+
+`<a>`: It's where the link goes! Can be a URL, email, phone number, or anchor. I'm versatile.
+
+**HF: What about `target="_blank"`?**
+
+`<a>`: *Sighs* Look, I'll open a new tab if you insist, but maybe let users decide? They know how to use Ctrl+click.
+
+**HF: Any pet peeves?**
+
+`<a>`: When people write "click here" as link text. Be descriptive! And add `rel="noopener"` with `target="_blank"` for security.
 
 ---
 
-## 5. Lists and Types
+## 5. Lists: Organizing Information
 
-### Ordered Lists
+### Three types of lists (but you'll use two of them)
 
-Numbered list using `<ol>`.
+1. **Ordered lists** (`<ol>`) - Numbered
+2. **Unordered lists** (`<ul>`) - Bulleted
+3. **Definition lists** (`<dl>`) - Terms and definitions
+
+### Ordered lists: When sequence matters
 
 ```html
+<h3>Recipe Instructions:</h3>
 <ol>
-    <li>First item</li>
-    <li>Second item</li>
-    <li>Third item</li>
+    <li>Preheat oven to 350°F</li>
+    <li>Mix dry ingredients</li>
+    <li>Add wet ingredients</li>
+    <li>Bake for 30 minutes</li>
 </ol>
 ```
 
 **Output:**
-1. First item
-2. Second item
-3. Third item
+1. Preheat oven to 350°F
+2. Mix dry ingredients
+3. Add wet ingredients
+4. Bake for 30 minutes
 
-### Unordered Lists
-
-Bulleted list using `<ul>`.
+### Unordered lists: When order doesn't matter
 
 ```html
+<h3>Shopping List:</h3>
 <ul>
-    <li>Item one</li>
-    <li>Item two</li>
-    <li>Item three</li>
+    <li>Milk</li>
+    <li>Eggs</li>
+    <li>Bread</li>
+    <li>Coffee</li>
 </ul>
 ```
 
 **Output:**
-- Item one
-- Item two
-- Item three
+- Milk
+- Eggs
+- Bread
+- Coffee
 
-### Definition Lists
+### Brain Power
+🧠 When should you use `<ol>` vs `<ul>`? What about navigation menus - ordered or unordered?
 
-List of terms and descriptions.
+### Definition lists: The forgotten list
 
 ```html
 <dl>
     <dt>HTML</dt>
-    <dd>HyperText Markup Language</dd>
+    <dd>HyperText Markup Language - the structure of web pages</dd>
 
     <dt>CSS</dt>
-    <dd>Cascading Style Sheets</dd>
+    <dd>Cascading Style Sheets - the styling of web pages</dd>
 
     <dt>JavaScript</dt>
-    <dd>Programming language for web interactivity</dd>
+    <dd>The programming language of the web</dd>
 </dl>
 ```
 
-### Nested Lists
+### Nested lists: Lists inside lists
 
 ```html
 <ul>
-    <li>Item 1
+    <li>Frontend
         <ul>
-            <li>Sub-item 1.1</li>
-            <li>Sub-item 1.2</li>
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>JavaScript</li>
         </ul>
     </li>
-    <li>Item 2</li>
-    <li>Item 3
-        <ol>
-            <li>Nested ordered item</li>
-        </ol>
+    <li>Backend
+        <ul>
+            <li>Node.js</li>
+            <li>Python</li>
+            <li>Ruby</li>
+        </ul>
+    </li>
+</ul>
+```
+
+### Watch It!
+⚠️ **Only `<li>` can be direct children of `<ul>` or `<ol>`!** Don't put `<p>` or `<div>` directly inside. Put them inside the `<li>` instead.
+
+```html
+<!-- Wrong! -->
+<ul>
+    <p>Don't do this</p>
+</ul>
+
+<!-- Right! -->
+<ul>
+    <li><p>Do this instead</p></li>
+</ul>
+```
+
+### Exercise: Build a nested list
+
+Create a nested list showing:
+- Web Technologies
+  - HTML
+  - CSS
+  - JavaScript
+    - React
+    - Vue
+    - Angular
+
+**Your code here:**
+```html
+<!-- Try it yourself before looking at the answer! -->
+```
+
+**Answer:**
+```html
+<ul>
+    <li>Web Technologies
+        <ul>
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>JavaScript
+                <ul>
+                    <li>React</li>
+                    <li>Vue</li>
+                    <li>Angular</li>
+                </ul>
+            </li>
+        </ul>
     </li>
 </ul>
 ```
 
 ---
 
-## 6. Table Tag
+## 6. Tables: Structured Data
 
-### Basic Table Structure
+### When to use tables
+
+**Good uses:**
+- Actual tabular data (spreadsheet-like info)
+- Calendars
+- Pricing comparisons
+- Sports scores
+
+**Bad uses:**
+- Page layout (that's what CSS is for!)
+- Anything that's not actually data
+
+### Basic table anatomy
 
 ```html
 <table>
     <thead>
         <tr>
-            <th>Header 1</th>
-            <th>Header 2</th>
-            <th>Header 3</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>City</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Row 1, Cell 1</td>
-            <td>Row 1, Cell 2</td>
-            <td>Row 1, Cell 3</td>
+            <td>Alice</td>
+            <td>25</td>
+            <td>New York</td>
         </tr>
         <tr>
-            <td>Row 2, Cell 1</td>
-            <td>Row 2, Cell 2</td>
-            <td>Row 2, Cell 3</td>
+            <td>Bob</td>
+            <td>30</td>
+            <td>London</td>
         </tr>
     </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="3">Footer content</td>
-        </tr>
-    </tfoot>
 </table>
 ```
 
-### Table Tags
+### Table tags exposed
 
-| Tag | Description |
-|-----|-------------|
-| `<table>` | Defines a table |
-| `<thead>` | Table header section |
-| `<tbody>` | Table body section |
-| `<tfoot>` | Table footer section |
+| Tag | What It Does |
+|-----|--------------|
+| `<table>` | Wraps the entire table |
+| `<thead>` | Table header section (optional but recommended) |
+| `<tbody>` | Table body section (optional but recommended) |
+| `<tfoot>` | Table footer section (for totals, etc.) |
 | `<tr>` | Table row |
-| `<th>` | Table header cell |
+| `<th>` | Table header cell (bold and centered by default) |
 | `<td>` | Table data cell |
-| `<caption>` | Table caption |
-| `<colgroup>` | Group of columns |
-| `<col>` | Column properties |
+| `<caption>` | Table title/caption |
 
-### Spanning Cells
+### Brain Power
+🧠 Why have separate `<thead>`, `<tbody>`, and `<tfoot>` sections? Think about printing long tables...
 
-```html
-<!-- Colspan - spans across columns -->
-<td colspan="2">Spans 2 columns</td>
-
-<!-- Rowspan - spans across rows -->
-<td rowspan="3">Spans 3 rows</td>
-```
-
-### Complete Example
+### Spanning cells: colspan and rowspan
 
 ```html
 <table border="1">
+    <tr>
+        <th colspan="2">Name</th>
+        <th>Age</th>
+    </tr>
+    <tr>
+        <td>First</td>
+        <td>Last</td>
+        <td rowspan="2">25</td>
+    </tr>
+    <tr>
+        <td>Alice</td>
+        <td>Smith</td>
+    </tr>
+</table>
+```
+
+**colspan** = spans across columns (horizontal)
+**rowspan** = spans across rows (vertical)
+
+### Complete table example
+
+```html
+<table>
     <caption>Monthly Sales Report</caption>
     <thead>
         <tr>
@@ -477,245 +677,324 @@ List of terms and descriptions.
             <td>150</td>
             <td>$15,000</td>
         </tr>
+        <tr>
+            <td>March</td>
+            <td>200</td>
+            <td>$20,000</td>
+        </tr>
     </tbody>
     <tfoot>
         <tr>
-            <td>Total</td>
-            <td>250</td>
-            <td>$25,000</td>
+            <th>Total</th>
+            <td>450</td>
+            <td>$45,000</td>
         </tr>
     </tfoot>
 </table>
 ```
 
+### Watch It!
+⚠️ **Tables are NOT responsive by default.** On mobile, wide tables will break your layout. You'll need CSS to make them mobile-friendly.
+
+### There are NO Dumb Questions
+
+**Q: Why use `<th>` instead of `<td>` for headers?**
+**A:** Accessibility! Screen readers announce header cells differently. Plus, browsers style them bold and centered by default.
+
+**Q: Can I nest tables?**
+**A:** Yes, but... just because you *can* doesn't mean you *should*. It gets messy fast. Consider restructuring your data instead.
+
+**Q: What happened to the `border` attribute? I see it in old code.**
+**A:** It's deprecated (not recommended). Use CSS instead: `table { border: 1px solid black; }`
+
 ---
 
-## 7. Embedding Media
+## 7. Media Time: Images, Audio, and Video
 
-### Images
-
-#### `<img>`
-Embeds an image (self-closing tag).
+### Images: A picture is worth 1,000 words (or bytes)
 
 ```html
-<img src="image.jpg" alt="Description of image" width="300" height="200">
+<img src="photo.jpg" alt="A sunset over the ocean" width="800" height="600">
 ```
 
-**Important attributes:**
-- `src` - Image source URL (required)
-- `alt` - Alternative text for accessibility (required)
-- `width` - Image width
-- `height` - Image height
-- `loading` - Lazy loading (`lazy` or `eager`)
-- `fetchpriority` - Loading priority (`high`, `low`, `auto`)
+### The src and alt attributes are REQUIRED
 
-#### `<figure>` and `<figcaption>`
-Semantic way to group images with captions.
+**src** = Source URL of the image
+**alt** = Alternative text (for screen readers and when images don't load)
+
+### Watch It!
+⚠️ **Always, ALWAYS include `alt` text!** It's crucial for accessibility. Describe what's in the image. If it's decorative, use an empty alt: `alt=""`.
+
+### Image formats: Which one should I use?
+
+| Format | Best For | File Size |
+|--------|----------|-----------|
+| JPEG | Photos, complex images | Medium |
+| PNG | Graphics, transparency | Larger |
+| SVG | Logos, icons, scalable graphics | Small |
+| WebP | Modern alternative (smaller files) | Smallest |
+| GIF | Simple animations | Small |
+
+### Lazy loading: Don't load images until needed
+
+```html
+<img src="hero.jpg" alt="Hero image" loading="eager">
+<img src="footer-image.jpg" alt="Footer" loading="lazy">
+```
+
+- `loading="eager"` = Load immediately (default, for above-the-fold images)
+- `loading="lazy"` = Load when scrolled into view (for below-the-fold images)
+
+### Priority hints: Tell the browser what's important
+
+```html
+<!-- High priority (critical for LCP) -->
+<img src="hero.jpg" alt="Hero" fetchpriority="high">
+
+<!-- Low priority (not critical) -->
+<img src="thumbnail.jpg" alt="Thumbnail" fetchpriority="low">
+```
+
+### Figure and figcaption: Images with captions
 
 ```html
 <figure>
-    <img src="photo.jpg" alt="A beautiful sunset">
-    <figcaption>A beautiful sunset over the ocean</figcaption>
+    <img src="chart.png" alt="Sales increased 50% in Q4">
+    <figcaption>Figure 1: Q4 Sales Growth</figcaption>
 </figure>
 ```
 
-#### img vs figure
+### img vs figure: When to use which?
 
-- Use `<img>` for simple images
-- Use `<figure>` when you need to associate a caption with the image or when the image is a self-contained unit of content
+**Use `<img>` when:**
+- Simple image, no caption needed
+- Image is part of the text flow
+- Decorative images
 
-#### Priority Hints
+**Use `<figure>` when:**
+- Image has a caption
+- Image is a self-contained unit
+- Diagrams, charts, code examples with captions
 
-Control resource loading priority.
+### Brain Power
+🧠 Why do you think lazy loading improves page performance? What happens to images "below the fold"?
 
-```html
-<!-- High priority (above-the-fold images) -->
-<img src="hero.jpg" alt="Hero" fetchpriority="high">
-
-<!-- Lazy loading (below-the-fold images) -->
-<img src="thumbnail.jpg" alt="Thumbnail" loading="lazy">
-```
-
-### Audio
+### Audio: Making noise on the web
 
 ```html
 <audio controls>
-    <source src="audio.mp3" type="audio/mpeg">
-    <source src="audio.ogg" type="audio/ogg">
-    Your browser does not support the audio element.
+    <source src="song.mp3" type="audio/mpeg">
+    <source src="song.ogg" type="audio/ogg">
+    Your browser doesn't support audio playback.
 </audio>
 ```
 
-**Attributes:**
-- `controls` - Show playback controls
-- `autoplay` - Start playing automatically
-- `loop` - Loop the audio
-- `muted` - Start muted
-- `preload` - `auto`, `metadata`, or `none`
-
-### Video
+### Audio attributes you should know
 
 ```html
-<video width="640" height="360" controls>
+<audio controls autoplay loop muted preload="auto">
+    <source src="audio.mp3" type="audio/mpeg">
+</audio>
+```
+
+- `controls` = Show play/pause/volume controls
+- `autoplay` = Start playing automatically (annoying, use sparingly!)
+- `loop` = Repeat forever
+- `muted` = Start muted (required if using autoplay)
+- `preload` = "auto", "metadata", or "none"
+
+### Watch It!
+⚠️ **Autoplaying audio is annoying!** Most browsers block autoplay unless the audio is muted. Don't be that person.
+
+### Video: YouTube isn't your only option
+
+```html
+<video width="640" height="360" controls poster="preview.jpg">
     <source src="video.mp4" type="video/mp4">
     <source src="video.webm" type="video/webm">
-    <track src="subtitles_en.vtt" kind="subtitles" srclang="en" label="English">
-    Your browser does not support the video tag.
+    <track src="subtitles.vtt" kind="subtitles" srclang="en" label="English">
+    Your browser doesn't support video playback.
 </video>
 ```
 
-**Attributes:**
-- `controls` - Show playback controls
-- `autoplay` - Start playing automatically
-- `loop` - Loop the video
-- `muted` - Start muted
-- `poster` - Image shown before video plays
-- `preload` - `auto`, `metadata`, or `none`
+- `poster` = Image shown before video plays
+- `<track>` = Subtitles/captions (important for accessibility!)
 
-### iframe
-
-Embeds another webpage or content.
+### iframe: Embedding other websites
 
 ```html
-<iframe src="https://example.com" width="600" height="400" title="Example Website"></iframe>
+<!-- Embed a webpage -->
+<iframe src="https://example.com" width="600" height="400"></iframe>
 
-<!-- YouTube video embed -->
+<!-- Embed a YouTube video -->
 <iframe width="560" height="315"
     src="https://www.youtube.com/embed/VIDEO_ID"
-    title="YouTube video player"
     frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media"
     allowfullscreen>
 </iframe>
 ```
 
-### CSP (Content Security Policy)
+### Watch It!
+⚠️ **iframes are a security risk!** Only embed content you trust. Use CSP (Content Security Policy) headers to restrict what iframes can do.
 
-Security feature to prevent XSS attacks.
+### There are NO Dumb Questions
 
-```html
-<meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' https://trusted.com">
-```
+**Q: Why provide multiple `<source>` elements?**
+**A:** Different browsers support different formats. The browser will use the first one it can play.
+
+**Q: What's the difference between `width/height` attributes and CSS?**
+**A:** Both work, but attributes prevent layout shift (browser reserves space before image loads). Use both!
+
+**Q: Can I style the video player controls?**
+**A:** Not easily. Native controls vary by browser. For custom controls, you'll need JavaScript.
 
 ---
 
-## 8. Using Forms
+## 8. Forms: Talking to Your Users
 
-### Basic Form Structure
+### Forms: Where users talk back
+
+Forms are how users send data to your server. Every login, search box, comment section, and checkout page uses forms.
+
+### Basic form anatomy
 
 ```html
 <form action="/submit" method="POST">
-    <!-- Form elements go here -->
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name">
+
+    <button type="submit">Submit</button>
 </form>
 ```
 
-**Form attributes:**
-- `action` - URL where form data is sent
-- `method` - HTTP method (`GET` or `POST`)
-- `enctype` - Encoding type (use `multipart/form-data` for file uploads)
-- `autocomplete` - Enable/disable autocomplete
-- `novalidate` - Disable HTML5 validation
+- `action` = Where to send the data (URL)
+- `method` = How to send it ("GET" or "POST")
 
-### Labels and Inputs
+### GET vs POST: What's the difference?
 
-#### Text Input
+**GET:**
+- Data appears in URL (`?name=John&age=30`)
+- Use for searches and filtering
+- Bookmarkable, shareable
+- Not secure (passwords visible in URL!)
+
+**POST:**
+- Data sent in request body (not visible in URL)
+- Use for forms that change data
+- More secure
+- Can send files
+
+### Brain Power
+🧠 When would you use GET vs POST? Think about a search form vs a login form.
+
+### Input types: More than just text boxes
 
 ```html
-<label for="username">Username:</label>
-<input type="text" id="username" name="username" placeholder="Enter username">
-```
+<!-- Text input -->
+<input type="text" name="username">
 
-### Common Input Types
+<!-- Email (with validation!) -->
+<input type="email" name="email">
 
-```html
-<!-- Email -->
-<input type="email" name="email" required>
-
-<!-- Password -->
+<!-- Password (hidden characters) -->
 <input type="password" name="password">
 
-<!-- Number -->
+<!-- Number (with spinner) -->
 <input type="number" name="age" min="0" max="120">
 
-<!-- Date -->
+<!-- Date picker -->
 <input type="date" name="birthdate">
 
-<!-- Time -->
-<input type="time" name="appointment">
-
 <!-- Color picker -->
-<input type="color" name="favcolor">
+<input type="color" name="favorite-color">
 
 <!-- Range slider -->
 <input type="range" name="volume" min="0" max="100">
 
-<!-- URL -->
-<input type="url" name="website">
+<!-- File upload -->
+<input type="file" name="avatar" accept="image/*">
 
-<!-- Tel -->
-<input type="tel" name="phone">
-
-<!-- Search -->
-<input type="search" name="query">
-
-<!-- Hidden -->
+<!-- Hidden (invisible to user) -->
 <input type="hidden" name="user_id" value="12345">
 ```
 
-### Checkbox
+### Labels: Always, always, ALWAYS use them
 
 ```html
-<input type="checkbox" name="subscribe" id="subscribe" value="yes">
-<label for="subscribe">Subscribe to newsletter</label>
+<!-- Method 1: Using "for" attribute -->
+<label for="email">Email:</label>
+<input type="email" id="email" name="email">
 
-<!-- Multiple checkboxes -->
+<!-- Method 2: Wrapping the input -->
+<label>
+    Email:
+    <input type="email" name="email">
+</label>
+```
+
+### Watch It!
+⚠️ **Forms without labels are inaccessible!** Screen readers can't tell users what each field is for. Always use labels.
+
+### Checkboxes: Check all that apply
+
+```html
 <fieldset>
     <legend>Select your interests:</legend>
-    <input type="checkbox" name="interests" value="sports" id="sports">
+
+    <input type="checkbox" id="sports" name="interests" value="sports">
     <label for="sports">Sports</label>
 
-    <input type="checkbox" name="interests" value="music" id="music">
+    <input type="checkbox" id="music" name="interests" value="music">
     <label for="music">Music</label>
+
+    <input type="checkbox" id="reading" name="interests" value="reading">
+    <label for="reading">Reading</label>
 </fieldset>
 ```
 
-### Radio Buttons
+### Radio buttons: Choose one
 
 ```html
 <fieldset>
-    <legend>Gender:</legend>
-    <input type="radio" name="gender" value="male" id="male">
+    <legend>Select your gender:</legend>
+
+    <input type="radio" id="male" name="gender" value="male">
     <label for="male">Male</label>
 
-    <input type="radio" name="gender" value="female" id="female">
+    <input type="radio" id="female" name="gender" value="female">
     <label for="female">Female</label>
 
-    <input type="radio" name="gender" value="other" id="other">
+    <input type="radio" id="other" name="gender" value="other">
     <label for="other">Other</label>
 </fieldset>
 ```
 
-### Textarea
+**Key point:** Radio buttons with the same `name` are grouped - only one can be selected.
+
+### Brain Power
+🧠 What's the difference between checkboxes and radio buttons? When would you use each?
+
+### Textarea: For longer text
 
 ```html
 <label for="message">Message:</label>
-<textarea name="message" id="message" rows="4" cols="50" placeholder="Enter your message"></textarea>
+<textarea id="message" name="message" rows="5" cols="50"></textarea>
 ```
 
-### Select Dropdown
+### Select: Dropdowns and multi-select
 
 ```html
 <!-- Single select -->
 <label for="country">Country:</label>
-<select name="country" id="country">
+<select id="country" name="country">
     <option value="">-- Select --</option>
     <option value="us">United States</option>
     <option value="uk">United Kingdom</option>
     <option value="ca">Canada</option>
 </select>
 
-<!-- Multiple select -->
+<!-- Multi-select (hold Ctrl/Cmd) -->
 <select name="languages" multiple>
     <option value="html">HTML</option>
     <option value="css">CSS</option>
@@ -723,33 +1002,41 @@ Security feature to prevent XSS attacks.
 </select>
 
 <!-- Grouped options -->
-<select name="category">
-    <optgroup label="Fruits">
-        <option value="apple">Apple</option>
-        <option value="banana">Banana</option>
+<select name="tech">
+    <optgroup label="Frontend">
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
     </optgroup>
-    <optgroup label="Vegetables">
-        <option value="carrot">Carrot</option>
-        <option value="potato">Potato</option>
+    <optgroup label="Backend">
+        <option value="node">Node.js</option>
+        <option value="python">Python</option>
     </optgroup>
 </select>
 ```
 
-### Buttons
+### Form validation: HTML's got your back
 
 ```html
-<!-- Submit button -->
-<button type="submit">Submit</button>
-<input type="submit" value="Submit">
+<!-- Required field -->
+<input type="text" name="username" required>
 
-<!-- Reset button -->
-<button type="reset">Reset</button>
+<!-- Email validation -->
+<input type="email" name="email" required>
 
-<!-- Regular button -->
-<button type="button" onclick="doSomething()">Click Me</button>
+<!-- Min/max length -->
+<input type="text" name="username" minlength="3" maxlength="20">
+
+<!-- Number range -->
+<input type="number" name="age" min="18" max="100">
+
+<!-- Pattern (regex) -->
+<input type="text" name="zipcode" pattern="[0-9]{5}" title="5-digit zip code">
 ```
 
-### File Uploads
+### Watch It!
+⚠️ **Client-side validation is NOT enough!** Users can bypass HTML validation. Always validate on the server too.
+
+### File uploads: enctype is CRUCIAL
 
 ```html
 <form action="/upload" method="POST" enctype="multipart/form-data">
@@ -757,37 +1044,15 @@ Security feature to prevent XSS attacks.
     <input type="file" id="file" name="file" accept=".jpg,.png,.pdf">
 
     <!-- Multiple files -->
-    <input type="file" name="files" multiple>
+    <input type="file" name="photos" multiple accept="image/*">
 
     <button type="submit">Upload</button>
 </form>
 ```
 
-### Form Validation
+**Without `enctype="multipart/form-data"`, file uploads WON'T WORK!**
 
-```html
-<!-- Required field -->
-<input type="text" name="username" required>
-
-<!-- Pattern validation -->
-<input type="text" name="code" pattern="[A-Za-z]{3}" title="3 letter code">
-
-<!-- Min/Max length -->
-<input type="text" name="username" minlength="3" maxlength="20">
-
-<!-- Email validation -->
-<input type="email" name="email" required>
-
-<!-- Number range -->
-<input type="number" name="age" min="18" max="100">
-
-<!-- Custom validation message -->
-<input type="text" name="username" required
-       oninvalid="this.setCustomValidity('Please enter your username')"
-       oninput="this.setCustomValidity('')">
-```
-
-### Complete Form Example
+### Complete form example
 
 ```html
 <form action="/register" method="POST">
@@ -804,146 +1069,58 @@ Security feature to prevent XSS attacks.
         <input type="password" id="password" name="password" required minlength="8">
 
         <label for="age">Age:</label>
-        <input type="number" id="age" name="age" min="13" max="120">
+        <input type="number" id="age" name="age" min="13">
 
-        <label for="country">Country:</label>
-        <select id="country" name="country" required>
-            <option value="">-- Select --</option>
-            <option value="us">United States</option>
-            <option value="uk">United Kingdom</option>
-        </select>
+        <fieldset>
+            <legend>Interests:</legend>
+            <input type="checkbox" id="tech" name="interests" value="tech">
+            <label for="tech">Technology</label>
+
+            <input type="checkbox" id="sports" name="interests" value="sports">
+            <label for="sports">Sports</label>
+        </fieldset>
 
         <input type="checkbox" id="terms" name="terms" required>
         <label for="terms">I agree to the terms and conditions</label>
 
         <button type="submit">Register</button>
+        <button type="reset">Clear Form</button>
     </fieldset>
 </form>
 ```
 
-### Limitations
+### There are NO Dumb Questions
 
-**HTML Validation Limitations:**
-- Client-side validation can be bypassed
-- Always validate on the server side
-- Limited customization of error messages
-- Not all browsers support all HTML5 validation features
-- Regex patterns can be complex and hard to maintain
+**Q: What's the difference between `<button>` and `<input type="submit">`?**
+**A:** `<button>` is more flexible (you can put HTML inside, like images). Both work for submitting forms.
+
+**Q: Why use `<fieldset>` and `<legend>`?**
+**A:** They group related form fields and add a label. Great for accessibility and organization.
+
+**Q: Can I style form elements?**
+**A:** Yes, but some elements (like file inputs and select dropdowns) are tricky to style. CSS frameworks help.
 
 ---
 
-## 9. Semantic Markup
+## 9. Semantic HTML: Meaning Matters
 
-### Layout Tags
+### Why semantic HTML?
 
-Semantic HTML5 elements that give meaning to your page structure.
+Think about this: You could build an entire website using only `<div>` and `<span>`. But should you?
 
-#### `<header>`
-Introductory content or navigation.
+**No!** Here's why semantic HTML matters:
+1. **Accessibility** - Screen readers rely on semantic tags
+2. **SEO** - Search engines understand your content better
+3. **Maintainability** - Other developers understand your code
+4. **Default styling** - Browsers style semantic tags appropriately
 
-```html
-<header>
-    <h1>Site Title</h1>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-        </ul>
-    </nav>
-</header>
-```
-
-#### `<nav>`
-Navigation links.
+### The layout tags: Structuring your page
 
 ```html
-<nav>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/services">Services</a></li>
-        <li><a href="/contact">Contact</a></li>
-    </ul>
-</nav>
-```
-
-#### `<main>`
-Main content of the document (only one per page).
-
-```html
-<main>
-    <h1>Page Title</h1>
-    <article>
-        <!-- Article content -->
-    </article>
-</main>
-```
-
-#### `<article>`
-Self-contained content that could be distributed independently.
-
-```html
-<article>
-    <h2>Article Title</h2>
-    <p>Published on <time datetime="2026-01-13">January 13, 2026</time></p>
-    <p>Article content...</p>
-</article>
-```
-
-#### `<section>`
-Thematic grouping of content.
-
-```html
-<section>
-    <h2>Section Title</h2>
-    <p>Section content...</p>
-</section>
-```
-
-#### `<aside>`
-Tangentially related content (sidebar, callouts).
-
-```html
-<aside>
-    <h3>Related Links</h3>
-    <ul>
-        <li><a href="#">Link 1</a></li>
-        <li><a href="#">Link 2</a></li>
-    </ul>
-</aside>
-```
-
-#### `<footer>`
-Footer for a section or page.
-
-```html
-<footer>
-    <p>&copy; 2026 My Website. All rights reserved.</p>
-    <nav>
-        <a href="/privacy">Privacy Policy</a> |
-        <a href="/terms">Terms of Service</a>
-    </nav>
-</footer>
-```
-
-### Complete Semantic Page Structure
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Semantic HTML Example</title>
-</head>
 <body>
     <header>
-        <h1>Website Name</h1>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-            </ul>
-        </nav>
+        <h1>Site Title</h1>
+        <nav>Navigation menu</nav>
     </header>
 
     <main>
@@ -952,147 +1129,293 @@ Footer for a section or page.
             <p>Article content...</p>
         </article>
 
-        <section>
-            <h2>Section Title</h2>
-            <p>Section content...</p>
-        </section>
+        <aside>Sidebar content</aside>
     </main>
 
-    <aside>
-        <h3>Sidebar</h3>
-        <p>Additional information...</p>
-    </aside>
+    <footer>
+        <p>&copy; 2026 My Website</p>
+    </footer>
+</body>
+```
+
+### Let's meet the semantic tags
+
+**`<header>`** - Introductory content or navigation
+- Not just at the top of the page!
+- Can have multiple headers (one per article/section)
+
+**`<nav>`** - Navigation links
+- Main site navigation
+- Breadcrumbs
+- Table of contents
+
+**`<main>`** - Main content (only ONE per page!)
+- The primary content
+- Excludes sidebars, navigation, footers
+
+**`<article>`** - Self-contained content
+- Blog posts
+- News articles
+- Forum posts
+- Can stand alone and still make sense
+
+**`<section>`** - Thematic grouping
+- Chapters
+- Tabs in a tabbed interface
+- Different sections of a page
+
+**`<aside>`** - Tangentially related content
+- Sidebars
+- Pull quotes
+- Advertisements
+- Related links
+
+**`<footer>`** - Footer for page or section
+- Copyright info
+- Contact info
+- Related links
+
+### Brain Power
+🧠 What's the difference between `<article>` and `<section>`? Could an article contain sections? Could a section contain articles?
+
+### A complete semantic page structure
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Blog</title>
+</head>
+<body>
+    <header>
+        <h1>My Awesome Blog</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <article>
+            <header>
+                <h2>Understanding Semantic HTML</h2>
+                <p>Published on <time datetime="2026-01-13">January 13, 2026</time></p>
+            </header>
+
+            <section>
+                <h3>Introduction</h3>
+                <p>Semantic HTML is important because...</p>
+            </section>
+
+            <section>
+                <h3>Benefits</h3>
+                <p>Here are the benefits...</p>
+            </section>
+
+            <footer>
+                <p>Tags: HTML, Semantic, Web Development</p>
+            </footer>
+        </article>
+
+        <aside>
+            <h3>Related Posts</h3>
+            <ul>
+                <li><a href="/post1">Post 1</a></li>
+                <li><a href="/post2">Post 2</a></li>
+            </ul>
+        </aside>
+    </main>
 
     <footer>
-        <p>&copy; 2026 Website Name</p>
+        <p>&copy; 2026 My Blog. All rights reserved.</p>
     </footer>
 </body>
 </html>
 ```
 
-### Highlighting Changes
+### Watch It!
+⚠️ **Don't use semantic tags just for styling!** If you need a container for CSS, use `<div>`. Only use semantic tags when they add meaning.
 
-#### `<del>`
-Deleted text (strikethrough).
+### More semantic tags for text
 
+**`<mark>`** - Highlighted text (like a highlighter pen)
+```html
+<p>The <mark>important part</mark> is highlighted.</p>
+```
+
+**`<time>`** - Dates and times
+```html
+<time datetime="2026-01-13">January 13, 2026</time>
+```
+
+**`<code>`** - Code snippets
+```html
+<p>Use the <code>console.log()</code> function to debug.</p>
+```
+
+**`<pre>`** - Preformatted text (preserves whitespace)
+```html
+<pre>
+function hello() {
+    console.log("Hello!");
+}
+</pre>
+```
+
+**`<kbd>`** - Keyboard input
+```html
+<p>Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy.</p>
+```
+
+**`<samp>`** - Sample output
+```html
+<samp>Error: File not found</samp>
+```
+
+**`<var>`** - Variable in math or programming
+```html
+<p>The formula is <var>E</var> = <var>mc</var><sup>2</sup></p>
+```
+
+### Quotations and citations
+
+**`<blockquote>`** - Long quotations (block-level)
+```html
+<blockquote cite="https://source.com">
+    <p>This is a long quotation that deserves its own paragraph.</p>
+</blockquote>
+```
+
+**`<q>`** - Short inline quotations
+```html
+<p>As Einstein said, <q>Imagination is more important than knowledge.</q></p>
+```
+
+**`<cite>`** - Title of a work
+```html
+<p>My favorite book is <cite>The Great Gatsby</cite>.</p>
+```
+
+**`<abbr>`** - Abbreviations
+```html
+<p><abbr title="HyperText Markup Language">HTML</abbr> is awesome!</p>
+```
+
+**`<dfn>`** - Defining instance of a term
+```html
+<p><dfn>HTML</dfn> is a markup language for creating web pages.</p>
+```
+
+**`<address>`** - Contact information
+```html
+<address>
+    Written by <a href="mailto:john@example.com">John Doe</a>.<br>
+    Visit us at: 123 Main St, City, Country
+</address>
+```
+
+### Highlighting changes
+
+**`<del>`** - Deleted text
 ```html
 <p>Price: <del>$50</del> $30</p>
 ```
 
-#### `<s>`
-Text that is no longer accurate or relevant.
-
-```html
-<s>Out of stock</s>
-```
-
-#### `<ins>`
-Inserted text (underlined).
-
+**`<ins>`** - Inserted text
 ```html
 <p>My favorite color is <del>blue</del> <ins>red</ins>.</p>
 ```
 
-### Quotation / Citation
-
-#### `<blockquote>`
-Block-level quotation.
-
+**`<s>`** - No longer accurate
 ```html
-<blockquote cite="https://example.com">
-    <p>This is a long quotation that spans multiple lines.</p>
-</blockquote>
+<s>Out of stock</s>
 ```
 
-#### `<q>`
-Inline quotation (adds quotation marks).
+### Exercise: Semantify this HTML
+
+Convert this div soup into semantic HTML:
 
 ```html
-<p>He said, <q>Hello world</q> and smiled.</p>
+<div class="header">
+    <div class="title">My Blog</div>
+    <div class="menu">
+        <div><a href="/">Home</a></div>
+        <div><a href="/about">About</a></div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="post">
+        <div class="post-title">My First Post</div>
+        <div class="post-content">This is my first blog post...</div>
+    </div>
+</div>
+
+<div class="sidebar">Related links</div>
+
+<div class="footer">Copyright 2026</div>
 ```
 
-#### `<cite>`
-Citation or reference to a creative work.
-
+**Your answer:**
 ```html
-<p><cite>The Great Gatsby</cite> by F. Scott Fitzgerald</p>
+<!-- Try it yourself first! -->
 ```
 
-#### `<abbr>`
-Abbreviation or acronym.
-
+**Answer:**
 ```html
-<p><abbr title="HyperText Markup Language">HTML</abbr> is a markup language.</p>
-```
+<header>
+    <h1>My Blog</h1>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+        </ul>
+    </nav>
+</header>
 
-#### `<dfn>`
-Definition term.
+<main>
+    <article>
+        <h2>My First Post</h2>
+        <p>This is my first blog post...</p>
+    </article>
 
-```html
-<p><dfn>HTML</dfn> is a markup language for web pages.</p>
-```
+    <aside>Related links</aside>
+</main>
 
-#### `<address>`
-Contact information.
-
-```html
-<address>
-    Written by <a href="mailto:webmaster@example.com">John Doe</a>.<br>
-    Visit us at: example.com<br>
-    123 Main Street, City, Country
-</address>
-```
-
-### Other Semantic Tags
-
-```html
-<!-- Code snippets -->
-<code>const x = 10;</code>
-
-<!-- Keyboard input -->
-<kbd>Ctrl</kbd> + <kbd>C</kbd>
-
-<!-- Sample output -->
-<samp>Error: File not found</samp>
-
-<!-- Variable -->
-<var>x</var> = 5
-
-<!-- Time -->
-<time datetime="2026-01-13">January 13, 2026</time>
-
-<!-- Progress bar -->
-<progress value="70" max="100">70%</progress>
-
-<!-- Meter -->
-<meter value="0.7">70%</meter>
-
-<!-- Details/Summary (collapsible) -->
-<details>
-    <summary>Click to expand</summary>
-    <p>Hidden content goes here.</p>
-</details>
+<footer>
+    <p>&copy; 2026</p>
+</footer>
 ```
 
 ---
 
-## 10. Styling Basics
+## 10. Styling: Making It Pretty
 
-### Inline CSS
+### Three ways to style HTML
 
-Styles applied directly to an element using the style attribute.
+1. **Inline CSS** - Style attribute on elements
+2. **Internal CSS** - `<style>` tag in `<head>`
+3. **External CSS** - Separate `.css` file
+
+### Inline CSS: Quick but messy
 
 ```html
 <p style="color: red; font-size: 18px; font-weight: bold;">
-    Styled text
+    This text is red, large, and bold.
 </p>
 ```
 
-**Note:** Inline styles have the highest specificity but are hard to maintain. Use sparingly.
+**Pros:** Quick, overrides everything
+**Cons:** Hard to maintain, repeating yourself, mixing content and presentation
 
-### Internal CSS
+### Watch It!
+⚠️ **Avoid inline CSS!** It's okay for quick testing, but not for production. Use external CSS instead.
 
-Styles defined in a `<style>` tag within the `<head>`.
+### Internal CSS: Better, but still limited
 
 ```html
 <!DOCTYPE html>
@@ -1102,13 +1425,13 @@ Styles defined in a `<style>` tag within the `<head>`.
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #f4f4f4;
         }
 
         h1 {
             color: #333;
-            text-align: center;
+            border-bottom: 2px solid #007bff;
         }
 
         .highlight {
@@ -1127,20 +1450,28 @@ Styles defined in a `<style>` tag within the `<head>`.
     <div id="header">
         <h1>Welcome</h1>
     </div>
-    <p class="highlight">This is highlighted text.</p>
+    <p class="highlight">This is highlighted.</p>
 </body>
 </html>
 ```
 
-### External CSS
+**Pros:** All in one file, easier to manage than inline
+**Cons:** Can't reuse across pages, makes HTML file large
 
-Styles defined in a separate CSS file.
+### External CSS: The right way
 
+**index.html:**
 ```html
+<!DOCTYPE html>
+<html>
 <head>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="responsive.css">
 </head>
+<body>
+    <h1>Hello World</h1>
+    <p class="highlight">Styled text</p>
+</body>
+</html>
 ```
 
 **styles.css:**
@@ -1148,44 +1479,90 @@ Styles defined in a separate CSS file.
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
+    padding: 20px;
 }
 
 h1 {
     color: #333;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.highlight {
+    background-color: yellow;
 }
 ```
 
-**Best Practice:** Use external CSS files for better organization, reusability, and caching.
+**Pros:** Reusable, cached by browser, separates content and presentation
+**Cons:** Extra HTTP request (but worth it!)
 
-### CSS Specificity Order
+### CSS Specificity: Who wins?
 
-1. Inline styles (highest)
-2. IDs
-3. Classes, attributes, pseudo-classes
-4. Elements, pseudo-elements (lowest)
+When multiple styles conflict, specificity determines the winner:
+
+1. **Inline styles** (highest) - `style="..."`
+2. **IDs** - `#header { }`
+3. **Classes, attributes, pseudo-classes** - `.highlight { }`, `[type="text"]`, `:hover`
+4. **Elements** (lowest) - `p { }`, `div { }`
+
+```html
+<style>
+    p { color: black; }           /* Specificity: 1 */
+    .highlight { color: yellow; }  /* Specificity: 10 */
+    #intro { color: blue; }        /* Specificity: 100 */
+</style>
+
+<p style="color: red;">Red wins!</p>     <!-- Inline: 1000 -->
+<p id="intro" class="highlight">Blue wins!</p>  <!-- ID beats class -->
+<p class="highlight">Yellow wins!</p>    <!-- Class beats element -->
+```
+
+### Brain Power
+🧠 What color will this text be?
+```html
+<style>
+    p { color: black; }
+    .red { color: red; }
+    #blue { color: blue; }
+</style>
+
+<p id="blue" class="red" style="color: green;">What color am I?</p>
+```
+
+**Answer:** Green! Inline styles always win.
+
+### There are NO Dumb Questions
+
+**Q: Can I have multiple `<link>` tags?**
+**A:** Yes! Load as many CSS files as you need. They're processed in order.
+
+**Q: Where should I put the `<link>` tag?**
+**A:** In the `<head>`. Browsers will load CSS before rendering the page.
+
+**Q: What if my CSS file doesn't load?**
+**A:** Check the file path, check your browser console for errors, and make sure the file exists!
 
 ---
 
-## 11. Including JavaScript
+## 11. JavaScript: Adding Behavior
 
-### Inline JavaScript
+### HTML structures, CSS styles, JavaScript DOES
+
+HTML is the skeleton, CSS is the skin, JavaScript is the muscles and brain. It makes things interactive!
+
+### Three ways to include JavaScript
+
+1. **Inline JavaScript** - Event handlers
+2. **Internal JavaScript** - `<script>` tag in HTML
+3. **External JavaScript** - Separate `.js` file
+
+### Inline JavaScript: Don't do this
 
 ```html
-<button onclick="alert('Hello!')">Click Me</button>
-
-<a href="javascript:void(0)" onclick="doSomething()">Link</a>
+<button onclick="alert('Clicked!')">Click Me</button>
 ```
 
-**Note:** Inline JavaScript is not recommended for maintainability and security reasons.
+**Why not?** Mixing behavior with structure, hard to maintain, security issues.
 
-### Internal JavaScript
+### Internal JavaScript: Better
 
 ```html
 <!DOCTYPE html>
@@ -1198,7 +1575,7 @@ h1 {
     <button id="btn">Click Me</button>
 
     <script>
-        console.log('Page loaded');
+        console.log('Page loaded!');
 
         document.getElementById('btn').addEventListener('click', function() {
             document.getElementById('heading').textContent = 'Button Clicked!';
@@ -1208,260 +1585,412 @@ h1 {
 </html>
 ```
 
-### External JavaScript
+### External JavaScript: The best way
 
+**index.html:**
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <title>External JS Example</title>
-    <!-- In head (blocks rendering) -->
-    <script src="script.js"></script>
+    <title>JavaScript Example</title>
 </head>
 <body>
-    <h1>Hello World</h1>
+    <h1 id="heading">Hello World</h1>
+    <button id="btn">Click Me</button>
 
-    <!-- Before closing body (recommended) -->
+    <!-- Just before closing </body> -->
     <script src="script.js"></script>
 </body>
 </html>
 ```
 
-### Script Loading Strategies
+**script.js:**
+```javascript
+console.log('Page loaded!');
+
+document.getElementById('btn').addEventListener('click', function() {
+    document.getElementById('heading').textContent = 'Button Clicked!';
+});
+```
+
+### Script placement: Where matters!
 
 ```html
-<!-- Defer: Downloads asynchronously, executes after HTML parsing -->
-<script src="script.js" defer></script>
+<!-- In <head>: Blocks rendering! -->
+<head>
+    <script src="script.js"></script>
+</head>
 
-<!-- Async: Downloads and executes asynchronously -->
-<script src="script.js" async></script>
-
-<!-- Module: Treats file as ES6 module -->
-<script type="module" src="script.js"></script>
-
-<!-- No blocking (traditional way) -->
+<!-- Before </body>: Best for most scripts -->
 <body>
     <!-- Content -->
     <script src="script.js"></script>
 </body>
+
+<!-- With defer: Loads async, executes after parsing -->
+<head>
+    <script src="script.js" defer></script>
+</head>
+
+<!-- With async: Loads and executes ASAP -->
+<head>
+    <script src="script.js" async></script>
+</head>
 ```
 
-**Comparison:**
+### defer vs async: What's the difference?
 
-| Method | Download | Execution | Use Case |
-|--------|----------|-----------|----------|
-| Normal | Blocks HTML parsing | Immediately | Small scripts, dependencies |
-| `defer` | Async, parallel | After HTML parsing, in order | Most scripts |
-| `async` | Async, parallel | As soon as downloaded | Independent scripts, analytics |
+| Attribute | Download | Execution | Order Preserved |
+|-----------|----------|-----------|-----------------|
+| Normal | Blocks HTML | Immediately | Yes |
+| `defer` | Parallel (async) | After HTML parsing | Yes |
+| `async` | Parallel (async) | ASAP (may block) | No |
 
-**Best Practice:** Use `defer` for most scripts to avoid blocking page rendering.
+**Rule of thumb:** Use `defer` for most scripts!
+
+### Brain Power
+🧠 Why would you put a script tag at the END of the body instead of the beginning? Think about DOM elements...
+
+### Watch It!
+⚠️ **Scripts run in order!** If `script1.js` depends on `script2.js`, load `script2.js` first.
+
+```html
+<!-- Wrong! jQuery not loaded yet -->
+<script src="my-plugin.js"></script>
+<script src="jquery.js"></script>
+
+<!-- Right! jQuery loads first -->
+<script src="jquery.js"></script>
+<script src="my-plugin.js"></script>
+```
+
+### ES6 Modules: Modern JavaScript
+
+```html
+<!-- Modern modules -->
+<script type="module" src="script.js"></script>
+```
+
+Modules are always deferred, have their own scope, and support `import`/`export`.
+
+### There are NO Dumb Questions
+
+**Q: What's `document.getElementById()`?**
+**A:** JavaScript function that finds an HTML element by its `id` attribute. Then you can manipulate it!
+
+**Q: Can I have multiple `<script>` tags?**
+**A:** Yes! They execute in order. Common to have multiple external scripts.
+
+**Q: What's the `console.log()` thing?**
+**A:** Prints to browser console (F12 → Console tab). Great for debugging!
 
 ---
 
-## 12. Accessibility
+## 12. Accessibility: Building for Everyone
 
-### Core Principles (WCAG)
+### What is web accessibility?
+
+**Web accessibility** means people with disabilities can use your website. This includes:
+- Visual impairments (blindness, low vision, color blindness)
+- Hearing impairments (deafness, hard of hearing)
+- Motor impairments (can't use a mouse)
+- Cognitive impairments (dyslexia, memory issues)
+
+### Why should you care?
+
+1. **It's the right thing to do** - 15% of the world has a disability
+2. **It's often the law** - ADA, Section 508, WCAG compliance
+3. **Better SEO** - Accessible sites rank higher
+4. **Better UX for everyone** - Curb-cut effect
+
+### The four principles of accessibility (WCAG)
 
 1. **Perceivable** - Information must be presentable to users
-2. **Operable** - UI components must be operable
-3. **Understandable** - Information and operation must be understandable
-4. **Robust** - Content must be robust enough for assistive technologies
+2. **Operable** - UI must be operable (keyboard navigation!)
+3. **Understandable** - Information must be understandable
+4. **Robust** - Content must work with assistive technologies
 
-### Best Practices
-
-#### Use Semantic HTML
+### Use semantic HTML
 
 ```html
-<!-- Good: Semantic and accessible -->
+<!-- Good: Semantic button -->
 <button>Click Me</button>
-<nav>Navigation</nav>
-<main>Main content</main>
 
-<!-- Bad: Non-semantic -->
+<!-- Bad: Div pretending to be a button -->
 <div onclick="doSomething()">Click Me</div>
-<div>Navigation</div>
-<div>Main content</div>
 ```
 
-#### Alt Text for Images
+Screen readers know what a `<button>` is. A `<div>` with `onclick`? Not so much.
+
+### Always use alt text on images
 
 ```html
-<!-- Descriptive image -->
-<img src="logo.png" alt="Company Logo">
+<!-- Informative image: Describe it -->
+<img src="chart.png" alt="Bar chart showing 50% increase in Q4 sales">
 
-<!-- Decorative image (empty alt) -->
-<img src="decorative.png" alt="">
+<!-- Decorative image: Empty alt -->
+<img src="decorative-border.png" alt="">
 
-<!-- Complex image -->
-<img src="chart.png" alt="Bar chart showing sales increased 50% in Q4">
+<!-- Don't skip alt! Screen readers will read the filename! -->
+<img src="IMG_20240113_0834.jpg">  <!-- Bad! -->
 ```
 
-#### Form Labels
+### Watch It!
+⚠️ **Empty alt (`alt=""`) is NOT the same as missing alt!** Empty alt tells screen readers "this is decorative, skip it". Missing alt makes screen readers announce the filename.
+
+### Labels for ALL form inputs
 
 ```html
-<!-- Always associate labels with inputs -->
-<label for="email">Email Address:</label>
+<!-- Good: Label associated with input -->
+<label for="email">Email:</label>
 <input type="email" id="email" name="email">
 
-<!-- Or wrap the input -->
-<label>
-    Email Address:
-    <input type="email" name="email">
-</label>
+<!-- Bad: No label -->
+<input type="email" name="email" placeholder="Email">
 ```
 
-#### ARIA Attributes
+Placeholders are NOT labels! They disappear when you type.
+
+### Keyboard navigation: Not everyone uses a mouse
+
+**Test your site with keyboard only:**
+- Tab = Next element
+- Shift+Tab = Previous element
+- Enter = Activate button/link
+- Space = Activate checkbox/button
+- Arrow keys = Radio buttons, select dropdowns
 
 ```html
-<!-- Button with aria-label -->
-<button aria-label="Close dialog">X</button>
-
-<!-- Navigation with aria-label -->
-<nav aria-label="Main navigation">...</nav>
-
-<!-- Live region for dynamic content -->
-<div role="alert" aria-live="polite">Error message</div>
-
-<!-- Expandable section -->
-<button aria-expanded="false" aria-controls="menu">Menu</button>
-<div id="menu" hidden>Menu items...</div>
-
-<!-- Required field -->
-<input type="text" aria-required="true">
-
-<!-- Invalid field -->
-<input type="email" aria-invalid="true" aria-describedby="email-error">
-<span id="email-error">Please enter a valid email</span>
-```
-
-#### Keyboard Navigation
-
-```html
-<!-- Ensure interactive elements are keyboard accessible -->
-<button tabindex="0">Accessible Button</button>
-
-<!-- Skip navigation for keyboard users -->
-<a href="#main-content" class="skip-link">Skip to main content</a>
-
-<!-- Modal with focus trap -->
-<div role="dialog" aria-labelledby="dialog-title" aria-modal="true">
-    <h2 id="dialog-title">Dialog Title</h2>
-    <button>Close</button>
+<!-- Make custom elements keyboard-accessible -->
+<div tabindex="0" role="button" onclick="doSomething()">
+    Custom Button
 </div>
 ```
 
-#### Color Contrast
-
-- WCAG AA: Minimum contrast ratio of 4.5:1 for normal text
-- WCAG AAA: Minimum contrast ratio of 7:1 for normal text
-- Large text (18pt+): 3:1 ratio for AA
-
-#### Accessible Links
+### Skip links: Let keyboard users skip navigation
 
 ```html
-<!-- Good: Descriptive link text -->
-<a href="/about">Learn more about our company</a>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<!-- Bad: Vague link text -->
-<a href="/about">Click here</a>
+    <nav>
+        <!-- Long navigation menu -->
+    </nav>
 
-<!-- Screen reader only text -->
-<a href="/report.pdf">
-    Download Report
-    <span class="sr-only">(PDF, 2MB)</span>
-</a>
+    <main id="main-content">
+        <!-- Main content -->
+    </main>
+</body>
 ```
 
-#### Language Declaration
+```css
+.skip-link {
+    position: absolute;
+    top: -40px;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+```
+
+### Color contrast: Make text readable
+
+**WCAG Requirements:**
+- **Level AA:** 4.5:1 contrast for normal text, 3:1 for large text
+- **Level AAA:** 7:1 contrast for normal text, 4.5:1 for large text
+
+```html
+<!-- Good contrast -->
+<p style="color: #000; background: #fff;">Black on white (21:1)</p>
+
+<!-- Bad contrast -->
+<p style="color: #ccc; background: #fff;">Light gray on white (1.6:1) - FAIL!</p>
+```
+
+Use tools like WebAIM Contrast Checker to test.
+
+### ARIA: When HTML isn't enough
+
+ARIA (Accessible Rich Internet Applications) fills gaps when semantic HTML isn't available.
+
+```html
+<!-- Button with no text (icon only) -->
+<button aria-label="Close dialog">
+    <span class="icon-close"></span>
+</button>
+
+<!-- Expandable section -->
+<button aria-expanded="false" aria-controls="menu">
+    Menu
+</button>
+<div id="menu" hidden>Menu items...</div>
+
+<!-- Live region for dynamic content -->
+<div role="alert" aria-live="polite">
+    Your changes have been saved!
+</div>
+
+<!-- Form field with error -->
+<label for="email">Email:</label>
+<input type="email" id="email" aria-invalid="true" aria-describedby="email-error">
+<span id="email-error" role="alert">Please enter a valid email</span>
+```
+
+### Common ARIA attributes
+
+| Attribute | Purpose | Example |
+|-----------|---------|---------|
+| `role` | Define element's purpose | `role="navigation"` |
+| `aria-label` | Label for screen readers | `aria-label="Close"` |
+| `aria-labelledby` | Reference to label element | `aria-labelledby="title"` |
+| `aria-describedby` | Additional description | `aria-describedby="help"` |
+| `aria-expanded` | Is it expanded? | `aria-expanded="false"` |
+| `aria-hidden` | Hide from screen readers | `aria-hidden="true"` |
+| `aria-live` | Announce dynamic changes | `aria-live="polite"` |
+
+### Watch It!
+⚠️ **Don't use ARIA when HTML will do!** `<button>` is better than `<div role="button">`. Native HTML has better keyboard support and browser compatibility.
+
+### Heading structure: It's a table of contents
+
+```html
+<!-- Good: Logical hierarchy -->
+<h1>Main Page Title</h1>
+  <h2>Section 1</h2>
+    <h3>Subsection 1.1</h3>
+    <h3>Subsection 1.2</h3>
+  <h2>Section 2</h2>
+
+<!-- Bad: Skipping levels -->
+<h1>Main Page Title</h1>
+  <h4>Section 1</h4>  <!-- Skipped h2 and h3! -->
+```
+
+Screen readers let users jump between headings. Don't use headings for font size - use CSS!
+
+### Language declaration
 
 ```html
 <html lang="en">
 
-<!-- For mixed language content -->
+<!-- Mixed language content -->
 <p>The French word <span lang="fr">bonjour</span> means hello.</p>
 ```
 
-#### Page Structure
+Helps screen readers pronounce words correctly.
 
-```html
-<!-- Logical heading hierarchy -->
-<h1>Main Page Title</h1>
-<h2>Section 1</h2>
-<h3>Subsection 1.1</h3>
-<h3>Subsection 1.2</h3>
-<h2>Section 2</h2>
+### Brain Power
+🧠 Why is accessibility good for SEO? Think about how search engine bots "see" your website...
 
-<!-- Skip to main content -->
-<body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    <header>...</header>
-    <main id="main-content">...</main>
-</body>
-```
+### Quick accessibility checklist
 
-#### Accessible Forms
-
-```html
-<form>
-    <fieldset>
-        <legend>Personal Information</legend>
-
-        <label for="name">Name (required):</label>
-        <input type="text" id="name" name="name" required aria-required="true">
-
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" aria-describedby="email-help">
-        <span id="email-help">We'll never share your email</span>
-    </fieldset>
-</form>
-```
+- [ ] All images have alt text
+- [ ] All form inputs have labels
+- [ ] Color contrast meets WCAG AA (4.5:1)
+- [ ] Site is keyboard-navigable
+- [ ] Heading hierarchy is logical
+- [ ] Links have descriptive text (not "click here")
+- [ ] Videos have captions
+- [ ] HTML language is declared
+- [ ] Semantic HTML used appropriately
+- [ ] Forms have clear error messages
 
 ---
 
-## 13. Basics of SEO
+## 13. SEO: Getting Found
 
-### Meta Tags
+### What is SEO?
+
+**Search Engine Optimization** = Making your website rank higher in search results. More traffic = more visitors = more customers/readers/whatever your goal is.
+
+### The `<title>` tag: The most important SEO element
 
 ```html
-<head>
-    <!-- Title (most important for SEO) -->
-    <title>Page Title | Site Name (50-60 characters)</title>
-
-    <!-- Meta description -->
-    <meta name="description" content="Clear, concise page description (150-160 characters)">
-
-    <!-- Meta keywords (less important nowadays) -->
-    <meta name="keywords" content="keyword1, keyword2, keyword3">
-
-    <!-- Viewport for mobile -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Character encoding -->
-    <meta charset="UTF-8">
-
-    <!-- Canonical URL (prevent duplicate content) -->
-    <link rel="canonical" href="https://example.com/page">
-
-    <!-- Robots meta tag -->
-    <meta name="robots" content="index, follow">
-
-    <!-- Author -->
-    <meta name="author" content="Author Name">
-</head>
+<title>Best Pizza in New York | Joe's Pizza</title>
 ```
 
-### Open Graph (Social Media)
+**Best practices:**
+- 50-60 characters (longer gets truncated)
+- Include main keyword
+- Include brand name
+- Unique for every page
+- Descriptive and compelling
+
+### Meta description: Your sales pitch
 
 ```html
-<!-- Open Graph for Facebook, LinkedIn -->
+<meta name="description" content="Joe's Pizza serves authentic New York-style pizza since 1975. Order online for delivery or pickup in Manhattan.">
+```
+
+**Best practices:**
+- 150-160 characters
+- Include main keyword naturally
+- Call to action
+- Unique for every page
+- Accurate (Google penalizes misleading descriptions)
+
+### Meta keywords: Mostly useless now
+
+```html
+<meta name="keywords" content="pizza, new york pizza, manhattan pizza">
+```
+
+Google ignores meta keywords (too much spam). Focus on content instead.
+
+### Viewport: Mobile-first is required
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+Google's mobile-first indexing means mobile-friendliness affects your ranking. This tag is REQUIRED.
+
+### Canonical URL: Prevent duplicate content
+
+```html
+<link rel="canonical" href="https://example.com/page">
+```
+
+Use when the same content is available at multiple URLs:
+```
+example.com/page
+example.com/page/
+example.com/page?utm_source=email
+```
+
+### Robots meta tag: Control indexing
+
+```html
+<!-- Allow indexing and following links (default) -->
+<meta name="robots" content="index, follow">
+
+<!-- Don't index this page -->
+<meta name="robots" content="noindex, follow">
+
+<!-- Don't follow links on this page -->
+<meta name="robots" content="index, nofollow">
+
+<!-- Don't index or follow -->
+<meta name="robots" content="noindex, nofollow">
+```
+
+### Open Graph: Look good on social media
+
+```html
 <meta property="og:title" content="Page Title">
 <meta property="og:description" content="Page description">
 <meta property="og:image" content="https://example.com/image.jpg">
 <meta property="og:url" content="https://example.com/page">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Site Name">
+```
 
-<!-- Twitter Card -->
+When someone shares your link on Facebook/LinkedIn, this is what shows up.
+
+### Twitter Card: Twitter has its own tags
+
+```html
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@username">
 <meta name="twitter:title" content="Page Title">
@@ -1469,70 +1998,82 @@ h1 {
 <meta name="twitter:image" content="https://example.com/image.jpg">
 ```
 
-### SEO Best Practices
+### Semantic HTML for SEO
 
-#### 1. Semantic HTML Structure
-
-Use proper heading hierarchy and semantic tags.
+Search engines love semantic HTML! It helps them understand your content.
 
 ```html
-<h1>Main Page Title (only one per page)</h1>
-<h2>Section Heading</h2>
-<h3>Subsection Heading</h3>
+<!-- Good: Semantic structure -->
+<article>
+    <h1>Article Title</h1>
+    <p>Content...</p>
+</article>
+
+<!-- Bad: Div soup -->
+<div class="article">
+    <div class="title">Article Title</div>
+    <div class="content">Content...</div>
+</div>
 ```
 
-#### 2. Clean URLs
+### Heading hierarchy: Your table of contents
 
 ```html
-<!-- Good: Descriptive URLs -->
-https://example.com/products/red-shoes
-https://example.com/blog/seo-tips
-
-<!-- Bad: Non-descriptive URLs -->
-https://example.com/page?id=123&cat=45
-https://example.com/product/12345
+<h1>Main Page Topic (one per page!)</h1>
+  <h2>Section 1</h2>
+    <h3>Subsection 1.1</h3>
+  <h2>Section 2</h2>
 ```
 
-#### 3. Image Optimization
+Search engines use headings to understand page structure. One `<h1>` per page!
+
+### Image SEO: Don't ignore images
 
 ```html
-<img src="red-shoes.jpg"
-     alt="Red running shoes with white stripes"
+<img src="red-running-shoes-nike.jpg"
+     alt="Red Nike running shoes with white swoosh"
      width="800"
      height="600"
      loading="lazy">
 ```
 
-**Image SEO Tips:**
-- Use descriptive file names
-- Add descriptive alt text
-- Compress images for faster loading
-- Use appropriate image formats (WebP, JPEG, PNG)
-- Specify dimensions to prevent layout shift
+**Image SEO tips:**
+- Descriptive file names (not `IMG_1234.jpg`)
+- Descriptive alt text with keywords (naturally!)
+- Specify dimensions (prevents layout shift)
+- Compress images (faster = better ranking)
+- Use modern formats (WebP)
+- Lazy load below-the-fold images
 
-#### 4. Internal Linking
-
-```html
-<!-- Link to related pages with descriptive anchor text -->
-<a href="/related-article">Learn more about HTML semantics</a>
-
-<!-- Breadcrumb navigation -->
-<nav aria-label="Breadcrumb">
-    <ol>
-        <li><a href="/">Home</a></li>
-        <li><a href="/category">Category</a></li>
-        <li aria-current="page">Current Page</li>
-    </ol>
-</nav>
-```
-
-#### 5. Mobile-Friendly
+### Internal linking: Connect your content
 
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Good: Descriptive anchor text -->
+<a href="/seo-guide">Learn more about SEO best practices</a>
+
+<!-- Bad: Generic anchor text -->
+<a href="/seo-guide">Click here</a>
 ```
 
-#### 6. Page Speed Optimization
+Internal links help:
+1. Search engines discover new pages
+2. Distribute page authority
+3. Users navigate your site
+4. Establish content relationships
+
+### Clean URLs: Readable is rankable
+
+```html
+<!-- Good: Descriptive URLs -->
+https://example.com/blog/seo-tips-2026
+https://example.com/products/red-shoes
+
+<!-- Bad: Non-descriptive URLs -->
+https://example.com/page?id=123&cat=45
+https://example.com/product/item.php?id=789
+```
+
+### Page speed: Fast sites rank higher
 
 ```html
 <!-- Preload critical resources -->
@@ -1545,25 +2086,23 @@ https://example.com/product/12345
 <!-- DNS prefetch -->
 <link rel="dns-prefetch" href="https://cdn.example.com">
 
-<!-- Lazy load images and iframes -->
-<img src="image.jpg" loading="lazy">
-<iframe src="video.html" loading="lazy"></iframe>
-
 <!-- Defer non-critical JavaScript -->
-<script src="script.js" defer></script>
+<script src="analytics.js" defer></script>
+
+<!-- Lazy load images -->
+<img src="image.jpg" loading="lazy" alt="Description">
 ```
 
-#### 7. Structured Data (Schema.org)
+### Structured data: Help search engines understand
 
 ```html
-<!-- JSON-LD format -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "Article Title",
-  "description": "Article description",
-  "image": "https://example.com/image.jpg",
+  "headline": "SEO Best Practices for 2026",
+  "description": "Comprehensive guide to SEO",
+  "image": "https://example.com/seo-guide.jpg",
   "author": {
     "@type": "Person",
     "name": "John Doe"
@@ -1572,138 +2111,139 @@ https://example.com/product/12345
   "dateModified": "2026-01-13"
 }
 </script>
-
-<!-- Organization schema -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Company Name",
-  "url": "https://example.com",
-  "logo": "https://example.com/logo.png",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "telephone": "+1-123-456-7890",
-    "contactType": "Customer Service"
-  }
-}
-</script>
 ```
 
-#### 8. Content Quality
+**Common structured data types:**
+- Article
+- Product
+- Recipe
+- Event
+- Organization
+- Person
+- FAQ
+- BreadcrumbList
 
-- Write unique, valuable content
-- Use keywords naturally (don't keyword stuff)
-- Keep content updated
-- Use headings to structure content
-- Write for humans, not just search engines
+### Watch It!
+⚠️ **SEO takes time!** Changes won't show up overnight. Google can take weeks or months to re-index and re-rank your page.
 
-#### 9. HTML Sitemap
+### Brain Power
+🧠 Why do you think page speed affects SEO? Think about user experience...
 
-```html
-<nav aria-label="Site map">
-    <h2>Sitemap</h2>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a>
-            <ul>
-                <li><a href="/about/team">Team</a></li>
-                <li><a href="/about/history">History</a></li>
-            </ul>
-        </li>
-        <li><a href="/products">Products</a></li>
-        <li><a href="/contact">Contact</a></li>
-    </ul>
-</nav>
-```
+### SEO Best Practices Checklist
 
-#### 10. XML Sitemap
+- [ ] Unique, descriptive `<title>` for each page
+- [ ] Unique meta description for each page
+- [ ] Mobile-friendly (responsive design)
+- [ ] Fast loading (under 3 seconds)
+- [ ] Semantic HTML structure
+- [ ] One `<h1>` per page with logical heading hierarchy
+- [ ] Descriptive URLs
+- [ ] Internal linking with descriptive anchor text
+- [ ] Image optimization (alt text, file names, compression)
+- [ ] HTTPS (secure connection)
+- [ ] XML sitemap
+- [ ] Robots.txt file
+- [ ] Structured data where appropriate
+- [ ] Fresh, quality content
+- [ ] Mobile-first design
 
-Create an XML sitemap file (sitemap.xml) and reference it:
+### There are NO Dumb Questions
 
-```html
-<head>
-    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
-</head>
-```
+**Q: Is SEO the same as accessibility?**
+**A:** They overlap! Both benefit from semantic HTML, alt text, good structure. But accessibility is about people with disabilities, SEO is about search engines.
+
+**Q: Can I guarantee #1 ranking?**
+**A:** No! Anyone who promises #1 ranking is lying. SEO is about improving your chances, not guarantees.
+
+**Q: How long does SEO take?**
+**A:** Typically 3-6 months to see significant results. SEO is a long-term strategy, not a quick fix.
+
+**Q: Should I hire an SEO expert?**
+**A:** For complex sites or competitive industries, yes. But learn the basics first so you can evaluate their work!
 
 ---
 
-## Quick Reference
+## Congratulations!
 
-### Most Common Tags
+You've made it through the HTML cheatsheet! But this isn't the end - it's just the beginning.
 
-| Tag | Purpose |
-|-----|---------|
-| `<div>` | Block container |
-| `<span>` | Inline container |
-| `<p>` | Paragraph |
-| `<a>` | Link |
-| `<img>` | Image |
-| `<h1>` - `<h6>` | Headings |
-| `<ul>`, `<ol>`, `<li>` | Lists |
-| `<table>`, `<tr>`, `<td>` | Tables |
-| `<form>`, `<input>` | Forms |
-| `<button>` | Button |
+### What's next?
 
-### Document Structure
+1. **Practice, practice, practice** - Build real projects
+2. **Learn CSS** - Make your HTML look amazing
+3. **Learn JavaScript** - Add interactivity
+4. **Study responsive design** - Mobile-first approach
+5. **Explore frameworks** - React, Vue, Angular
+6. **Keep learning** - The web evolves constantly
 
+### Brain Power (Final Challenge)
+🧠 Build a complete personal portfolio page using everything you learned. Include:
+- Semantic HTML structure
+- Multiple sections (about, projects, contact)
+- A form for contact
+- Images with proper alt text
+- Accessible navigation
+- SEO meta tags
+- Internal links
+
+### Additional Resources
+
+- **MDN Web Docs:** https://developer.mozilla.org/en-US/docs/Web/HTML
+- **W3Schools:** https://www.w3schools.com/html/
+- **HTML Living Standard:** https://html.spec.whatwg.org/
+- **WCAG Guidelines:** https://www.w3.org/WAI/WCAG21/quickref/
+- **Frontend Roadmap:** https://roadmap.sh/frontend
+- **Can I Use:** https://caniuse.com/
+
+---
+
+## Quick Reference Card
+
+**Document Structure:**
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Page Title</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
+    <!-- Content -->
+    <script src="script.js"></script>
 </body>
 </html>
 ```
 
-### Common Attributes
+**Common Tags:**
+- `<h1>` to `<h6>` - Headings
+- `<p>` - Paragraph
+- `<a href="">` - Link
+- `<img src="" alt="">` - Image
+- `<div>` - Block container
+- `<span>` - Inline container
+- `<ul>/<ol>/<li>` - Lists
+- `<table>/<tr>/<td>` - Tables
+- `<form>/<input>` - Forms
 
-| Attribute | Purpose |
-|-----------|---------|
-| `id` | Unique identifier |
-| `class` | CSS class names |
-| `style` | Inline styles |
-| `src` | Source URL |
-| `href` | Link URL |
-| `alt` | Alternative text |
-| `title` | Tooltip text |
-| `data-*` | Custom data |
+**Semantic Tags:**
+- `<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<aside>`, `<footer>`
 
----
+**Form Inputs:**
+- `text`, `email`, `password`, `number`, `date`, `checkbox`, `radio`, `file`, `submit`
 
-## Additional Resources
-
-- **MDN Web Docs:** https://developer.mozilla.org/en-US/docs/Web/HTML
-- **W3Schools:** https://www.w3schools.com/html/
-- **HTML Living Standard:** https://html.spec.whatwg.org/
-- **W3C HTML Validator:** https://validator.w3.org/
-- **Frontend Developer Roadmap:** https://roadmap.sh/frontend
-- **JavaScript Roadmap:** https://roadmap.sh/javascript
-- **Can I Use (Browser Support):** https://caniuse.com/
-
----
-
-## Frontend Learning Path
-
-1. **HTML** - Structure (You are here!)
-2. **CSS** - Styling and layout
-3. **JavaScript** - Interactivity and logic
-4. **Responsive Design** - Mobile-first approach
-5. **Frameworks** - React, Vue, Angular
-6. **Build Tools** - Webpack, Vite, npm
-7. **Version Control** - Git, GitHub
-8. **Testing** - Jest, Cypress
-9. **Performance** - Optimization techniques
-10. **Accessibility** - WCAG compliance
+**Attributes:**
+- `id` - Unique identifier
+- `class` - CSS class
+- `style` - Inline CSS
+- `data-*` - Custom data
+- `alt` - Image alternative text
+- `href` - Link URL
+- `src` - Resource URL
 
 ---
 
-**Created from roadmap.sh HTML Roadmap**
+**Created in the style of Head First books**
 
-Keep learning and building amazing websites!
+*Now go build something awesome!* 🚀
