@@ -29,24 +29,40 @@ If you need a refresher, check out the React cheatsheet first!
 
 ## Table of Contents
 
+### Part I: Fundamentals
 1. [Introduction: Why Next.js?](#1-introduction-why-nextjs)
 2. [Getting Started: Your First App](#2-getting-started-your-first-app)
 3. [Routing: File-Based Routes](#3-routing-file-based-routes)
 4. [App Router vs Pages Router](#4-app-router-vs-pages-router)
 5. [Advanced Routing Patterns](#5-advanced-routing-patterns)
+
+### Part II: Rendering & Data
 6. [Rendering: Server and Client](#6-rendering-server-and-client)
-7. [Advanced Data Fetching](#7-advanced-data-fetching)
-8. [Server Actions: Mutations](#8-server-actions-mutations)
-9. [Runtimes: Node.js vs Edge](#9-runtimes-nodejs-vs-edge)
-10. [Layouts and Templates](#10-layouts-and-templates)
-11. [Styling: Writing CSS](#11-styling-writing-css)
-12. [Optimizations: Images, Fonts, Scripts](#12-optimizations-images-fonts-scripts)
-13. [API Routes: Building APIs](#13-api-routes-building-apis)
-14. [Middleware: Request Processing](#14-middleware-request-processing)
-15. [Caching: Performance](#15-caching-performance)
-16. [Configuration: Setting Up Your App](#16-configuration-setting-up-your-app)
-17. [Testing Your Next.js App](#17-testing-your-nextjs-app)
-18. [Deployment: Going Live](#18-deployment-going-live)
+7. [Data Fetching: Getting Data](#7-data-fetching-getting-data)
+8. [Advanced Data Fetching](#8-advanced-data-fetching)
+9. [Server Actions: Mutations](#9-server-actions-mutations)
+
+### Part III: Architecture
+10. [Runtimes: Node.js vs Edge](#10-runtimes-nodejs-vs-edge)
+11. [Layouts and Templates](#11-layouts-and-templates)
+12. [Styling: Writing CSS](#12-styling-writing-css)
+13. [Testing Your Next.js App](#13-testing-your-nextjs-app)
+14. [Optimizations: Images, Fonts, Scripts](#14-optimizations-images-fonts-scripts)
+
+### Part IV: APIs & Middleware
+15. [API Routes: Building APIs](#15-api-routes-building-apis)
+16. [Middleware: Request Processing](#16-middleware-request-processing)
+17. [Caching: Performance](#17-caching-performance)
+18. [Configuration: Setting Up Your App](#18-configuration-setting-up-your-app)
+
+### Part V: Production
+19. [Authentication: Protecting Your App](#19-authentication-protecting-your-app)
+20. [Navigation Hooks](#20-navigation-hooks-useparams-usepathname-usesearchparams)
+21. [Special Files: File Conventions](#21-special-files-file-conventions)
+22. [Security Best Practices](#22-security-best-practices)
+23. [Turbopack: The New Bundler](#23-turbopack-the-new-bundler)
+24. [Partial Prerendering (PPR)](#24-partial-prerendering-ppr)
+25. [Deployment: Going Live](#25-deployment-going-live)
 
 ---
 
@@ -181,11 +197,21 @@ my-app/
 
 ```tsx
 // app/page.tsx
-export default function Home() {
+import Link from 'next/link';
+
+export default function LandingPage() {
     return (
-        <main>
-            <h1>Welcome to Next.js!</h1>
-            <p>This is your home page</p>
+        <main className="flex flex-col items-center justify-center min-h-screen">
+            <h1 className="text-5xl font-bold">Build Your Dream SaaS</h1>
+            <p className="mt-4 text-xl">The best platform for managing your business.</p>
+            <div className="mt-8 flex gap-4">
+                <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded">
+                    Get Started
+                </Link>
+                <Link href="/demo" className="border border-gray-300 px-6 py-3 rounded">
+                    View Demo
+                </Link>
+            </div>
         </main>
     );
 }
@@ -196,18 +222,20 @@ That's it! File in `app/page.tsx` = route at `/`
 ### Adding Another Page
 
 ```tsx
-// app/about/page.tsx
-export default function About() {
+// app/pricing/page.tsx
+export default function Pricing() {
     return (
         <main>
-            <h1>About Us</h1>
-            <p>Learn more about our company</p>
+            <h1>Pricing Plans</h1>
+            <div className="grid grid-cols-3 gap-4">
+                {/* Pricing cards... */}
+            </div>
         </main>
     );
 }
 ```
 
-File in `app/about/page.tsx` = route at `/about`
+File in `app/pricing/page.tsx` = route at `/pricing`
 
 ### Brain Power
 🧠 How does Next.js know what route a page should be? What's the pattern?
@@ -241,18 +269,19 @@ app/
 ### Dynamic Routes: With Parameters
 
 ```tsx
-// app/blog/[slug]/page.tsx
-export default function BlogPost({ params }: { params: { slug: string } }) {
+// app/shop/[sku]/page.tsx
+export default function ProductPage({ params }: { params: { sku: string } }) {
     return (
         <article>
-            <h1>Blog Post: {params.slug}</h1>
-            <p>This is the blog post for {params.slug}</p>
+            <h1>Product SKU: {params.sku}</h1>
+            <p>Details for product {params.sku}...</p>
+            <AddToCart sku={params.sku} />
         </article>
     );
 }
 ```
 
-Visiting `/blog/hello-world` → `params.slug = 'hello-world'`
+Visiting `/shop/123-abc` → `params.sku = '123-abc'`
 
 ### Multiple Dynamic Segments
 
@@ -728,14 +757,26 @@ Add `'use client'` directive to make it a Client Component:
 
 import { useState } from 'react';
 
-export default function Counter() {
-    const [count, setCount] = useState(0);
+export default function LikeButton({ initialLikes }: { initialLikes: number }) {
+    const [likes, setLikes] = useState(initialLikes);
+    const [isLiked, setIsLiked] = useState(false);
+
+    const handleLike = () => {
+        if (isLiked) {
+            setLikes(likes - 1);
+        } else {
+            setLikes(likes + 1);
+        }
+        setIsLiked(!isLiked);
+    };
 
     return (
-        <div>
-            <p>Count: {count}</p>
-            <button onClick={() => setCount(count + 1)}>+</button>
-        </div>
+        <button 
+            onClick={handleLike}
+            className={isLiked ? 'text-red-500' : 'text-gray-500'}
+        >
+            ♥ {likes}
+        </button>
     );
 }
 ```
@@ -765,32 +806,36 @@ export default function Counter() {
 
 ```tsx
 // app/page.tsx (Server Component)
-import Counter from '@/components/Counter';
+import LikeButton from '@/components/LikeButton';
 
-export default function Home() {
+export default async function Feed() {
     // Server-side code
     const posts = await fetchPosts();
 
     return (
         <div>
-            <h1>Welcome</h1>
+            <h1>Your Feed</h1>
             {/* Server-rendered list */}
             <ul>
-                {posts.map(post => <li key={post.id}>{post.title}</li>)}
+                {posts.map(post => (
+                    <li key={post.id}>
+                        <h2>{post.title}</h2>
+                        {/* Client component for interactivity */}
+                        <LikeButton initialLikes={post.likes} />
+                    </li>
+                ))}
             </ul>
-            {/* Client component for interactivity */}
-            <Counter />
         </div>
     );
 }
 
-// components/Counter.tsx (Client Component)
+// components/LikeButton.tsx (Client Component)
 'use client';
 import { useState } from 'react';
 
-export default function Counter() {
-    const [count, setCount] = useState(0);
-    return <button onClick={() => setCount(count + 1)}>{count}</button>;
+export default function LikeButton({ initialLikes }) {
+    const [likes, setLikes] = useState(initialLikes);
+    return <button onClick={() => setLikes(likes + 1)}>♥ {likes}</button>;
 }
 ```
 
@@ -814,30 +859,29 @@ import ServerComponent from './Server'; // Stays server
 
 ---
 
-## 6. Data Fetching: Getting Data
+## 7. Data Fetching: Getting Data
 
 ### Fetching in Server Components
 
 Server Components can `await` data directly:
 
 ```tsx
-// app/posts/page.tsx (Server Component)
-async function getPosts() {
-    const res = await fetch('https://api.example.com/posts');
-    return res.json();
+// app/dashboard/page.tsx (Server Component)
+async function getDashboardMetrics() {
+    // Simulate database call
+    const revenue = await db.orders.aggregate({ _sum: { total: true } });
+    const users = await db.users.count();
+    
+    return { revenue, users };
 }
 
-export default async function PostsPage() {
-    const posts = await getPosts();
+export default async function DashboardPage() {
+    const metrics = await getDashboardMetrics();
 
     return (
-        <div>
-            <h1>Blog Posts</h1>
-            <ul>
-                {posts.map(post => (
-                    <li key={post.id}>{post.title}</li>
-                ))}
-            </ul>
+        <div className="grid grid-cols-2 gap-4">
+            <Card title="Total Revenue" value={`$${metrics.revenue}`} />
+            <Card title="Total Users" value={metrics.users} />
         </div>
     );
 }
@@ -854,26 +898,26 @@ Client Components use traditional React patterns:
 
 import { useEffect, useState } from 'react';
 
-export default function Posts() {
-    const [posts, setPosts] = useState([]);
+export default function LiveStockTicker() {
+    const [price, setPrice] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('https://api.example.com/posts')
-            .then(res => res.json())
-            .then(data => {
-                setPosts(data);
-                setLoading(false);
-            });
+        const interval = setInterval(() => {
+            fetch('https://api.finance.com/stock/AAPL')
+                .then(res => res.json())
+                .then(data => {
+                    setPrice(data.price);
+                    setLoading(false);
+                });
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Loading market data...</p>;
 
-    return (
-        <ul>
-            {posts.map(post => <li key={post.id}>{post.title}</li>)}
-        </ul>
-    );
+    return <div>AAPL: ${price}</div>;
 }
 ```
 
@@ -1047,7 +1091,7 @@ export default function Error({ error, reset }) {
 
 ---
 
-## 7. Advanced Data Fetching
+## 8. Advanced Data Fetching
 
 ### Preloading Data
 
@@ -1280,7 +1324,7 @@ export default async function Page() {
 
 ---
 
-## 8. Server Actions: Mutations
+## 9. Server Actions: Mutations
 
 ### What are Server Actions?
 
@@ -1290,29 +1334,41 @@ Server Actions are **async functions that run on the server**. They're great for
 // app/actions.ts
 'use server';
 
-export async function createPost(formData: FormData) {
-    const title = formData.get('title');
-    const content = formData.get('content');
+import { revalidatePath } from 'next/cache';
+
+export async function updateUserProfile(formData: FormData) {
+    const userId = formData.get('userId');
+    const name = formData.get('name');
+    const bio = formData.get('bio');
 
     // Server-side code (can access database)
-    await db.posts.create({
-        data: { title, content }
+    await db.users.update({
+        where: { id: userId },
+        data: { name, bio }
     });
+
+    revalidatePath('/profile');
 }
 ```
 
 ### Using Server Actions in Forms
 
 ```tsx
-// app/new-post/page.tsx
-import { createPost } from '../actions';
+// app/profile/page.tsx
+import { updateUserProfile } from '../actions';
 
-export default function NewPost() {
+export default function ProfilePage({ user }) {
     return (
-        <form action={createPost}>
-            <input name="title" placeholder="Title" required />
-            <textarea name="content" placeholder="Content" required />
-            <button type="submit">Create Post</button>
+        <form action={updateUserProfile}>
+            <input type="hidden" name="userId" value={user.id} />
+            
+            <label>Name</label>
+            <input name="name" defaultValue={user.name} required />
+            
+            <label>Bio</label>
+            <textarea name="bio" defaultValue={user.bio} />
+            
+            <button type="submit">Save Changes</button>
         </form>
     );
 }
@@ -1597,7 +1653,7 @@ export default function NewPost() {
 
 ---
 
-## 9. Runtimes: Node.js vs Edge
+## 10. Runtimes: Node.js vs Edge
 
 ### What are Runtimes?
 
@@ -1797,7 +1853,7 @@ export default function BlogPost({ params }) {
 
 ---
 
-## 10. Layouts and Templates
+## 11. Layouts and Templates
 
 ### Root Layout: Wraps Everything
 
@@ -1812,7 +1868,7 @@ export default function RootLayout({ children }) {
                     <Link href="/about">About</Link>
                 </nav>
                 <main>{children}</main>
-                <footer>&copy; 2024</footer>
+                <footer>&copy; {new Date().getFullYear()}</footer>
             </body>
         </html>
     );
@@ -1853,7 +1909,7 @@ export default function Template({ children }) {
 
 ---
 
-## 9. Styling: Writing CSS
+## 12. Styling: Writing CSS
 
 ### Global CSS
 
@@ -2042,7 +2098,7 @@ export default function Page() {
 
 ---
 
-## 16. Testing Your Next.js App
+## 13. Testing Your Next.js App
 
 ### Unit Testing with Vitest
 
@@ -2317,7 +2373,7 @@ describe('/api/hello', () => {
 
 ---
 
-## 10. Optimizations: Images, Fonts, Scripts
+## 14. Optimizations: Images, Fonts, Scripts
 
 ### Image Optimization
 
@@ -2763,6 +2819,45 @@ export async function GET() {
 - Use pagination for large lists
 - Implement proper garbage collection
 
+### Instrumentation & OpenTelemetry
+
+Monitor your app's performance deeply with Instrumentation!
+
+**What is it?**
+A way to run code **before** your app starts and hook into Next.js internals to track performance, errors, and behavior.
+
+**Setup:**
+Create `instrumentation.ts` (or `.js`) in your root (or `src/`) directory.
+
+```ts
+// instrumentation.ts
+export async function register() {
+    if (process.env.NEXT_RUNTIME === 'nodejs') {
+        await import('./instrumentation-node');
+    }
+
+    if (process.env.NEXT_RUNTIME === 'edge') {
+        await import('./instrumentation-edge');
+    }
+}
+```
+
+**OpenTelemetry:**
+Standardize your logging and tracing.
+
+```bash
+npm install @vercel/otel
+```
+
+```js
+// next.config.js
+module.exports = {
+    experimental: {
+        instrumentationHook: true,
+    },
+};
+```
+
 ### Brain Power
 🧠 Why would you lazy load a component instead of importing it normally?
 
@@ -2773,34 +2868,46 @@ export async function GET() {
 
 ---
 
-## 11. API Routes: Building APIs
+## 15. API Routes: Building APIs
 
 ### Creating API Routes
 
 ```tsx
-// app/api/hello/route.ts
-export async function GET() {
-    return Response.json({ message: 'Hello!' });
-}
+// app/api/webhooks/stripe/route.ts
+import { headers } from 'next/headers';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: Request) {
-    const data = await request.json();
-    return Response.json({ received: data });
-}
+    const body = await request.text();
+    const signature = headers().get('stripe-signature');
 
-export async function PATCH(request: Request) {
-    const data = await request.json();
-    // Update logic
-    return Response.json({ updated: true });
-}
+    let event;
 
-export async function DELETE(request: Request) {
-    // Delete logic
-    return Response.json({ deleted: true });
+    try {
+        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (err) {
+        return Response.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+    }
+
+    // Handle the event
+    switch (event.type) {
+        case 'checkout.session.completed':
+            const session = event.data.object;
+            // Fulfill the purchase...
+            await db.orders.updateStatus(session.metadata.orderId, 'paid');
+            break;
+        default:
+            console.log(`Unhandled event type ${event.type}`);
+    }
+
+    return Response.json({ received: true });
 }
 ```
 
-Visit `/api/hello` → JSON response
+Visit `/api/webhooks/stripe` → (Handled by Stripe)
 
 ### Dynamic API Routes
 
@@ -2992,7 +3099,7 @@ export async function GET() {
 
 ---
 
-## 12. Middleware: Request Processing
+## 16. Middleware: Request Processing
 
 ### Global Middleware
 
@@ -3231,7 +3338,7 @@ export const config = {
 
 ---
 
-## 13. Caching: Performance
+## 17. Caching: Performance
 
 ### Automatic Caching
 
@@ -3261,7 +3368,7 @@ revalidateTag('posts');
 
 ---
 
-## 14. Configuration: Setting Up Your App
+## 18. Configuration: Setting Up Your App
 
 ### Environment Variables
 
@@ -3355,6 +3462,52 @@ import Link from 'next/link';
 <Link<Route> href="/invalid-route" /> // ❌ Error
 ```
 
+### Linting (ESLint) & Formatting (Prettier)
+
+Keep your code clean and consistent!
+
+**ESLint (Built-in):**
+Next.js comes with ESLint out of the box.
+
+```bash
+# Run linter
+npm run lint
+```
+
+```json
+// .eslintrc.json
+{
+  "extends": ["next/core-web-vitals", "next/typescript"]
+}
+```
+
+**Prettier (Formatting):**
+ESLint finds errors, Prettier fixes style.
+
+```bash
+npm install -D prettier eslint-config-prettier
+```
+
+```json
+// .eslintrc.json
+{
+  "extends": ["next/core-web-vitals", "prettier"]
+}
+```
+
+**Watch It!**
+⚠️ **Always extend "prettier" last!** This turns off ESLint rules that might conflict with Prettier's formatting.
+
+**Prettier Config:**
+```json
+// .prettierrc
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5"
+}
+```
+
 ### Internationalization (i18n)
 
 Support multiple languages!
@@ -3445,7 +3598,7 @@ module.exports = withMDX({
 // app/blog/hello-world.mdx
 ---
 title: "Hello World"
-date: "2024-01-01"
+date: "2025-01-15"
 ---
 
 # Hello World
@@ -3534,7 +3687,836 @@ app.prepare().then(() => {
 
 ---
 
-## 15. Deployment: Going Live
+## 19. Authentication: Protecting Your App
+
+### What is NextAuth.js (Auth.js)?
+
+NextAuth.js (now called Auth.js) is the most popular authentication library for Next.js. It handles:
+- OAuth providers (Google, GitHub, etc.)
+- Email/password authentication
+- Session management
+- JWT tokens
+
+### Installation
+
+```bash
+npm install next-auth
+```
+
+### Setting Up Providers
+
+```tsx
+// app/api/auth/[...nextauth]/route.ts
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+import GitHubProvider from 'next-auth/providers/github';
+import CredentialsProvider from 'next-auth/providers/credentials';
+
+const handler = NextAuth({
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
+        GitHubProvider({
+            clientId: process.env.GITHUB_ID!,
+            clientSecret: process.env.GITHUB_SECRET!,
+        }),
+        CredentialsProvider({
+            name: 'Credentials',
+            credentials: {
+                email: { label: 'Email', type: 'email' },
+                password: { label: 'Password', type: 'password' }
+            },
+            async authorize(credentials) {
+                // Add your own logic here
+                const user = await verifyUser(credentials.email, credentials.password);
+                if (user) {
+                    return user;
+                }
+                return null;
+            }
+        })
+    ],
+    pages: {
+        signIn: '/login',
+        error: '/auth/error',
+    },
+    callbacks: {
+        async session({ session, token }) {
+            session.user.id = token.sub;
+            return session;
+        },
+    },
+});
+
+export { handler as GET, handler as POST };
+```
+
+### Session Provider
+
+```tsx
+// app/providers.tsx
+'use client';
+
+import { SessionProvider } from 'next-auth/react';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+    return <SessionProvider>{children}</SessionProvider>;
+}
+
+// app/layout.tsx
+import { Providers } from './providers';
+
+export default function RootLayout({ children }) {
+    return (
+        <html>
+            <body>
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    );
+}
+```
+
+### Using Sessions in Client Components
+
+```tsx
+'use client';
+
+import { useSession, signIn, signOut } from 'next-auth/react';
+
+export default function AuthButton() {
+    const { data: session, status } = useSession();
+
+    if (status === 'loading') {
+        return <p>Loading...</p>;
+    }
+
+    if (session) {
+        return (
+            <div>
+                <p>Welcome, {session.user?.name}!</p>
+                <img src={session.user?.image} alt="Avatar" />
+                <button onClick={() => signOut()}>Sign out</button>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <button onClick={() => signIn('google')}>Sign in with Google</button>
+            <button onClick={() => signIn('github')}>Sign in with GitHub</button>
+        </div>
+    );
+}
+```
+
+### Using Sessions in Server Components
+
+```tsx
+// app/dashboard/page.tsx
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+
+export default async function Dashboard() {
+    const session = await getServerSession();
+
+    if (!session) {
+        redirect('/login');
+    }
+
+    return (
+        <div>
+            <h1>Welcome, {session.user?.name}!</h1>
+            <p>Email: {session.user?.email}</p>
+        </div>
+    );
+}
+```
+
+### Protecting API Routes
+
+```tsx
+// app/api/protected/route.ts
+import { getServerSession } from 'next-auth';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+    const session = await getServerSession();
+
+    if (!session) {
+        return NextResponse.json(
+            { error: 'Unauthorized' },
+            { status: 401 }
+        );
+    }
+
+    return NextResponse.json({
+        message: 'Protected data',
+        user: session.user
+    });
+}
+```
+
+### Middleware Authentication
+
+```tsx
+// middleware.ts
+import { withAuth } from 'next-auth/middleware';
+
+export default withAuth({
+    pages: {
+        signIn: '/login',
+    },
+});
+
+export const config = {
+    matcher: ['/dashboard/:path*', '/admin/:path*'],
+};
+```
+
+### Brain Power
+🧠 Why use NextAuth.js instead of building your own auth?
+
+**Answer:** Security is hard! NextAuth.js handles CSRF protection, secure cookies, token rotation, and more. Building secure auth from scratch is error-prone. Let the experts handle it!
+
+### Watch It!
+⚠️ **Never store sensitive auth secrets in client components!** Use environment variables without NEXT_PUBLIC_ prefix for OAuth secrets. They should only be accessible on the server.
+
+---
+
+## 20. Navigation Hooks: useParams, usePathname, useSearchParams
+
+### useParams: Get Route Parameters
+
+```tsx
+'use client';
+
+import { useParams } from 'next/navigation';
+
+// URL: /blog/hello-world
+// app/blog/[slug]/page.tsx
+export default function BlogPost() {
+    const params = useParams();
+    // params = { slug: 'hello-world' }
+
+    return <h1>Post: {params.slug}</h1>;
+}
+```
+
+**Multiple parameters:**
+```tsx
+// URL: /shop/electronics/laptop
+// app/shop/[category]/[product]/page.tsx
+export default function Product() {
+    const params = useParams();
+    // params = { category: 'electronics', product: 'laptop' }
+
+    return (
+        <div>
+            <p>Category: {params.category}</p>
+            <p>Product: {params.product}</p>
+        </div>
+    );
+}
+```
+
+### usePathname: Get Current Path
+
+```tsx
+'use client';
+
+import { usePathname } from 'next/navigation';
+
+export default function Navigation() {
+    const pathname = usePathname();
+    // pathname = '/dashboard/settings'
+
+    return (
+        <nav>
+            <a
+                href="/dashboard"
+                className={pathname === '/dashboard' ? 'active' : ''}
+            >
+                Dashboard
+            </a>
+            <a
+                href="/dashboard/settings"
+                className={pathname === '/dashboard/settings' ? 'active' : ''}
+            >
+                Settings
+            </a>
+        </nav>
+    );
+}
+```
+
+### useSearchParams: Get Query Parameters
+
+```tsx
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+
+// URL: /search?q=nextjs&page=2
+export default function SearchPage() {
+    const searchParams = useSearchParams();
+
+    const query = searchParams.get('q'); // 'nextjs'
+    const page = searchParams.get('page'); // '2'
+    const missing = searchParams.get('foo'); // null
+
+    return (
+        <div>
+            <p>Search: {query}</p>
+            <p>Page: {page}</p>
+        </div>
+    );
+}
+```
+
+**Updating search params:**
+```tsx
+'use client';
+
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+
+export default function Filters() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const updateFilter = (key: string, value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(key, value);
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    return (
+        <div>
+            <button onClick={() => updateFilter('sort', 'price')}>
+                Sort by Price
+            </button>
+            <button onClick={() => updateFilter('sort', 'date')}>
+                Sort by Date
+            </button>
+        </div>
+    );
+}
+```
+
+### Combining Hooks
+
+```tsx
+'use client';
+
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+
+// URL: /products/shoes?color=red&size=10
+export default function ProductPage() {
+    const params = useParams();       // { category: 'shoes' }
+    const pathname = usePathname();   // '/products/shoes'
+    const searchParams = useSearchParams();
+
+    return (
+        <div>
+            <p>Category: {params.category}</p>
+            <p>Path: {pathname}</p>
+            <p>Color: {searchParams.get('color')}</p>
+            <p>Size: {searchParams.get('size')}</p>
+        </div>
+    );
+}
+```
+
+### Watch It!
+⚠️ **These hooks only work in Client Components!** Add `'use client'` directive. For Server Components, use the `params` and `searchParams` props passed to the page.
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between params prop and useParams hook?**
+**A:** The `params` prop is for Server Components (passed from Next.js). The `useParams()` hook is for Client Components. Same data, different access methods.
+
+---
+
+## 21. Special Files: File Conventions
+
+### not-found.tsx: Custom 404 Page
+
+```tsx
+// app/not-found.tsx (root level)
+import Link from 'next/link';
+
+export default function NotFound() {
+    return (
+        <div>
+            <h1>404 - Page Not Found</h1>
+            <p>The page you're looking for doesn't exist.</p>
+            <Link href="/">Go back home</Link>
+        </div>
+    );
+}
+```
+
+**Trigger programmatically:**
+```tsx
+import { notFound } from 'next/navigation';
+
+export default async function BlogPost({ params }) {
+    const post = await getPost(params.slug);
+
+    if (!post) {
+        notFound(); // Shows not-found.tsx
+    }
+
+    return <article>{post.content}</article>;
+}
+```
+
+**Nested not-found:**
+```tsx
+// app/blog/not-found.tsx
+// Only shown for /blog/* 404s
+export default function BlogNotFound() {
+    return <p>Blog post not found. Check our latest posts!</p>;
+}
+```
+
+### generateStaticParams: Static Dynamic Routes
+
+Pre-render dynamic routes at build time!
+
+```tsx
+// app/blog/[slug]/page.tsx
+
+// Generate static pages for these slugs
+export async function generateStaticParams() {
+    const posts = await getPosts();
+
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
+}
+
+// Page component
+export default async function BlogPost({ params }) {
+    const post = await getPost(params.slug);
+    return <article>{post.content}</article>;
+}
+```
+
+**Multiple parameters:**
+```tsx
+// app/products/[category]/[id]/page.tsx
+export async function generateStaticParams() {
+    const products = await getProducts();
+
+    return products.map((product) => ({
+        category: product.category,
+        id: product.id,
+    }));
+}
+// Generates: /products/electronics/123, /products/clothing/456, etc.
+```
+
+**With fetch:**
+```tsx
+export async function generateStaticParams() {
+    const res = await fetch('https://api.example.com/posts');
+    const posts = await res.json();
+
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
+}
+```
+
+### global-error.tsx: Root Error Boundary
+
+```tsx
+// app/global-error.tsx
+'use client';
+
+export default function GlobalError({
+    error,
+    reset,
+}: {
+    error: Error;
+    reset: () => void;
+}) {
+    return (
+        <html>
+            <body>
+                <h2>Something went wrong!</h2>
+                <button onClick={() => reset()}>Try again</button>
+            </body>
+        </html>
+    );
+}
+```
+
+### route.ts: Route Handlers
+
+Supported HTTP methods:
+
+```tsx
+// app/api/resource/route.ts
+export async function GET(request: Request) {}
+export async function POST(request: Request) {}
+export async function PUT(request: Request) {}
+export async function PATCH(request: Request) {}
+export async function DELETE(request: Request) {}
+export async function HEAD(request: Request) {}
+export async function OPTIONS(request: Request) {}
+```
+
+### File Convention Summary
+
+```
+app/
+├── layout.tsx          # Shared UI wrapper
+├── page.tsx            # Route UI
+├── loading.tsx         # Loading UI
+├── error.tsx           # Error UI
+├── not-found.tsx       # 404 UI
+├── global-error.tsx    # Root error UI
+├── route.ts            # API endpoint
+├── template.tsx        # Re-renders on navigation
+├── default.tsx         # Parallel route fallback
+└── middleware.ts       # Request middleware (root only)
+```
+
+### Brain Power
+🧠 Why use generateStaticParams instead of letting pages render on-demand?
+
+**Answer:** Performance! Static pages are pre-built and served from CDN instantly. No server rendering needed. Perfect for blogs, docs, and content that doesn't change often.
+
+---
+
+## 22. Security Best Practices
+
+### Content Security Policy (CSP)
+
+```tsx
+// middleware.ts
+import { NextResponse } from 'next/server';
+
+export function middleware(request) {
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+
+    const cspHeader = `
+        default-src 'self';
+        script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' blob: data:;
+        font-src 'self';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'none';
+        upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
+    const response = NextResponse.next();
+    response.headers.set('Content-Security-Policy', cspHeader);
+    response.headers.set('x-nonce', nonce);
+
+    return response;
+}
+```
+
+### Security Headers
+
+```tsx
+// next.config.js
+module.exports = {
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    {
+                        key: 'X-DNS-Prefetch-Control',
+                        value: 'on'
+                    },
+                    {
+                        key: 'Strict-Transport-Security',
+                        value: 'max-age=63072000; includeSubDomains; preload'
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'SAMEORIGIN'
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff'
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'origin-when-cross-origin'
+                    },
+                    {
+                        key: 'Permissions-Policy',
+                        value: 'camera=(), microphone=(), geolocation=()'
+                    }
+                ]
+            }
+        ];
+    }
+};
+```
+
+### Input Validation with Zod
+
+```tsx
+'use server';
+
+import { z } from 'zod';
+
+const userSchema = z.object({
+    email: z.string().email('Invalid email'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    name: z.string().min(2).max(50),
+});
+
+export async function createUser(formData: FormData) {
+    const rawData = {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        name: formData.get('name'),
+    };
+
+    const result = userSchema.safeParse(rawData);
+
+    if (!result.success) {
+        return { errors: result.error.flatten().fieldErrors };
+    }
+
+    // Safe to use result.data
+    await db.users.create({ data: result.data });
+}
+```
+
+### Environment Variable Validation
+
+```tsx
+// lib/env.ts
+import { z } from 'zod';
+
+const envSchema = z.object({
+    DATABASE_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string().min(32),
+    NEXTAUTH_URL: z.string().url(),
+});
+
+export const env = envSchema.parse(process.env);
+```
+
+### Rate Limiting
+
+```tsx
+// lib/rate-limit.ts
+const rateLimit = new Map();
+
+export function rateLimiter(ip: string, limit = 10, window = 60000) {
+    const now = Date.now();
+    const windowStart = now - window;
+
+    const requestTimestamps = rateLimit.get(ip) || [];
+    const requestsInWindow = requestTimestamps.filter(
+        (timestamp: number) => timestamp > windowStart
+    );
+
+    if (requestsInWindow.length >= limit) {
+        return false; // Rate limited
+    }
+
+    requestsInWindow.push(now);
+    rateLimit.set(ip, requestsInWindow);
+    return true; // Allowed
+}
+```
+
+```tsx
+// app/api/submit/route.ts
+import { rateLimiter } from '@/lib/rate-limit';
+
+export async function POST(request: Request) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+
+    if (!rateLimiter(ip)) {
+        return Response.json(
+            { error: 'Too many requests' },
+            { status: 429 }
+        );
+    }
+
+    // Process request...
+}
+```
+
+### Watch It!
+⚠️ **Never trust client input!** Always validate on the server. Client-side validation is for UX, server-side validation is for security. Use libraries like Zod for both.
+
+### There are NO Dumb Questions
+
+**Q: Do I need CSP for every app?**
+**A:** For production apps with user content, YES! CSP prevents XSS attacks. Start strict and loosen as needed.
+
+**Q: Why validate environment variables?**
+**A:** Fail fast! If a required env var is missing, you want to know at startup, not when a user hits that code path.
+
+---
+
+## 23. Turbopack: The New Bundler
+
+### What is Turbopack?
+
+Turbopack is Next.js's new Rust-based bundler, designed to replace Webpack. It's significantly faster!
+
+**Benefits:**
+- Up to 700x faster than Webpack
+- Incremental compilation
+- Built in Rust for speed
+- Drop-in replacement
+
+### Using Turbopack
+
+```bash
+# Development with Turbopack
+next dev --turbo
+
+# Or in package.json
+{
+    "scripts": {
+        "dev": "next dev --turbo"
+    }
+}
+```
+
+### When to Use Turbopack
+
+**Use Turbopack when:**
+- You want faster dev server startup
+- You want faster hot module replacement (HMR)
+- You're starting a new project
+
+**Stick with Webpack when:**
+- You need custom Webpack plugins
+- You use unsupported features
+- You need production builds (Turbopack is dev-only currently)
+
+### Configuration
+
+```js
+// next.config.js
+module.exports = {
+    experimental: {
+        turbo: {
+            rules: {
+                '*.svg': {
+                    loaders: ['@svgr/webpack'],
+                    as: '*.js',
+                },
+            },
+        },
+    },
+};
+```
+
+### Watch It!
+⚠️ **Turbopack is still in beta for production builds!** Use it for development, but production builds still use Webpack. Check the Next.js docs for the latest status.
+
+---
+
+## 24. Partial Prerendering (PPR)
+
+### What is PPR?
+
+Partial Prerendering combines static and dynamic rendering in a single page. The static shell loads instantly, then dynamic content streams in.
+
+```
+┌─────────────────────────────┐
+│ Static Header (instant)     │
+├─────────────────────────────┤
+│ Static Content (instant)    │
+├─────────────────────────────┤
+│ [Loading...] → Dynamic Data │
+├─────────────────────────────┤
+│ Static Footer (instant)     │
+└─────────────────────────────┘
+```
+
+### Enabling PPR
+
+```js
+// next.config.js
+module.exports = {
+    experimental: {
+        ppr: true,
+    },
+};
+```
+
+### Using PPR
+
+```tsx
+// app/dashboard/page.tsx
+import { Suspense } from 'react';
+
+export default function Dashboard() {
+    return (
+        <div>
+            {/* Static - rendered at build time */}
+            <header>
+                <h1>Dashboard</h1>
+                <nav>...</nav>
+            </header>
+
+            {/* Dynamic - streams in */}
+            <Suspense fallback={<p>Loading stats...</p>}>
+                <DynamicStats />
+            </Suspense>
+
+            {/* Static */}
+            <footer>© 2025 My App</footer>
+        </div>
+    );
+}
+
+async function DynamicStats() {
+    const stats = await fetch('https://api.example.com/stats', {
+        cache: 'no-store' // Makes this dynamic
+    });
+
+    return <StatsDisplay data={stats} />;
+}
+```
+
+### How PPR Works
+
+1. **Build time:** Static parts are pre-rendered
+2. **Request time:** Static shell served instantly from CDN
+3. **Streaming:** Dynamic parts stream in with Suspense
+
+### Benefits
+
+- **Fastest possible initial load** (static shell)
+- **Fresh dynamic data** (streaming)
+- **Best of both worlds** (SSG + SSR)
+
+### Brain Power
+🧠 How is PPR different from regular Suspense streaming?
+
+**Answer:** Regular streaming renders everything on request. PPR pre-renders the static shell at build time and only streams the dynamic parts. The static shell loads from CDN instantly!
+
+### Watch It!
+⚠️ **PPR is experimental!** It's a preview feature as of Next.js 14. The API may change. Great to learn, but check docs before production use.
+
+---
+
+## 25. Deployment: Going Live
 
 ### Deploy to Vercel (Easiest)
 
@@ -3585,6 +4567,27 @@ module.exports = {
 npm run build
 # Generates static HTML in out/
 ```
+
+### Output Modes & Adapters
+
+Customize your build for your hosting platform.
+
+**Standalone Mode (Docker/Self-hosting):**
+Automatically traces dependencies and creates a minimal server folder. Huge space saver!
+
+```js
+// next.config.js
+module.exports = {
+    output: 'standalone'
+};
+```
+
+**Result:**
+Creates `.next/standalone`. You can run this folder with just `node server.js` without `node_modules` (mostly)!
+
+**Brain Power**
+🧠 Why is "standalone" mode better for Docker?
+**Answer:** It copies only the necessary files from `node_modules` into the output folder. Your Docker image becomes significantly smaller because you don't need the entire 500MB+ `node_modules` folder, just the parts you actually use.
 
 ---
 
@@ -3833,8 +4836,86 @@ npx playwright test
 npx cypress run
 ```
 
+**Authentication (NextAuth.js):**
+```tsx
+// app/api/auth/[...nextauth]/route.ts
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+
+const handler = NextAuth({
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
+    ],
+});
+export { handler as GET, handler as POST };
+
+// Check session (server)
+import { getServerSession } from 'next-auth';
+const session = await getServerSession();
+
+// Check session (client)
+'use client';
+import { useSession } from 'next-auth/react';
+const { data: session } = useSession();
+```
+
+**Navigation Hooks:**
+```tsx
+'use client';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+
+const params = useParams();           // { slug: 'hello' }
+const pathname = usePathname();       // '/blog/hello'
+const searchParams = useSearchParams();
+const query = searchParams.get('q');  // 'nextjs'
+```
+
+**Special Files:**
+```tsx
+// not-found.tsx - Custom 404
+import { notFound } from 'next/navigation';
+if (!post) notFound();
+
+// generateStaticParams - Pre-render dynamic routes
+export async function generateStaticParams() {
+    const posts = await getPosts();
+    return posts.map((post) => ({ slug: post.slug }));
+}
+```
+
+**Security:**
+```tsx
+// Input validation with Zod
+import { z } from 'zod';
+const schema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+});
+const result = schema.safeParse(data);
+```
+
+**Turbopack:**
+```bash
+# Fast dev server with Turbopack
+next dev --turbo
+```
+
+**Partial Prerendering (PPR):**
+```tsx
+// next.config.js
+module.exports = { experimental: { ppr: true } };
+
+// Static shell + dynamic streaming
+<Suspense fallback={<Loading />}>
+    <DynamicComponent />
+</Suspense>
+```
+
 ---
 
 **Created in the style of Head First books**
 
-*Now go build the next big thing with Next.js!* 🚀
+*Now go build the next big thing with Next.js!*
