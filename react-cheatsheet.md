@@ -249,6 +249,44 @@ function App() {
 
 **Answer:** Composition is more flexible! Instead of "is-a" relationships (inheritance), you have "has-a" relationships. A Dashboard "has" a Header, not "is a" Header. Easier to reuse and understand.
 
+### Complete Components Example
+
+```jsx
+function Avatar({ src, alt, size = 'md' }) {
+    const sizes = { sm: 32, md: 48, lg: 64 };
+    return <img src={src} alt={alt} width={sizes[size]} className="avatar" />;
+}
+
+function UserInfo({ name, role }) {
+    return (
+        <div className="user-info">
+            <strong>{name}</strong>
+            <span>{role}</span>
+        </div>
+    );
+}
+
+function UserCard({ user }) {
+    return (
+        <div className="user-card">
+            <Avatar src={user.avatar} alt={user.name} size="lg" />
+            <UserInfo name={user.name} role={user.role} />
+        </div>
+    );
+}
+```
+
+### There are NO Dumb Questions
+
+**Q: Should I use named functions or arrow functions for components?**
+**A:** Either works! Named functions show up better in DevTools and stack traces. Arrow functions are shorter. Teams usually pick one and stay consistent.
+
+**Q: How small should a component be?**
+**A:** If a component does one thing and you can name it clearly, it's the right size. A 5-line component is fine. Don't over-split - if extracting a piece doesn't add clarity, keep it inline.
+
+**Q: Can a component return `null`?**
+**A:** Yes! Returning `null` renders nothing. Useful for conditional rendering: `if (!isVisible) return null;`
+
 ---
 
 ## 3. JSX: HTML in JavaScript
@@ -430,6 +468,11 @@ function UserCard() {
     );
 }
 ```
+
+### Brain Power
+🧠 What does JSX actually compile to?
+
+**Answer:** JSX is syntactic sugar for `React.createElement()` calls. `<div className="box">Hello</div>` becomes `React.createElement('div', { className: 'box' }, 'Hello')`. The build tool (Babel/SWC) handles this transformation.
 
 ### There are NO Dumb Questions
 
@@ -1116,6 +1159,22 @@ function TodoApp() {
 }
 ```
 
+### Brain Power
+🧠 Why does React use `onClick` instead of `onclick` or `addEventListener`?
+
+**Answer:** React uses a synthetic event system that wraps native events. `onClick` (camelCase) is consistent with JSX conventions and provides cross-browser compatibility automatically. React also handles event cleanup for you when components unmount.
+
+### There are NO Dumb Questions
+
+**Q: Should I define handlers inside the component or outside?**
+**A:** Inside! Handlers often need access to state and props via closures. Define them outside only if they're pure utility functions.
+
+**Q: What's the difference between `onChange` in React vs HTML?**
+**A:** In HTML, `onchange` fires on blur. In React, `onChange` fires on every keystroke (like `oninput`). This gives you real-time control.
+
+**Q: How do I prevent the default browser behavior?**
+**A:** Call `event.preventDefault()` at the start of your handler. Common for form submissions and link clicks.
+
 ---
 
 ## 7. Conditional Rendering: Show or Hide
@@ -1209,6 +1268,49 @@ function Status({ status }) {
 - **if-else:** When you need to return completely different components or have complex logic
 - **ternary `? :`:** When you have exactly two outcomes and want inline rendering
 - **`&&`:** When you want to show something OR nothing (not two alternatives)
+
+### Complete Conditional Rendering Example
+
+```jsx
+function DataDisplay({ status, data, error }) {
+    // Early returns for different states
+    if (status === 'loading') {
+        return <div className="skeleton">Loading...</div>;
+    }
+
+    if (status === 'error') {
+        return (
+            <div className="error" role="alert">
+                <h3>Something went wrong</h3>
+                <p>{error.message}</p>
+                <button onClick={() => window.location.reload()}>Retry</button>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            {data.length > 0 ? (
+                <ul>
+                    {data.map(item => <li key={item.id}>{item.name}</li>)}
+                </ul>
+            ) : (
+                <p className="empty">No items found</p>
+            )}
+
+            {data.length > 10 && <button>Show More</button>}
+        </div>
+    );
+}
+```
+
+### There are NO Dumb Questions
+
+**Q: Why does `{false && <Component />}` render nothing but `{0 && <Component />}` renders "0"?**
+**A:** React doesn't render `false`, `null`, or `undefined`. But `0` is a valid number to display! That's why `&&` with numeric conditions is dangerous.
+
+**Q: Can I use `switch` statements in JSX?**
+**A:** Not inline, but you can use them before the return statement, or create a mapping object: `const views = { loading: <Spinner />, error: <Error /> }; return views[status];`
 
 ---
 
@@ -1446,6 +1548,17 @@ function SignupForm() {
 - **Controlled:** When you need instant validation, conditional fields, or to transform input (e.g., uppercase). More React-like.
 - **Uncontrolled:** For simple forms where you only need values on submit. Less re-renders, better performance for large forms.
 
+### There are NO Dumb Questions
+
+**Q: Why does react-hook-form perform better than controlled forms?**
+**A:** It uses uncontrolled inputs internally (refs), so typing doesn't trigger re-renders. Only validation and submission trigger updates.
+
+**Q: How do I handle file inputs in React?**
+**A:** File inputs are always uncontrolled (you can't set their value). Use a ref or `e.target.files` to access the selected file.
+
+**Q: Should I validate on the client, server, or both?**
+**A:** Both! Client-side for UX (instant feedback). Server-side for security (client validation can be bypassed).
+
 ---
 
 ## 10. Rules of Hooks
@@ -1545,6 +1658,74 @@ function Profile({ userId }) {
 }
 ```
 
+### There are NO Dumb Questions
+
+**Q: Why can't React just figure out hooks regardless of call order?**
+**A:** React stores hook state in a simple linked list. Each hook corresponds to a position. If the order changes, hook 1 might get hook 2's state. Named hooks would solve this but add runtime overhead.
+
+**Q: Can I call a hook inside a try-catch?**
+**A:** No! `try-catch` is a control flow construct. The hook might not execute if an error occurs before it, changing call order.
+
+### Complete Rules of Hooks Example
+
+```jsx
+import { useState, useEffect, useCallback } from 'react';
+
+// Custom hook - follows the rules internally
+function useWindowSize() {
+    const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        const handleResize = () => {
+            setSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);  // ✅ Hook at top level of custom hook
+
+    return size;
+}
+
+// Component using hooks correctly
+function ResponsiveGallery({ images, columns = 3 }) {
+    // ✅ All hooks at the top level, always called in the same order
+    const [selected, setSelected] = useState(null);
+    const [page, setPage] = useState(1);
+    const { width } = useWindowSize();
+
+    // ✅ Derived value (not a hook, just computation)
+    const responsiveColumns = width < 768 ? 1 : width < 1024 ? 2 : columns;
+    const visibleImages = images.slice(0, page * responsiveColumns * 3);
+
+    // ✅ useCallback at top level
+    const handleSelect = useCallback((img) => {
+        setSelected(img);
+    }, []);
+
+    // ✅ Conditional rendering AFTER all hooks
+    if (images.length === 0) {
+        return <p>No images to display</p>;
+    }
+
+    return (
+        <div style={{ columns: responsiveColumns }}>
+            {visibleImages.map(img => (
+                <img
+                    key={img.id}
+                    src={img.url}
+                    alt={img.alt}
+                    onClick={() => handleSelect(img)}
+                    style={{ outline: selected?.id === img.id ? '3px solid blue' : 'none' }}
+                />
+            ))}
+            {visibleImages.length < images.length && (
+                <button onClick={() => setPage(p => p + 1)}>Load More</button>
+            )}
+        </div>
+    );
+}
+```
+
 ---
 
 ## 11. useEffect: Side Effects
@@ -1614,27 +1795,29 @@ function ProductDetails({ productId }) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        let cancelled = false;  // Prevent state update on unmounted component
+        const controller = new AbortController();
 
         async function fetchProduct() {
             try {
                 setLoading(true);
-                const res = await fetch(`/api/products/${productId}`);
+                const res = await fetch(`/api/products/${productId}`, {
+                    signal: controller.signal
+                });
                 const data = await res.json();
-                if (!cancelled) {
-                    setProduct(data);
-                    setError(null);
-                }
+                setProduct(data);
+                setError(null);
             } catch (err) {
-                if (!cancelled) setError(err.message);
+                if (err.name !== 'AbortError') {
+                    setError(err.message);
+                }
             } finally {
-                if (!cancelled) setLoading(false);
+                setLoading(false);
             }
         }
 
         fetchProduct();
 
-        return () => { cancelled = true; };  // Cleanup
+        return () => controller.abort();  // Cancel on unmount or productId change
     }, [productId]);
 
     if (loading) return <p>Loading...</p>;
@@ -1672,6 +1855,17 @@ useEffect(() => {
 - **No array:** Runs after EVERY render (rarely what you want)
 - **Empty `[]`:** Runs ONCE on mount (like componentDidMount)
 - **`[dep]`:** Runs on mount AND whenever `dep` changes
+
+### There are NO Dumb Questions
+
+**Q: Why use AbortController instead of a `cancelled` flag?**
+**A:** AbortController actually cancels the network request (saving bandwidth), while a flag just ignores the response. AbortController is the modern standard for fetch cancellation.
+
+**Q: Can I use async directly in useEffect?**
+**A:** No! `useEffect(() => async () => {})` is wrong because async returns a Promise, but cleanup must be a function. Define an async function inside and call it.
+
+**Q: Should I fetch data in useEffect or use a library?**
+**A:** For production, use React Query or SWR. They handle caching, deduplication, retries, and background updates. `useEffect` fetching is fine for learning but error-prone in production.
 
 ---
 
@@ -1818,6 +2012,14 @@ function PasswordField() {
 2. Doesn't need to trigger a re-render when it changes
 3. Examples: DOM refs, interval IDs, previous values, mutable values in closures
 
+### There are NO Dumb Questions
+
+**Q: What's the difference between `useRef` and a module-level variable?**
+**A:** A module variable is shared across all instances of a component. `useRef` gives each component instance its own value.
+
+**Q: When would I use `useLayoutEffect` over `useEffect`?**
+**A:** Only when you need to measure or mutate the DOM before the browser paints. Examples: tooltips positioning, scroll restoration, animations that must not flicker.
+
 ---
 
 ## 13. Custom Hooks: Reusable Logic
@@ -1867,16 +2069,18 @@ function useFetch(url) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        let cancelled = false;
+        const controller = new AbortController();
 
         setLoading(true);
-        fetch(url)
+        fetch(url, { signal: controller.signal })
             .then(res => res.json())
-            .then(data => !cancelled && setData(data))
-            .catch(err => !cancelled && setError(err))
-            .finally(() => !cancelled && setLoading(false));
+            .then(data => setData(data))
+            .catch(err => {
+                if (err.name !== 'AbortError') setError(err);
+            })
+            .finally(() => setLoading(false));
 
-        return () => { cancelled = true; };
+        return () => controller.abort();
     }, [url]);
 
     return { data, loading, error };
@@ -1914,6 +2118,17 @@ function SearchInput() {
 
 ### Watch It!
 ⚠️ **Custom hooks share logic, not state!** Each component that calls a custom hook gets its own isolated state. The hook code is shared, but the values are independent.
+
+### There are NO Dumb Questions
+
+**Q: How do I test custom hooks?**
+**A:** Use `renderHook` from `@testing-library/react-hooks`. It renders your hook in isolation so you can test its return values and state updates without a full component.
+
+**Q: Can custom hooks call other custom hooks?**
+**A:** Yes! That's a major benefit. You can compose hooks together. A `useAuth` hook might use `useFetch` and `useLocalStorage` internally.
+
+**Q: Should I put each custom hook in its own file?**
+**A:** Yes, one hook per file is the convention. Name the file the same as the hook: `useLocalStorage.js`. This makes hooks easy to find and import.
 
 ---
 
@@ -2013,6 +2228,17 @@ const value = useMemo(() => ({ theme, toggleTheme }), [theme]);
 - **Context:** For truly global data (theme, auth, locale) that changes infrequently
 - **Libraries (Zustand, Redux):** For complex state with frequent updates, or when you need devtools/middleware
 
+### There are NO Dumb Questions
+
+**Q: Why does context cause performance issues?**
+**A:** When a context value changes, ALL components consuming that context re-render - even if they only use a small part of the value. Split contexts by concern (AuthContext, ThemeContext) rather than one giant AppContext.
+
+**Q: What's the point of the `useTheme` wrapper hook?**
+**A:** It adds error checking (throws if used outside Provider) and hides the context import. Consumers just import `useTheme` instead of knowing about `ThemeContext` directly.
+
+**Q: Can I nest providers of the same context?**
+**A:** Yes! Inner providers override outer ones. A component reads from the closest Provider above it in the tree.
+
 ---
 
 ## 15. Portals: Escaping the DOM
@@ -2098,6 +2324,17 @@ function Tooltip({ children, text, targetRef }) {
 3. CSS `transform` creating new containing blocks
 
 Portals render outside these constraints entirely.
+
+### There are NO Dumb Questions
+
+**Q: Do portals break event bubbling?**
+**A:** No! Events still bubble through the React component tree, not the DOM tree. A click inside a portal still triggers onClick handlers on React ancestors.
+
+**Q: What if the portal target element doesn't exist yet?**
+**A:** The portal will fail silently. Ensure the target element exists in your HTML before the component mounts. Use `document.body` as a safe fallback.
+
+**Q: Can I use portals for tooltips and dropdowns too?**
+**A:** Yes! Any UI that needs to visually "escape" its container (overflow: hidden, z-index issues) benefits from portals. Libraries like Radix and Headless UI use portals internally.
 
 ---
 
@@ -2191,6 +2428,17 @@ function App() {
 2. Expose only specific methods (encapsulation)
 3. Create a cleaner API for complex components
 4. Prevent parents from doing unexpected things with the DOM node
+
+### There are NO Dumb Questions
+
+**Q: Do I always need forwardRef for component libraries?**
+**A:** Yes, if consumers might need to access the underlying DOM node (for focus management, measurements, etc.). It's standard practice for input, button, and container components in libraries.
+
+**Q: Is forwardRef being replaced in React 19?**
+**A:** React 19 lets you pass `ref` as a regular prop, making `forwardRef` unnecessary. But `forwardRef` still works and is needed for React 18 and earlier.
+
+**Q: Can I forward a ref through multiple levels?**
+**A:** Yes, each level needs `forwardRef`. Or use context to pass the ref down without prop drilling.
 
 ---
 
@@ -2289,6 +2537,26 @@ function Button() {
     return <button onClick={handleClick}>Click</button>;
 }
 ```
+
+### Brain Power
+🧠 Where should you place error boundaries in your app?
+
+**Answer:** At strategic levels:
+1. Around the entire app (catch-all)
+2. Around each major route/page
+3. Around risky third-party components
+This way one component crashing doesn't take down the whole app.
+
+### There are NO Dumb Questions
+
+**Q: Why are error boundaries class components?**
+**A:** There's no hook equivalent for `componentDidCatch` or `getDerivedStateFromError` yet. The `react-error-boundary` library provides a functional wrapper around this class component pattern.
+
+**Q: How do I catch async errors (like failed fetch)?**
+**A:** Error boundaries don't catch async errors. Handle those with try-catch in your async code, or use React Query which has built-in error handling.
+
+**Q: Can I recover from errors without a full page reload?**
+**A:** Yes! Use `resetErrorBoundary` (from react-error-boundary) or `resetKeys` to reset the boundary when conditions change, re-mounting the children.
 
 ---
 
@@ -2439,6 +2707,17 @@ function ProtectedRoute({ children }) {
 
 **Answer:** `<a>` causes a full page reload. `<Link>` uses JavaScript to update the URL and swap components without reloading - that's what makes it a Single Page Application (SPA).
 
+### There are NO Dumb Questions
+
+**Q: How do I pass data between routes?**
+**A:** Use URL params (`:id`), search params (`?key=value`), or the `state` prop on `<Navigate>` / `navigate()` for data that shouldn't be in the URL.
+
+**Q: What's the difference between `<Navigate>` and `navigate()`?**
+**A:** `<Navigate>` is a component for declarative redirects (render it to redirect). `navigate()` is imperative (call it in event handlers or effects).
+
+**Q: How do I handle 404 pages?**
+**A:** Add a catch-all route with `path="*"` as the last route. It matches any URL that doesn't match earlier routes.
+
 ---
 
 ## 19. API Calls: Fetching Data
@@ -2530,6 +2809,17 @@ const [user, posts] = await Promise.all([
 
 **Answer:** React Query handles: caching, background updates, deduplication, retry logic, loading/error states, pagination, optimistic updates, and garbage collection. Building this yourself is error-prone and time-consuming.
 
+### There are NO Dumb Questions
+
+**Q: Do I still need useEffect for fetching if I use React Query?**
+**A:** No! React Query replaces the useEffect + useState pattern entirely. It manages loading, error, and data states internally.
+
+**Q: What does `staleTime` actually do?**
+**A:** It controls how long data is considered "fresh." During this period, React Query returns cached data instantly without refetching. After staleTime, data is refetched in the background on the next access.
+
+**Q: How do I handle authentication headers?**
+**A:** Set default headers in the `queryFn` or configure a global fetch wrapper. React Query doesn't manage headers - it just calls your fetch function.
+
 ---
 
 ## 20. State Management: Zustand
@@ -2606,6 +2896,22 @@ const state = useStore();
 // Good: Only re-renders when count changes
 const count = useStore((state) => state.count);
 ```
+
+### Brain Power
+🧠 Why does Zustand use selectors instead of returning the whole store?
+
+**Answer:** Zustand uses object reference equality to decide re-renders. If you select the whole store, ANY change triggers a re-render. Selectors let each component subscribe to only the slice it needs.
+
+### There are NO Dumb Questions
+
+**Q: How is Zustand different from Redux?**
+**A:** Zustand has no boilerplate (no reducers, actions, dispatch). You mutate state directly with `set()`. No Provider needed - stores are global by default.
+
+**Q: Can I use Zustand with TypeScript?**
+**A:** Yes, it has excellent TypeScript support. Type your store: `create<StoreType>()((set) => ({ ... }))`.
+
+**Q: How do I access the store outside React components?**
+**A:** Call `useStore.getState()` or `useStore.setState()` directly. Unlike Context, Zustand stores work outside the React tree.
 
 ---
 
@@ -2693,6 +2999,22 @@ const ProductList = memo(function ProductList({ items, onAdd }) {
 ### Watch It!
 ⚠️ **Don't optimize prematurely!** Memoization has costs (memory, complexity). Only optimize when you have actual performance problems. Use React DevTools Profiler to find slow renders.
 
+### Brain Power
+🧠 Why must you combine `memo` with `useCallback`/`useMemo` for them to work?
+
+**Answer:** `memo` does a shallow comparison of props. If a parent re-renders and creates a new function or object (which happens every render), the prop reference changes and `memo` re-renders anyway. `useCallback`/`useMemo` preserve references.
+
+### There are NO Dumb Questions
+
+**Q: When should I NOT use memo?**
+**A:** When props change on almost every render anyway, when the component is cheap to render, or when the component accepts `children` (children are always a new reference).
+
+**Q: What's the difference between useMemo and useCallback?**
+**A:** `useMemo` memoizes a computed value. `useCallback` memoizes a function. `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`.
+
+**Q: Does React.memo do a deep comparison?**
+**A:** No, shallow only (compares prop references). For deep comparison, pass a custom `areEqual` function as the second argument to `memo()`, but this can be expensive.
+
 ---
 
 ## 22. useReducer: Complex State
@@ -2776,6 +3098,17 @@ function TodoApp() {
 - **useState:** Simple values, independent updates, few state variables
 - **useReducer:** Complex objects, related state changes, state machine logic, when next state depends on previous
 
+### There are NO Dumb Questions
+
+**Q: Can I use useReducer with Context for global state?**
+**A:** Yes! `useReducer` + Context is a lightweight Redux alternative. Put the reducer in a Provider and pass `dispatch` through context. But for complex apps, Zustand is simpler.
+
+**Q: Should my reducer handle async logic?**
+**A:** No! Reducers must be pure functions. Handle async logic outside the reducer (in event handlers or effects), then dispatch the result.
+
+**Q: What's the `default` case for?**
+**A:** It catches unrecognized action types. Return the current state unchanged. In TypeScript, you can use `never` to ensure exhaustive matching.
+
 ---
 
 ## 23. Code Splitting & Lazy Loading
@@ -2837,6 +3170,22 @@ const Dashboard = lazy(() => import('./Dashboard.lazy'));
 
 ### Watch It!
 ⚠️ **Don't lazy load everything!** Only split large components or routes that aren't needed immediately. Over-splitting creates too many network requests.
+
+### Brain Power
+🧠 Where is the best place to put Suspense boundaries?
+
+**Answer:** Around route-level components (each page loads independently) and around expensive below-the-fold components. The fallback UI replaces everything inside the boundary, so don't wrap too much or too little.
+
+### There are NO Dumb Questions
+
+**Q: What happens if the lazy-loaded chunk fails to download?**
+**A:** The Suspense boundary throws an error, which can be caught by an Error Boundary above it. Combine them for a robust loading pattern.
+
+**Q: Can I prefetch lazy components?**
+**A:** Yes! Call the import function early: `const preload = () => import('./Dashboard')`. Trigger it on hover or route change for instant navigation.
+
+**Q: Does React.lazy work with Server-Side Rendering?**
+**A:** Not directly. For SSR, use framework-specific solutions like Next.js `dynamic()` or `@loadable/component`.
 
 ---
 
@@ -2920,9 +3269,123 @@ function UserProfile() {
 }
 ```
 
+### React 19 Features
+
+#### use() Hook: Reading Resources in Render
+
+```jsx
+import { use, Suspense } from 'react';
+
+// Read a promise directly during render
+function UserProfile({ userPromise }) {
+    const user = use(userPromise);  // Suspends until resolved
+    return <h1>{user.name}</h1>;
+}
+
+// Read context conditionally (unlike useContext!)
+function Theme({ showTheme }) {
+    if (showTheme) {
+        const theme = use(ThemeContext);  // Can be called conditionally!
+        return <p>Theme: {theme}</p>;
+    }
+    return null;
+}
+
+// Usage with Suspense
+function App() {
+    const userPromise = fetchUser(1);  // Start fetching
+
+    return (
+        <Suspense fallback={<p>Loading...</p>}>
+            <UserProfile userPromise={userPromise} />
+        </Suspense>
+    );
+}
+```
+
+#### Server Actions & useActionState
+
+```jsx
+'use client';
+
+import { useActionState } from 'react';
+
+// Server Action (defined with 'use server')
+async function submitForm(previousState, formData) {
+    'use server';
+    const name = formData.get('name');
+
+    if (!name) return { error: 'Name is required' };
+
+    await saveToDatabase({ name });
+    return { success: true, message: `Saved ${name}` };
+}
+
+function ContactForm() {
+    const [state, formAction, isPending] = useActionState(submitForm, null);
+
+    return (
+        <form action={formAction}>
+            <input name="name" placeholder="Your name" />
+            <button type="submit" disabled={isPending}>
+                {isPending ? 'Saving...' : 'Submit'}
+            </button>
+            {state?.error && <p className="error">{state.error}</p>}
+            {state?.success && <p className="success">{state.message}</p>}
+        </form>
+    );
+}
+```
+
+#### useOptimistic: Optimistic UI Updates
+
+```jsx
+import { useOptimistic } from 'react';
+
+function TodoList({ todos, addTodo }) {
+    const [optimisticTodos, addOptimistic] = useOptimistic(
+        todos,
+        (currentTodos, newTodo) => [...currentTodos, { ...newTodo, pending: true }]
+    );
+
+    async function handleSubmit(formData) {
+        const newTodo = { text: formData.get('text'), id: Date.now() };
+        addOptimistic(newTodo);  // Show immediately
+        await addTodo(newTodo);  // Actually save
+    }
+
+    return (
+        <div>
+            <form action={handleSubmit}>
+                <input name="text" />
+                <button type="submit">Add</button>
+            </form>
+            <ul>
+                {optimisticTodos.map(todo => (
+                    <li key={todo.id} style={{ opacity: todo.pending ? 0.5 : 1 }}>
+                        {todo.text}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+```
+
 ### Brain Power
 🧠 When should you use `useTransition` vs `useDeferredValue`?
 **Answer:** Use `useTransition` when you control the state update (wrapping `setState`). Use `useDeferredValue` when you receive a value as a prop and want to defer rendering based on it.
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between `use()` and `useContext()`?**
+**A:** `use()` can be called conditionally (inside if/loops), while `useContext()` must follow the Rules of Hooks. `use()` also works with promises, not just context.
+
+**Q: Do I need a framework for Server Actions?**
+**A:** Yes, currently. Server Actions require a bundler that supports the `'use server'` directive (Next.js 14+, or a custom setup with React's bundler plugins).
+
+**Q: What happened to `useFormStatus`?**
+**A:** It still exists! Use it in child components of a `<form>` to access the form's pending state without prop drilling.
 
 ---
 
@@ -3042,6 +3505,22 @@ const AuthContext = createContext<AuthContextType | null>(null);
 ### Watch It!
 ⚠️ **Don't overuse `any`!** It defeats the purpose of TypeScript. Use `unknown` if you really don't know the type, or create proper types.
 
+### Brain Power
+🧠 Why type component props with `interface` instead of `type`?
+
+**Answer:** Both work, but `interface` can be extended (`extends`) and merged (declaration merging). Convention in React: use `interface` for props and component contracts, `type` for unions, intersections, and utility types.
+
+### There are NO Dumb Questions
+
+**Q: Do I need to type every single prop?**
+**A:** Yes, that's the point. TypeScript catches prop typos and missing required props at compile time. Use `?` for optional props with sensible defaults.
+
+**Q: How do I type a component that accepts all HTML attributes?**
+**A:** Extend from React's built-in types: `interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> { variant: 'primary' | 'secondary'; }`.
+
+**Q: What's the difference between `React.FC` and regular function typing?**
+**A:** `React.FC` implicitly adds `children` and has issues with generics. Most teams now prefer typing props directly: `function Button(props: ButtonProps)`.
+
 ---
 
 ## 26. Styling: CSS Solutions
@@ -3129,6 +3608,22 @@ function Box({ color, size }) {
 
 ### Watch It!
 ⚠️ **Pick one approach per project!** Mixing CSS Modules, Tailwind, and styled-components creates confusion. Choose one and stick with it.
+
+### Brain Power
+🧠 Which styling approach has the best runtime performance?
+
+**Answer:** CSS Modules and Tailwind have zero runtime cost (styles are extracted at build time). Styled-components and CSS-in-JS have runtime overhead (generating styles on each render). For performance-critical apps, prefer build-time solutions.
+
+### There are NO Dumb Questions
+
+**Q: Can I use Tailwind with component libraries?**
+**A:** Yes! Libraries like shadcn/ui are built on Tailwind. You can also combine Tailwind for layout/spacing with a component library for complex widgets.
+
+**Q: Why not just use inline styles for everything?**
+**A:** Inline styles can't handle pseudo-classes (`:hover`), media queries, or animations. They also skip the CSS cascade, making theming difficult.
+
+**Q: Are styled-components still recommended?**
+**A:** They work but are losing popularity to zero-runtime solutions (Tailwind, CSS Modules). The runtime cost of generating styles on each render adds up in large apps.
 
 ---
 
@@ -3245,8 +3740,71 @@ function Menu({ items }) {
 }
 ```
 
+### Live Regions: Announcing Dynamic Content
+
+```jsx
+function Notifications() {
+    const [message, setMessage] = useState('');
+
+    const saveItem = async () => {
+        await save();
+        setMessage('Item saved successfully');  // Screen reader announces this
+    };
+
+    return (
+        <div>
+            <button onClick={saveItem}>Save</button>
+            {/* aria-live announces content changes to screen readers */}
+            <div aria-live="polite" role="status">
+                {message}
+            </div>
+        </div>
+    );
+}
+
+// For urgent announcements (errors, alerts)
+<div aria-live="assertive" role="alert">
+    {error && `Error: ${error}`}
+</div>
+```
+
+### Skip Navigation Links
+
+```jsx
+function App() {
+    return (
+        <>
+            {/* Hidden until focused - lets keyboard users skip nav */}
+            <a href="#main-content" className="skip-link">
+                Skip to main content
+            </a>
+            <nav>...</nav>
+            <main id="main-content" tabIndex={-1}>
+                {/* Page content */}
+            </main>
+        </>
+    );
+}
+```
+
 ### Watch It!
 ⚠️ **Test with a screen reader!** VoiceOver (Mac), NVDA (Windows), or browser extensions. What looks right might not sound right.
+
+### Brain Power
+🧠 Why is `<div onClick>` worse than `<button onClick>` for accessibility?
+
+**Answer:** `<button>` gives you for free: keyboard activation (Enter/Space), focus indication, screen reader announcement as "button", and disabled state. A `<div>` gets none of these unless you manually add `role="button"`, `tabIndex`, `onKeyDown`, and `aria-disabled`.
+
+### There are NO Dumb Questions
+
+**Q: When should I use aria-label vs aria-labelledby?**
+**A:** Use `aria-label` for a short inline label (icon buttons). Use `aria-labelledby` to reference visible text elsewhere on the page as the label.
+
+**Q: How do I make a custom dropdown accessible?**
+**A:** Don't build one from scratch. Use a library like Radix, Headless UI, or React Aria that handles ARIA roles, keyboard navigation, and focus management correctly.
+
+**Q: Is `tabIndex={0}` always safe to use?**
+**A:** It makes any element focusable and adds it to the natural tab order. Only use it on interactive elements. Adding focus to non-interactive elements confuses keyboard users.
 
 ---
 
@@ -3308,6 +3866,17 @@ it('loads and displays user data', async () => {
 
 **Answer:** Users don't see state - they see the UI. Testing behavior (click button, see result) is resilient to refactoring. Testing implementation (state changed) breaks when you rename variables.
 
+### There are NO Dumb Questions
+
+**Q: Should I use Vitest or Jest?**
+**A:** Vitest is recommended for new projects (faster, ESM-native, works with Vite). Jest is fine for existing projects. Both have nearly identical APIs.
+
+**Q: How do I test components that use Context or Router?**
+**A:** Wrap the component in the required providers during testing: `render(<BrowserRouter><ThemeProvider><MyComponent /></ThemeProvider></BrowserRouter>)`. Create a test utility wrapper for this.
+
+**Q: What's the difference between `getBy`, `queryBy`, and `findBy`?**
+**A:** `getBy` throws if not found (use for elements that should exist). `queryBy` returns null if not found (use for asserting absence). `findBy` waits asynchronously (use for elements that appear after loading).
+
 ---
 
 ## 29. Strict Mode
@@ -3347,8 +3916,62 @@ useEffect(() => {
 }, []);
 ```
 
+### Common Bugs Strict Mode Reveals
+
+```jsx
+// Bug: Side effect in render (runs twice in Strict Mode)
+function BadComponent() {
+    // ❌ Mutating external variable during render
+    externalArray.push('item');  // Doubled in Strict Mode!
+    return <div>{externalArray.length}</div>;
+}
+
+// Fix: Move side effects to useEffect
+function GoodComponent() {
+    useEffect(() => {
+        externalArray.push('item');  // Only runs once per mount
+        return () => { externalArray.pop(); };  // Cleanup
+    }, []);
+    return <div>{externalArray.length}</div>;
+}
+```
+
+```jsx
+// Bug: Missing cleanup causes memory leaks
+function ChatRoom({ roomId }) {
+    useEffect(() => {
+        const connection = createConnection(roomId);
+        connection.connect();
+        // ❌ No cleanup! Strict Mode creates 2 connections
+    }, [roomId]);
+
+    // Fix: Always clean up
+    useEffect(() => {
+        const connection = createConnection(roomId);
+        connection.connect();
+        return () => connection.disconnect();  // ✅ Cleanup
+    }, [roomId]);
+}
+```
+
 ### Watch It!
 ⚠️ **"Why does my component render twice?"** That's Strict Mode! It only happens in development to help find bugs. Production renders normally.
+
+### Brain Power
+🧠 Why does Strict Mode remount components (mount → unmount → mount)?
+
+**Answer:** It simulates what happens when a user navigates away and back (like React's future Offscreen API). If your component breaks when remounted, it has a cleanup bug that would cause issues in production.
+
+### There are NO Dumb Questions
+
+**Q: Should I remove StrictMode in production?**
+**A:** You don't need to - it automatically does nothing in production builds. The double-rendering only happens in development mode.
+
+**Q: Can I use StrictMode on just part of my app?**
+**A:** Yes! Wrap only specific subtrees. Useful when gradually adding StrictMode to a legacy codebase.
+
+**Q: My API call fires twice in development. Is that a bug?**
+**A:** It's Strict Mode testing your cleanup. Add an AbortController to your useEffect so the first call gets cancelled. In production, it only fires once.
 
 ---
 
@@ -3385,8 +4008,52 @@ const Input = forwardRef(function Input(props, ref) {
 Input.displayName = 'Input';
 ```
 
+### Debugging Performance with Profiler
+
+```jsx
+// 1. Open Profiler tab → Click Record → Interact with app → Stop
+
+// 2. Flamegraph shows render time per component
+//    - Gray = didn't render
+//    - Green = fast render
+//    - Yellow/Red = slow render
+
+// 3. "Why did this render?" shows:
+//    - Props changed (which ones)
+//    - State changed
+//    - Parent rendered
+//    - Context changed
+
+// 4. Programmatic profiling
+import { Profiler } from 'react';
+
+function onRender(id, phase, actualDuration) {
+    console.log(`${id} ${phase} render took ${actualDuration}ms`);
+}
+
+<Profiler id="ProductList" onRender={onRender}>
+    <ProductList items={items} />
+</Profiler>
+```
+
 ### Watch It!
 ⚠️ **Enable "Highlight updates"** in DevTools settings. If you see constant flashing, you have unnecessary re-renders!
+
+### Brain Power
+🧠 How do you identify the root cause of unnecessary re-renders?
+
+**Answer:** In the Profiler, check "Why did this render?" for each slow component. Common causes: parent re-rendering (fix with memo), new object/function props (fix with useMemo/useCallback), or context changes (fix by splitting context).
+
+### There are NO Dumb Questions
+
+**Q: Why do I see "Anonymous" components in DevTools?**
+**A:** Arrow function components without names show as "Anonymous." Always use named functions: `const List = memo(function List() { ... })` instead of `memo(() => ...)`.
+
+**Q: Can I edit state directly in DevTools?**
+**A:** Yes! In the Components tab, click any state value to edit it live. Great for testing edge cases without writing code.
+
+**Q: DevTools shows gray (didn't render) but my component is slow. Why?**
+**A:** The component might be expensive on its initial render. Or a child component is slow. Drill down into the flamegraph to find the actual bottleneck.
 
 ---
 
@@ -3480,6 +4147,22 @@ const addItem = () => {
 {items.map(item => <li key={item.id}>{item.name}</li>)}
 ```
 
+### Brain Power
+🧠 What do all these pitfalls have in common?
+
+**Answer:** They all involve misunderstanding React's rendering model. React relies on: immutable state (new references trigger renders), stable dependency references (for hooks), and predictable hook call order. Understanding these three principles prevents most bugs.
+
+### There are NO Dumb Questions
+
+**Q: How do I debug a stale closure?**
+**A:** Add the variable to the useEffect dependency array. If ESLint's exhaustive-deps rule warns about a missing dependency, it's almost always right. Use functional updates (`setCount(c => c + 1)`) when you need the latest value without adding it as a dependency.
+
+**Q: Why does React not detect state mutations?**
+**A:** React uses reference equality (`===`). Mutating an array and calling `setState(sameArray)` passes the same reference - React thinks nothing changed. Always create new objects/arrays.
+
+**Q: What's the safest way to update nested state?**
+**A:** Spread at each level: `setUser({ ...user, address: { ...user.address, city: 'New York' } })`. For deeply nested state, consider Immer or flattening your state structure.
+
 ---
 
 ## 32. Server Components
@@ -3511,7 +4194,7 @@ async function ServerComponent() {
     return <div>{data.title}</div>;
 }
 
-// Client Component - add "use client" directive
+// Client Component - add "use client" directive at the TOP of the file
 'use client';
 
 import { useState } from 'react';
@@ -3522,6 +4205,85 @@ function ClientComponent() {
 }
 ```
 
+### The Boundary Pattern: Composing Server & Client
+
+```jsx
+// Server Component can render Client Components as children
+// page.jsx (Server Component)
+import { AddToCartButton } from './AddToCartButton';  // Client Component
+
+async function ProductPage({ params }) {
+    const product = await db.products.findUnique({ where: { id: params.id } });
+
+    return (
+        <div>
+            <h1>{product.name}</h1>
+            <p>{product.description}</p>
+            {/* Pass server data as props to client component */}
+            <AddToCartButton productId={product.id} price={product.price} />
+        </div>
+    );
+}
+```
+
+```jsx
+// AddToCartButton.jsx (Client Component)
+'use client';
+
+import { useState } from 'react';
+
+export function AddToCartButton({ productId, price }) {
+    const [added, setAdded] = useState(false);
+
+    return (
+        <button onClick={() => { addToCart(productId); setAdded(true); }}>
+            {added ? 'Added!' : `Add to Cart - $${price}`}
+        </button>
+    );
+}
+```
+
+### Server Actions with 'use server'
+
+```jsx
+// actions.js - Server-side functions callable from client
+'use server';
+
+import { db } from './db';
+import { revalidatePath } from 'next/cache';
+
+export async function addProduct(formData) {
+    const name = formData.get('name');
+    const price = parseFloat(formData.get('price'));
+
+    await db.products.create({ data: { name, price } });
+
+    revalidatePath('/products');  // Refresh the page data
+}
+
+export async function deleteProduct(id) {
+    await db.products.delete({ where: { id } });
+    revalidatePath('/products');
+}
+```
+
+```jsx
+// Using Server Actions in forms (works without JavaScript!)
+'use client';
+
+import { addProduct } from './actions';
+
+function AddProductForm() {
+    return (
+        <form action={addProduct}>
+            <input name="name" placeholder="Product name" required />
+            <input name="price" type="number" step="0.01" required />
+            <button type="submit">Add Product</button>
+        </form>
+    );
+}
+```
+
 ### When to Use Each
 
 | Server Components | Client Components |
@@ -3529,10 +4291,39 @@ function ClientComponent() {
 | Fetch data | useState, useEffect |
 | Access backend resources | Event handlers (onClick) |
 | Keep sensitive info server-side | Browser APIs |
-| Large dependencies | Interactivity |
+| Large dependencies (zero client JS) | Interactivity |
+| SEO-critical content | Real-time updates |
 
 ### Watch It!
-⚠️ **Server Components are Next.js 13+ only!** They're not available in Create React App or Vite yet. The patterns are the future of React but not universally available.
+⚠️ **You can't import a Server Component into a Client Component!** The boundary flows one way. Pass Server Components as `children` props to Client Components instead.
+
+```jsx
+// ❌ Can't do this
+'use client';
+import ServerComponent from './ServerComponent';  // Error!
+
+// ✅ Pass as children instead
+// layout.jsx (Server Component)
+<ClientWrapper>
+    <ServerComponent />  {/* Rendered on server, passed as children */}
+</ClientWrapper>
+```
+
+### Brain Power
+🧠 Why can't Server Components use useState or useEffect?
+
+**Answer:** Server Components render once on the server and send HTML to the client. There's no "re-render" on the server - no state updates, no effects, no event handlers. They're essentially static after the initial render. Use Client Components for anything interactive.
+
+### There are NO Dumb Questions
+
+**Q: Do I need Next.js to use Server Components?**
+**A:** Currently yes. Next.js 13+ (App Router) is the primary framework supporting RSC. Other frameworks (Remix, Waku) are adding support, but it's not available in plain React (Vite/CRA) yet.
+
+**Q: What can I pass as props from Server to Client Components?**
+**A:** Only serializable values: strings, numbers, booleans, arrays, plain objects, and Date. You cannot pass functions, class instances, or React elements as props across the boundary.
+
+**Q: How do Server Actions compare to API routes?**
+**A:** Server Actions are typed, colocated with your components, and work with progressive enhancement (forms work without JS). API routes are better for third-party integrations or when you need a REST/GraphQL endpoint.
 
 ---
 

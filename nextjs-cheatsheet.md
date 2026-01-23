@@ -245,6 +245,17 @@ File in `app/pricing/page.tsx` = route at `/pricing`
 ### Watch It!
 ⚠️ **File must be named `page.tsx` (or `page.jsx`)!** Other filenames won't create routes. `about.tsx` won't work, `about/page.tsx` will.
 
+### There are NO Dumb Questions
+
+**Q: Do I need to restart the server when I add a new page?**
+**A:** No! Next.js detects new files automatically in development mode. Just create the file and navigate to the route.
+
+**Q: What's the difference between `app/` and `src/app/`?**
+**A:** Both work! `src/app/` keeps your project root cleaner by putting all source code in `src/`. Next.js supports both conventions.
+
+**Q: Can I use JavaScript instead of TypeScript?**
+**A:** Yes! Use `.jsx` instead of `.tsx`. But TypeScript is strongly recommended for the better developer experience and error catching.
+
 ---
 
 ## 3. Routing: File-Based Routes
@@ -404,6 +415,11 @@ app/
         └── page.tsx                     → /docs/any/number/of/segments
 ```
 
+### Brain Power
+🧠 How does file-based routing compare to React Router? What are the trade-offs?
+
+**Answer:** File-based routing means the file structure IS the URL structure. Pros: no route config files, easier to understand, automatic code splitting. Cons: less flexible than programmatic routing, folder structure must match URL design.
+
 ### There are NO Dumb Questions
 
 **Q: What's the difference between `[slug]` and `[...slug]`?**
@@ -474,6 +490,17 @@ app/
 🧠 Why do you think Next.js created a new router instead of updating the old one?
 
 **Answer:** React Server Components needed fundamental changes that couldn't be added to Pages Router without breaking changes. App Router was built from scratch for the new React features.
+
+### There are NO Dumb Questions
+
+**Q: Can I use both routers in the same app?**
+**A:** Yes! Pages in `/pages` use Pages Router, pages in `/app` use App Router. They can coexist during migration. Just don't have the same route in both.
+
+**Q: Should I migrate my existing Pages Router app?**
+**A:** Only if you need App Router features (Server Components, streaming, parallel routes). Pages Router is stable and will be maintained. Migrate incrementally, route by route.
+
+**Q: Do I lose anything by using App Router?**
+**A:** App Router has a steeper learning curve and more complex caching behavior. Some libraries haven't fully adapted yet. But the performance and developer experience benefits outweigh these for new projects.
 
 ---
 
@@ -857,6 +884,17 @@ import ServerComponent from './Server'; // Stays server
 
 **Answer:** Their code never goes to the browser! Less JavaScript to download and execute. Server Components render to HTML on the server, so the browser just displays it - no React runtime needed for those parts.
 
+### There are NO Dumb Questions
+
+**Q: Can a Server Component render a Client Component?**
+**A:** Yes! Server Components can import and render Client Components. But Client Components cannot import Server Components - pass them as `children` instead.
+
+**Q: How do I know if my component is a Server or Client Component?**
+**A:** If it has `'use client'` at the top, it's a Client Component. Otherwise, it's a Server Component by default in the App Router.
+
+**Q: Can I use server-only code (like database queries) in a Client Component?**
+**A:** No! Client Components run in the browser. Fetch data in a Server Component parent and pass it as props, or use Server Actions for mutations.
+
 ---
 
 ## 7. Data Fetching: Getting Data
@@ -1078,6 +1116,13 @@ export default function Error({ error, reset }) {
 }
 ```
 
+### Brain Power
+🧠 In Next.js, you can fetch data in Server Components OR Client Components. When would you choose each?
+
+**Answer:**
+- **Server Components:** For initial data (SEO, no waterfall, direct DB access, no loading spinners)
+- **Client Components (React Query/SWR):** For interactive data (polling, optimistic updates, user-triggered refetches, real-time)
+
 ### There are NO Dumb Questions
 
 **Q: Do I always need loading.tsx and error.tsx?**
@@ -1095,22 +1140,34 @@ export default function Error({ error, reset }) {
 
 ### Preloading Data
 
-Preload data before it's needed to improve performance:
+Start fetching data early so it's ready when needed. Combine `cache()` with a preload pattern:
+
+```tsx
+// lib/data.ts
+import { cache } from 'react';
+
+// cache() deduplicates: calling getPost('1') twice only fetches once
+export const getPost = cache(async (id: string) => {
+    const res = await fetch(`https://api.example.com/posts/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch post');
+    return res.json();
+});
+
+// Preload function: kicks off fetch without awaiting
+export function preloadPost(id: string) {
+    void getPost(id);  // Start fetching, don't block
+}
+```
 
 ```tsx
 // app/posts/[id]/page.tsx
-import { preload } from 'react-dom';
-
-async function getPost(id: string) {
-    const res = await fetch(`https://api.example.com/posts/${id}`);
-    return res.json();
-}
+import { getPost, preloadPost } from '@/lib/data';
 
 export default async function Post({ params }: { params: { id: string } }) {
-    // Preload before awaiting
-    preload(getPost(params.id));
+    // Start fetching immediately (runs in parallel with other work)
+    preloadPost(params.id);
 
-    // Await later
+    // By the time we await, data may already be cached
     const post = await getPost(params.id);
 
     return (
@@ -1651,6 +1708,17 @@ export default function NewPost() {
 ### Watch It!
 ⚠️ **Server Actions can only be used in Server Components or Client Components that import them!** They're marked with `'use server'` directive. Also, always validate input - never trust client data!
 
+### There are NO Dumb Questions
+
+**Q: Can I call a Server Action from a Client Component?**
+**A:** Yes! Import the action and use it in `form action={...}` or call it directly in event handlers. The action still runs on the server.
+
+**Q: How do I show loading state during a Server Action?**
+**A:** Use `useFormStatus()` in a child component of the form, or `useActionState()` which provides an `isPending` state.
+
+**Q: Can Server Actions return data?**
+**A:** Yes! Return values from Server Actions are passed to the client. Use `useActionState` to capture the return value and display success/error messages.
+
 ---
 
 ## 10. Runtimes: Node.js vs Edge
@@ -1896,16 +1964,99 @@ export default function DashboardLayout({ children }) {
 // This layout wraps all /dashboard/* pages
 ```
 
-### Templates: Re-render on Navigation
+### Layout Hierarchy
+
+```
+app/
+├── layout.tsx          ← Root Layout (wraps everything)
+├── page.tsx            ← Home page
+├── dashboard/
+│   ├── layout.tsx      ← Dashboard Layout (persists across dashboard pages)
+│   ├── page.tsx        ← /dashboard
+│   ├── settings/
+│   │   └── page.tsx    ← /dashboard/settings (uses BOTH layouts)
+│   └── analytics/
+│       └── page.tsx    ← /dashboard/analytics (uses BOTH layouts)
+└── auth/
+    ├── layout.tsx      ← Auth Layout (different from dashboard)
+    └── login/
+        └── page.tsx    ← /auth/login
+```
+
+Navigating between `/dashboard/settings` and `/dashboard/analytics` keeps the Dashboard Layout mounted (sidebar stays, no re-render).
+
+### Layout with Data Fetching
 
 ```tsx
-// app/template.tsx
-export default function Template({ children }) {
+// app/dashboard/layout.tsx
+import { getUser } from '@/lib/data';
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+    // Layouts can be async Server Components!
+    const user = await getUser();
+
+    return (
+        <div className="dashboard">
+            <aside>
+                <p>Welcome, {user.name}</p>
+                <nav>
+                    <Link href="/dashboard">Overview</Link>
+                    <Link href="/dashboard/settings">Settings</Link>
+                </nav>
+            </aside>
+            <section>{children}</section>
+        </div>
+    );
+}
+```
+
+### Templates: Re-render on Navigation
+
+Templates are like layouts but **re-mount on every navigation** (fresh state, effects re-run).
+
+```tsx
+// app/dashboard/template.tsx
+'use client';
+
+import { useEffect } from 'react';
+
+export default function Template({ children }: { children: React.ReactNode }) {
+    useEffect(() => {
+        // Runs on EVERY navigation (unlike layout)
+        logPageView();
+    }, []);
+
     return <div className="animate-in">{children}</div>;
 }
 ```
 
-**Difference:** Layouts persist, templates re-mount on navigation.
+| Feature | Layout | Template |
+|---------|--------|----------|
+| Re-mounts on navigation | No (persists) | Yes (fresh) |
+| Maintains state | Yes | No |
+| Effects re-run | No | Yes |
+| Use case | Shared UI, nav, sidebar | Animations, analytics, form resets |
+
+### Watch It!
+⚠️ **Layouts cannot access the current route!** They don't know which child page is active. Use `usePathname()` in a Client Component child if you need to highlight active nav links.
+
+⚠️ **Don't pass data from layout to children via props!** Layouts don't re-render when children change. Use React Context or fetch data independently in each page.
+
+### Brain Power
+🧠 You have a multi-step form wizard at `/onboarding/step-1`, `/onboarding/step-2`, etc. Should you use a layout or template for the shared wrapper?
+
+**Answer:** Use a **layout** if you want to preserve form state between steps (user navigates back without losing data). Use a **template** if each step should start fresh (reset form, re-run validation effects).
+
+### There are NO Dumb Questions
+
+**Q: Can I have multiple root layouts?**
+**A:** Yes! Route groups let you have different root layouts: `(marketing)/layout.tsx` and `(app)/layout.tsx` each with their own `<html>` and `<body>`.
+
+**Q: Why doesn't my layout re-render when I navigate?**
+**A:** That's the point! Layouts persist to avoid unnecessary work. Only the `page.tsx` inside changes. Use a template if you need re-mounting behavior.
+
+**Q: Can I access route params in a layout?**
+**A:** Yes! Layouts receive a `params` prop: `function Layout({ children, params }: { children: ReactNode, params: { slug: string } })`.
 
 ---
 
@@ -2095,6 +2246,25 @@ export default function Page() {
     );
 }
 ```
+
+### Watch It!
+⚠️ **CSS-in-JS libraries (styled-components, Emotion) require `'use client'`!** They use React context and hooks internally, so they can't run in Server Components. This adds client-side JavaScript. Prefer CSS Modules or Tailwind for Server Components.
+
+### Brain Power
+🧠 Why does Next.js recommend CSS Modules or Tailwind over CSS-in-JS?
+
+**Answer:** CSS Modules and Tailwind extract CSS at build time (zero runtime cost). CSS-in-JS generates styles at runtime, adding JavaScript to the client bundle and requiring hydration. For Server Components, build-time CSS is the only option that works without `'use client'`.
+
+### There are NO Dumb Questions
+
+**Q: Which styling approach should I choose for a new Next.js project?**
+**A:** Tailwind CSS is the most popular choice in the Next.js ecosystem (used by Vercel's own templates). CSS Modules are great if you prefer writing traditional CSS with scoping.
+
+**Q: Can I use global CSS files?**
+**A:** Yes, but only import them in `layout.tsx` or `page.tsx` files. Importing global CSS in components causes ordering issues.
+
+**Q: How do I handle dynamic styles in Server Components?**
+**A:** Use CSS custom properties (variables) set via inline `style` prop, or conditional class names with CSS Modules/Tailwind. No runtime CSS-in-JS allowed in Server Components.
 
 ---
 
@@ -2303,6 +2473,7 @@ import Page from '@/app/page';
 // Mock fetch for server components
 global.fetch = jest.fn(() =>
     Promise.resolve({
+        ok: true,
         json: () => Promise.resolve({ data: 'test' }),
     })
 ) as jest.Mock;
@@ -2866,6 +3037,17 @@ module.exports = {
 ### Watch It!
 ⚠️ **Don't lazy load everything!** Only lazy load heavy components that aren't immediately needed. Lazy loading adds complexity and a small delay. Use it strategically for components like modals, charts, or below-the-fold content.
 
+### There are NO Dumb Questions
+
+**Q: Do I need to configure image domains?**
+**A:** Yes! For external images, add allowed domains in `next.config.js`: `images: { remotePatterns: [{ hostname: 'example.com' }] }`. This prevents misuse of your image optimization.
+
+**Q: Can I use `next/font` with Tailwind CSS?**
+**A:** Yes! Assign the font to a CSS variable and reference it in your Tailwind config: `fontFamily: { sans: ['var(--font-inter)'] }`.
+
+**Q: What's the difference between `priority` and lazy loading for images?**
+**A:** `priority` preloads the image (for above-the-fold hero images). Without it, images lazy load by default (only load when scrolled into view).
+
 ---
 
 ## 15. API Routes: Building APIs
@@ -3096,6 +3278,17 @@ export async function GET() {
 
 ### Watch It!
 ⚠️ **API Routes run on the server!** You can access databases, file system, and secrets. But make sure to validate all input and handle errors properly.
+
+### There are NO Dumb Questions
+
+**Q: Should I use API Routes or Server Actions for my backend?**
+**A:** Server Actions for form mutations and internal data changes. API Routes for public APIs, webhooks, third-party integrations, or when you need specific HTTP methods/headers.
+
+**Q: Can I use API Routes with the Edge Runtime?**
+**A:** Yes! Add `export const runtime = 'edge'` to your route file. Great for fast, globally distributed endpoints that don't need Node.js APIs.
+
+**Q: How do I handle CORS in API Routes?**
+**A:** Set CORS headers manually in your response: `headers: { 'Access-Control-Allow-Origin': '*' }`. Or use middleware for global CORS handling.
 
 ---
 
@@ -3340,31 +3533,173 @@ export const config = {
 
 ## 17. Caching: Performance
 
-### Automatic Caching
+### How Next.js Caching Works
+
+Next.js has **four caching layers** that work together:
+
+```
+Request → Router Cache (client) → Full Route Cache (server) → Data Cache (server) → Data Source
+```
+
+| Cache Layer | Location | Purpose | Duration |
+|-------------|----------|---------|----------|
+| **Request Memoization** | Server | Dedup same fetch in one render | Per request |
+| **Data Cache** | Server | Store fetch responses | Persistent (until revalidated) |
+| **Full Route Cache** | Server | Cache rendered HTML/RSC | Persistent (until revalidated) |
+| **Router Cache** | Client | Cache visited routes | Session (30s dynamic, 5min static) |
+
+### fetch() Cache Options
 
 ```tsx
-// Cached for 1 hour
-fetch('https://api.example.com/data', {
-    next: { revalidate: 3600 }
+// DEFAULT: Cached indefinitely (static)
+const data = await fetch('https://api.example.com/data');
+
+// Time-based revalidation: refetch after 1 hour
+const data = await fetch('https://api.example.com/data', {
+    next: { revalidate: 3600 }  // seconds
 });
 
-// Never cache
-fetch('https://api.example.com/data', {
+// Never cache: always fetch fresh (dynamic)
+const data = await fetch('https://api.example.com/data', {
     cache: 'no-store'
 });
+
+// Tag-based: label fetches for targeted revalidation
+const posts = await fetch('https://api.example.com/posts', {
+    next: { tags: ['posts'] }
+});
+
+const user = await fetch(`https://api.example.com/users/${id}`, {
+    next: { tags: ['users', `user-${id}`] }
+});
 ```
 
-### Revalidating Cache
+### Route Segment Cache Config
+
+Control caching at the page/layout level:
 
 ```tsx
+// app/dashboard/page.tsx
+
+// Make entire route dynamic (no caching)
+export const dynamic = 'force-dynamic';
+
+// Or set revalidation for all fetches in this route
+export const revalidate = 60;  // Revalidate every 60 seconds
+
+// Other options:
+export const dynamic = 'auto';           // Default: Next.js decides
+export const dynamic = 'force-static';   // Force static (error if dynamic)
+export const fetchCache = 'force-no-store';  // No caching for all fetches
+```
+
+### On-Demand Revalidation
+
+Invalidate cache when data changes (e.g., after a mutation):
+
+```tsx
+// app/actions.ts
+'use server';
+
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-// Revalidate specific path
-revalidatePath('/posts');
+export async function createPost(formData: FormData) {
+    await db.posts.create({
+        data: { title: formData.get('title') as string }
+    });
 
-// Revalidate by tag
-revalidateTag('posts');
+    // Option 1: Revalidate a specific path
+    revalidatePath('/posts');          // Revalidates /posts page
+    revalidatePath('/posts', 'layout'); // Revalidates /posts and all nested routes
+
+    // Option 2: Revalidate by tag (more granular)
+    revalidateTag('posts');            // Invalidates all fetches tagged 'posts'
+}
+
+export async function updateUser(id: string, formData: FormData) {
+    await db.users.update({ where: { id }, data: { ... } });
+
+    // Revalidate just this user's data
+    revalidateTag(`user-${id}`);
+}
 ```
+
+### Caching Non-fetch Data (unstable_cache)
+
+Cache database queries, computations, or any async function:
+
+```tsx
+import { unstable_cache } from 'next/cache';
+
+// Cache a database query
+const getCachedPosts = unstable_cache(
+    async (authorId: string) => {
+        return await db.posts.findMany({
+            where: { authorId },
+            orderBy: { createdAt: 'desc' }
+        });
+    },
+    ['posts-by-author'],  // Cache key parts
+    {
+        revalidate: 3600,     // Revalidate every hour
+        tags: ['posts']       // Tag for on-demand revalidation
+    }
+);
+
+// Usage in a Server Component
+export default async function AuthorPosts({ authorId }: { authorId: string }) {
+    const posts = await getCachedPosts(authorId);
+    return <PostList posts={posts} />;
+}
+```
+
+### Cache Strategies by Use Case
+
+```tsx
+// Blog posts: Cache forever, revalidate on publish
+const post = await fetch(`/api/posts/${id}`, {
+    next: { tags: [`post-${id}`] }
+});
+
+// User dashboard: Short cache, frequent updates
+const stats = await fetch('/api/stats', {
+    next: { revalidate: 30 }  // Fresh every 30 seconds
+});
+
+// Auth/session: Never cache
+const session = await fetch('/api/auth/session', {
+    cache: 'no-store'
+});
+
+// Product catalog: Medium cache, revalidate on inventory change
+const products = await fetch('/api/products', {
+    next: { revalidate: 300, tags: ['products'] }
+});
+```
+
+### Watch It!
+⚠️ **POST requests are never cached!** Only GET requests in fetch() use the Data Cache. If you need to cache a POST response, use `unstable_cache` wrapper instead.
+
+⚠️ **Dynamic functions opt out of caching!** Using `cookies()`, `headers()`, or `searchParams` in a Server Component makes the entire route dynamic. Move these calls to the specific components that need them.
+
+### Brain Power
+🧠 You have a product page showing price and reviews. Price changes rarely but reviews update constantly. How would you cache them differently?
+
+**Answer:** Use different revalidation strategies:
+- Price: `next: { revalidate: 3600, tags: ['product-price'] }` (cache 1 hour)
+- Reviews: `next: { revalidate: 30, tags: ['product-reviews'] }` (refresh every 30s)
+- Or: Make reviews a Client Component with React Query, and keep the price in the cached Server Component
+
+### There are NO Dumb Questions
+
+**Q: How do I completely disable all caching during development?**
+**A:** In Next.js 15+, fetch requests are uncached by default in development. For older versions, add `cache: 'no-store'` or set `export const dynamic = 'force-dynamic'` on your pages.
+
+**Q: When should I use `revalidatePath` vs `revalidateTag`?**
+**A:** Use `revalidatePath` when a mutation affects an entire page. Use `revalidateTag` when you want granular control - one mutation might invalidate data used across multiple pages.
+
+**Q: Does the Router Cache cause stale data problems?**
+**A:** It can! The client-side Router Cache means navigating back to a page shows the cached version. Call `router.refresh()` after mutations, or use Server Actions (they auto-invalidate the Router Cache).
 
 ---
 
@@ -3884,6 +4219,17 @@ export const config = {
 ### Watch It!
 ⚠️ **Never store sensitive auth secrets in client components!** Use environment variables without NEXT_PUBLIC_ prefix for OAuth secrets. They should only be accessible on the server.
 
+### There are NO Dumb Questions
+
+**Q: What's the difference between NextAuth.js and Auth.js?**
+**A:** Auth.js is the new name for NextAuth.js v5. It's framework-agnostic (works with SvelteKit, Express, etc.) but the Next.js adapter is the most mature.
+
+**Q: How do I protect Server Components?**
+**A:** Call `getServerSession()` at the top of your Server Component or layout. If no session, redirect to login. Middleware is faster for route-level protection.
+
+**Q: Should I use JWT or database sessions?**
+**A:** JWT for stateless/serverless (no DB needed per request, faster). Database sessions for more control (revocation, session listing). JWT is simpler for most apps.
+
 ---
 
 ## 20. Navigation Hooks: useParams, usePathname, useSearchParams
@@ -4038,6 +4384,11 @@ export default function ProductPage() {
 **Q: What's the difference between params prop and useParams hook?**
 **A:** The `params` prop is for Server Components (passed from Next.js). The `useParams()` hook is for Client Components. Same data, different access methods.
 
+### Brain Power
+🧠 Why does Next.js separate navigation into `useParams`, `usePathname`, and `useSearchParams` instead of one unified hook?
+
+**Answer:** Separation of concerns and re-rendering efficiency. If search params change, only components using `useSearchParams` re-render. Components using `usePathname` stay untouched. One big hook would cause unnecessary re-renders everywhere.
+
 ---
 
 ## 21. Special Files: File Conventions
@@ -4191,6 +4542,20 @@ app/
 🧠 Why use generateStaticParams instead of letting pages render on-demand?
 
 **Answer:** Performance! Static pages are pre-built and served from CDN instantly. No server rendering needed. Perfect for blogs, docs, and content that doesn't change often.
+
+### Watch It!
+⚠️ **`error.tsx` must be a Client Component!** It uses `'use client'` because error boundaries need to catch errors on the client side too. Always include a `reset` button so users can retry.
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between `error.tsx` and `global-error.tsx`?**
+**A:** `error.tsx` catches errors in its segment and below. `global-error.tsx` catches errors in the root layout itself (the only way to handle root-level errors). It must include its own `<html>` and `<body>` tags.
+
+**Q: When would I use `default.tsx`?**
+**A:** Only with parallel routes. It's the fallback shown when a parallel slot doesn't match the current URL (like navigating to a route that doesn't have content for that slot).
+
+**Q: Can I have `loading.tsx` at every route level?**
+**A:** Yes! Each segment can have its own loading state. Deeper loading files override parent ones for that segment, creating granular loading UIs.
 
 ---
 
@@ -4356,6 +4721,11 @@ export async function POST(request: Request) {
 }
 ```
 
+### Brain Power
+🧠 Why is server-side validation not enough? Why do we also need CSP headers?
+
+**Answer:** Validation prevents malicious data from being stored. CSP prevents malicious scripts from executing even if they slip through (defense in depth). A stored XSS payload might bypass validation but CSP blocks it from running in the browser.
+
 ### Watch It!
 ⚠️ **Never trust client input!** Always validate on the server. Client-side validation is for UX, server-side validation is for security. Use libraries like Zod for both.
 
@@ -4427,6 +4797,22 @@ module.exports = {
 
 ### Watch It!
 ⚠️ **Turbopack is still in beta for production builds!** Use it for development, but production builds still use Webpack. Check the Next.js docs for the latest status.
+
+### Brain Power
+🧠 Why is Turbopack written in Rust instead of JavaScript?
+
+**Answer:** Bundling is CPU-intensive work (parsing, transforming, linking). Rust is orders of magnitude faster than JavaScript for computation-heavy tasks. Webpack runs in Node.js (single-threaded JS), while Turbopack leverages Rust's zero-cost abstractions and parallelism.
+
+### There are NO Dumb Questions
+
+**Q: Do I need to change my code to use Turbopack?**
+**A:** No! It's a drop-in replacement. Your components, imports, and config work the same. Only custom Webpack plugins might need migration.
+
+**Q: Can I still use Webpack plugins with Turbopack?**
+**A:** Not directly. Turbopack has its own plugin system (`turbo.rules`). Some Webpack loaders work, but complex plugins need alternatives. Check the Turbopack docs for compatibility.
+
+**Q: Should I switch to Turbopack now?**
+**A:** For development, yes! The speed improvement is dramatic. For production builds, wait until it's stable (check `next build --turbo` support in your Next.js version).
 
 ---
 
@@ -4514,6 +4900,17 @@ async function DynamicStats() {
 ### Watch It!
 ⚠️ **PPR is experimental!** It's a preview feature as of Next.js 14. The API may change. Great to learn, but check docs before production use.
 
+### There are NO Dumb Questions
+
+**Q: Do I need to change my code to use PPR?**
+**A:** Mostly no! If you're already using Suspense boundaries for dynamic content, PPR automatically detects static vs dynamic parts. Just enable it in config.
+
+**Q: What makes a component "dynamic" in PPR?**
+**A:** Any component that uses `cookies()`, `headers()`, `searchParams`, or uncached data fetching. Everything else is treated as static and pre-rendered.
+
+**Q: Can I use PPR with any hosting provider?**
+**A:** Currently best supported on Vercel. Self-hosting PPR requires Node.js infrastructure that can handle streaming responses.
+
 ---
 
 ## 25. Deployment: Going Live
@@ -4585,9 +4982,24 @@ module.exports = {
 **Result:**
 Creates `.next/standalone`. You can run this folder with just `node server.js` without `node_modules` (mostly)!
 
-**Brain Power**
+### Brain Power
 🧠 Why is "standalone" mode better for Docker?
+
 **Answer:** It copies only the necessary files from `node_modules` into the output folder. Your Docker image becomes significantly smaller because you don't need the entire 500MB+ `node_modules` folder, just the parts you actually use.
+
+### Watch It!
+⚠️ **Static export (`output: 'export'`) disables server features!** No Server Components, no API routes, no middleware, no ISR. Only use it for purely static sites (docs, marketing pages). For most apps, use `standalone` or deploy to Vercel.
+
+### There are NO Dumb Questions
+
+**Q: Can I deploy Next.js anywhere, or only Vercel?**
+**A:** Anywhere! Vercel is easiest (zero config), but Next.js works on AWS, GCP, Railway, Docker, or any Node.js host. Use `standalone` output for self-hosting.
+
+**Q: Do I need a Node.js server for Next.js?**
+**A:** For full features (SSR, API routes, Server Actions), yes. For static export, any CDN/static host works (Netlify, GitHub Pages, S3).
+
+**Q: How do I handle environment variables in production?**
+**A:** Set them in your hosting platform's dashboard (Vercel, Railway, etc.) or in your Docker container. Never commit `.env.local` to git. Build-time vars (`NEXT_PUBLIC_`) are baked into the bundle.
 
 ---
 
