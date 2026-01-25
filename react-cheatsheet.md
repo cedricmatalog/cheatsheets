@@ -52,27 +52,28 @@ If you need a refresher, check out the JavaScript cheatsheet first!
 15. [Portals: Escaping the DOM](#15-portals-escaping-the-dom)
 16. [forwardRef & useImperativeHandle](#16-forwardref--useimperativehandle)
 17. [Error Boundaries](#17-error-boundaries)
+18. [Common Patterns](#18-common-patterns)
 
 ### Part 4: Data & Navigation
-18. [Routing: Navigation](#18-routing-navigation)
-19. [API Calls: Fetching Data](#19-api-calls-fetching-data)
-20. [State Management: Zustand](#20-state-management-zustand)
+19. [Routing: Navigation](#19-routing-navigation)
+20. [API Calls: Fetching Data](#20-api-calls-fetching-data)
+21. [State Management: Zustand](#21-state-management-zustand)
 
 ### Part 5: Performance
-21. [Performance: memo, useMemo, useCallback](#21-performance-memo-usememo-usecallback)
-22. [useReducer: Complex State](#22-usereducer-complex-state)
-23. [Code Splitting & Lazy Loading](#23-code-splitting--lazy-loading)
-24. [React 18+ Features](#24-react-18-features)
+22. [Performance: memo, useMemo, useCallback](#22-performance-memo-usememo-usecallback)
+23. [useReducer: Complex State](#23-usereducer-complex-state)
+24. [Code Splitting & Lazy Loading](#24-code-splitting--lazy-loading)
+25. [React 18+ Features](#25-react-18-features)
 
 ### Part 6: Production
-25. [TypeScript with React](#25-typescript-with-react)
-26. [Styling: CSS Solutions](#26-styling-css-solutions)
-27. [Accessibility: Building for Everyone](#27-accessibility-building-for-everyone)
-28. [Testing](#28-testing)
-29. [Strict Mode](#29-strict-mode)
-30. [React DevTools](#30-react-devtools)
-31. [Common Pitfalls](#31-common-pitfalls)
-32. [Server Components](#32-server-components)
+26. [TypeScript with React](#26-typescript-with-react)
+27. [Styling: CSS Solutions](#27-styling-css-solutions)
+28. [Accessibility: Building for Everyone](#28-accessibility-building-for-everyone)
+29. [Testing](#29-testing)
+30. [Strict Mode](#30-strict-mode)
+31. [React DevTools](#31-react-devtools)
+32. [Common Pitfalls](#32-common-pitfalls)
+33. [Server Components](#33-server-components)
 
 ---
 
@@ -1461,6 +1462,8 @@ function ContactForm() {
 Use refs to access DOM values directly. Less code, but less control.
 
 ```jsx
+import { useRef } from 'react';
+
 function QuickForm() {
     const nameRef = useRef();
     const emailRef = useRef();
@@ -2239,6 +2242,10 @@ const value = useMemo(() => ({ theme, toggleTheme }), [theme]);
 **Q: Can I nest providers of the same context?**
 **A:** Yes! Inner providers override outer ones. A component reads from the closest Provider above it in the tree.
 
+### Interview Checkpoint 🛑
+**Interviewer:** "When would you use Context API versus a state management library like Redux or Zustand?"
+**You:** "Context is great for low-frequency updates like themes, auth, or locale - data that doesn't change often. For high-frequency updates (like a shopping cart or form state), Context causes performance issues because ALL consumers re-render on any change. State management libraries like Zustand use selectors to re-render only components that use the changed slice of state. I'd use Context for 'set once, read everywhere' data, and Zustand/Redux for complex, frequently-changing state."
+
 ---
 
 ## 15. Portals: Escaping the DOM
@@ -2560,7 +2567,295 @@ This way one component crashing doesn't take down the whole app.
 
 ---
 
-## 18. Routing: Navigation
+## 18. Common Patterns
+
+### Compound Components
+
+Compound components work together to form a complete UI. They share implicit state through Context, giving users flexibility in composition.
+
+```jsx
+import { createContext, useContext, useState } from 'react';
+
+// 1. Create shared context
+const TabsContext = createContext();
+
+// 2. Parent component manages state
+function Tabs({ children, defaultIndex = 0 }) {
+    const [activeIndex, setActiveIndex] = useState(defaultIndex);
+
+    return (
+        <TabsContext.Provider value={{ activeIndex, setActiveIndex }}>
+            <div className="tabs">{children}</div>
+        </TabsContext.Provider>
+    );
+}
+
+// 3. Child components consume context
+function TabList({ children }) {
+    return <div className="tab-list" role="tablist">{children}</div>;
+}
+
+function Tab({ children, index }) {
+    const { activeIndex, setActiveIndex } = useContext(TabsContext);
+    const isActive = activeIndex === index;
+
+    return (
+        <button
+            role="tab"
+            aria-selected={isActive}
+            className={isActive ? 'tab active' : 'tab'}
+            onClick={() => setActiveIndex(index)}
+        >
+            {children}
+        </button>
+    );
+}
+
+function TabPanels({ children }) {
+    return <div className="tab-panels">{children}</div>;
+}
+
+function TabPanel({ children, index }) {
+    const { activeIndex } = useContext(TabsContext);
+    if (activeIndex !== index) return null;
+    return <div role="tabpanel">{children}</div>;
+}
+
+// 4. Attach child components to parent (optional but common)
+Tabs.TabList = TabList;
+Tabs.Tab = Tab;
+Tabs.TabPanels = TabPanels;
+Tabs.TabPanel = TabPanel;
+
+// Usage - flexible composition!
+function App() {
+    return (
+        <Tabs defaultIndex={0}>
+            <Tabs.TabList>
+                <Tabs.Tab index={0}>Profile</Tabs.Tab>
+                <Tabs.Tab index={1}>Settings</Tabs.Tab>
+                <Tabs.Tab index={2}>Billing</Tabs.Tab>
+            </Tabs.TabList>
+
+            <Tabs.TabPanels>
+                <Tabs.TabPanel index={0}>
+                    <h2>Profile Content</h2>
+                </Tabs.TabPanel>
+                <Tabs.TabPanel index={1}>
+                    <h2>Settings Content</h2>
+                </Tabs.TabPanel>
+                <Tabs.TabPanel index={2}>
+                    <h2>Billing Content</h2>
+                </Tabs.TabPanel>
+            </Tabs.TabPanels>
+        </Tabs>
+    );
+}
+```
+
+### Render Props
+
+Pass a function as a prop to share code between components. Less common with hooks, but still useful for some patterns.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+// Render prop component - shares mouse position logic
+function MouseTracker({ render }) {
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            setPosition({ x: e.clientX, y: e.clientY });
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    // Call the render prop with the state
+    return render(position);
+}
+
+// Usage - consumer decides how to render
+function App() {
+    return (
+        <div>
+            {/* Render as text */}
+            <MouseTracker
+                render={({ x, y }) => (
+                    <p>Mouse position: ({x}, {y})</p>
+                )}
+            />
+
+            {/* Render as a following element */}
+            <MouseTracker
+                render={({ x, y }) => (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            left: x + 10,
+                            top: y + 10,
+                            background: 'black',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '4px'
+                        }}
+                    >
+                        Cursor tooltip
+                    </div>
+                )}
+            />
+        </div>
+    );
+}
+
+// Alternative: "children as a function" pattern
+function DataFetcher({ url, children }) {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                setData(data);
+                setLoading(false);
+            });
+    }, [url]);
+
+    return children({ data, loading });
+}
+
+// Usage
+<DataFetcher url="/api/users">
+    {({ data, loading }) =>
+        loading ? <Spinner /> : <UserList users={data} />
+    }
+</DataFetcher>
+```
+
+### Higher-Order Components (HOCs)
+
+HOCs are functions that take a component and return an enhanced component. Common in older codebases.
+
+```jsx
+import { useState, useEffect } from 'react';
+
+// HOC that adds loading state
+function withLoading(WrappedComponent) {
+    return function WithLoadingComponent({ isLoading, ...props }) {
+        if (isLoading) {
+            return <div className="spinner">Loading...</div>;
+        }
+        return <WrappedComponent {...props} />;
+    };
+}
+
+// HOC that adds authentication check
+function withAuth(WrappedComponent) {
+    return function WithAuthComponent(props) {
+        const [user, setUser] = useState(null);
+        const [checking, setChecking] = useState(true);
+
+        useEffect(() => {
+            checkAuth().then(user => {
+                setUser(user);
+                setChecking(false);
+            });
+        }, []);
+
+        if (checking) return <div>Checking auth...</div>;
+        if (!user) return <Navigate to="/login" />;
+
+        return <WrappedComponent {...props} user={user} />;
+    };
+}
+
+// HOC that adds logging
+function withLogging(WrappedComponent) {
+    function WithLoggingComponent(props) {
+        useEffect(() => {
+            console.log(`${WrappedComponent.name} mounted`);
+            return () => console.log(`${WrappedComponent.name} unmounted`);
+        }, []);
+
+        return <WrappedComponent {...props} />;
+    }
+
+    // Important: Set displayName for DevTools
+    WithLoggingComponent.displayName =
+        `WithLogging(${WrappedComponent.displayName || WrappedComponent.name})`;
+
+    return WithLoggingComponent;
+}
+
+// Usage
+function Dashboard({ user }) {
+    return <h1>Welcome, {user.name}</h1>;
+}
+
+// Compose HOCs (read right to left: withAuth runs first)
+const EnhancedDashboard = withLogging(withAuth(Dashboard));
+
+// In your app
+<EnhancedDashboard />
+```
+
+### Watch It!
+⚠️ **HOCs have downsides!** They can cause "wrapper hell," make debugging harder (anonymous components), and have issues with refs. Prefer hooks for new code - most HOC patterns can be replaced with custom hooks.
+
+```jsx
+// Instead of withLoading HOC, use a custom hook
+function useLoading(asyncFn) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const execute = async (...args) => {
+        setLoading(true);
+        try {
+            const result = await asyncFn(...args);
+            return result;
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { loading, error, execute };
+}
+```
+
+### Brain Power
+🧠 When would you still use a HOC instead of a hook?
+
+**Answer:** HOCs are useful when you need to:
+1. Wrap a component you don't control (third-party library)
+2. Add behavior that requires wrapping JSX (like error boundaries)
+3. Work with class components that can't use hooks
+4. Maintain legacy codebases that already use HOC patterns
+
+For new code, custom hooks are almost always better.
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between compound components and render props?**
+**A:** Compound components share state implicitly via Context - users arrange predefined child components. Render props share state explicitly via function - users have complete control over rendering. Compound components are more declarative; render props are more flexible.
+
+**Q: Can I use both patterns together?**
+**A:** Yes! Many libraries do. For example, a Tabs compound component might also accept a render prop for custom tab rendering: `<Tab render={({ isActive }) => ...} />`.
+
+**Q: Why do HOCs need displayName?**
+**A:** Without displayName, React DevTools shows HOC wrappers as "Unknown" or "Anonymous," making debugging difficult. Always set displayName to `WithXxx(ComponentName)` format.
+
+### Interview Checkpoint 🛑
+**Interviewer:** "Explain the compound component pattern and when you'd use it."
+**You:** "Compound components are a set of components that work together, sharing implicit state through Context. Think of `<select>` and `<option>` - they're separate elements but work as one unit. I'd use this pattern for complex UI widgets like tabs, accordions, or menus where users need flexibility in composition but components need to coordinate. The parent manages state, children consume it via Context, and users get a clean declarative API."
+
+---
+
+## 19. Routing: Navigation
 
 ### React Router Setup
 
@@ -2702,6 +2997,75 @@ function ProtectedRoute({ children }) {
 />
 ```
 
+### URL State: Syncing State with the URL
+
+Store filter/sort/pagination state in the URL for shareable links and back button support.
+
+```jsx
+import { useSearchParams } from 'react-router-dom';
+
+function ProductFilters() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Read state from URL
+    const category = searchParams.get('category') || 'all';
+    const sort = searchParams.get('sort') || 'popular';
+    const page = parseInt(searchParams.get('page') || '1', 10);
+
+    // Update URL (replaces state management for these values!)
+    const setCategory = (newCategory) => {
+        setSearchParams(prev => {
+            prev.set('category', newCategory);
+            prev.set('page', '1');  // Reset page on category change
+            return prev;
+        });
+    };
+
+    const setSort = (newSort) => {
+        setSearchParams(prev => {
+            prev.set('sort', newSort);
+            return prev;
+        });
+    };
+
+    const setPage = (newPage) => {
+        setSearchParams(prev => {
+            prev.set('page', String(newPage));
+            return prev;
+        });
+    };
+
+    return (
+        <div>
+            <select value={category} onChange={e => setCategory(e.target.value)}>
+                <option value="all">All</option>
+                <option value="electronics">Electronics</option>
+                <option value="clothing">Clothing</option>
+            </select>
+
+            <select value={sort} onChange={e => setSort(e.target.value)}>
+                <option value="popular">Popular</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+            </select>
+
+            <ProductList category={category} sort={sort} page={page} />
+
+            <Pagination page={page} onPageChange={setPage} />
+        </div>
+    );
+}
+
+// URL looks like: /products?category=electronics&sort=price-low&page=2
+// Users can bookmark, share, and use back/forward buttons!
+```
+
+**When to use URL state:**
+- Filters, sorting, pagination
+- Search queries
+- Tab selection
+- Any state users might want to bookmark or share
+
 ### Watch It!
 ⚠️ **Never call `navigate()` during render!** Calling it unconditionally in a component body causes infinite loops. Use it inside event handlers or `useEffect`. For declarative redirects, use the `<Navigate>` component instead.
 
@@ -2723,7 +3087,7 @@ function ProtectedRoute({ children }) {
 
 ---
 
-## 19. API Calls: Fetching Data
+## 20. API Calls: Fetching Data
 
 ### React Query (TanStack Query)
 
@@ -2734,7 +3098,7 @@ npm install @tanstack/react-query
 ```
 
 ```jsx
-import { QueryClient, QueryClientProvider, useQuery, useMutation } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Setup
 const queryClient = new QueryClient();
@@ -2825,7 +3189,7 @@ const [user, posts] = await Promise.all([
 
 ---
 
-## 20. State Management: Zustand
+## 21. State Management: Zustand
 
 ### Why Zustand?
 
@@ -2918,7 +3282,7 @@ const count = useStore((state) => state.count);
 
 ---
 
-## 21. Performance: memo, useMemo, useCallback
+## 22. Performance: memo, useMemo, useCallback
 
 ### React.memo: Memoize Components
 
@@ -2965,6 +3329,8 @@ const handleSelect = useCallback((id) => {
 ### The Optimization Pattern
 
 ```jsx
+import { useState, useMemo, useCallback, memo } from 'react';
+
 function ProductPage() {
     const [filter, setFilter] = useState('');
     const [cart, setCart] = useState([]);
@@ -3018,16 +3384,20 @@ const ProductList = memo(function ProductList({ items, onAdd }) {
 **Q: Does React.memo do a deep comparison?**
 **A:** No, shallow only (compares prop references). For deep comparison, pass a custom `areEqual` function as the second argument to `memo()`, but this can be expensive.
 
+### Interview Checkpoint 🛑
+**Interviewer:** "A component is re-rendering too often. How would you debug and fix it?"
+**You:** "First, I'd use React DevTools Profiler to identify which components are slow and why they're re-rendering. Common causes are: (1) parent re-rendering - fix with `React.memo`, (2) new object/function props every render - fix with `useMemo`/`useCallback`, (3) context changes - fix by splitting contexts or using selectors. I'd only add memoization after confirming there's a real performance problem - premature optimization adds complexity without benefit."
+
 ---
 
-## 22. useReducer: Complex State
+## 23. useReducer: Complex State
 
 ### When useState Isn't Enough
 
 Use `useReducer` when state logic is complex or involves multiple sub-values.
 
 ```jsx
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 
 // Reducer function (pure, no side effects)
 function todoReducer(state, action) {
@@ -3115,9 +3485,13 @@ function TodoApp() {
 **Q: What's the `default` case for?**
 **A:** It catches unrecognized action types. Return the current state unchanged. In TypeScript, you can use `never` to ensure exhaustive matching.
 
+### Interview Checkpoint 🛑
+**Interviewer:** "When would you choose useReducer over useState?"
+**You:** "I use `useReducer` when: (1) state updates depend on previous state in complex ways, (2) multiple state values change together (like a form with validation), (3) the state logic is complex enough to benefit from a named action pattern, or (4) I want to extract state logic for testing. For simple counters or toggles, `useState` is cleaner. A good rule: if your `setState` calls are getting complicated with spread operators and conditionals, it's time for `useReducer`."
+
 ---
 
-## 23. Code Splitting & Lazy Loading
+## 24. Code Splitting & Lazy Loading
 
 ### React.lazy: Load Components On Demand
 
@@ -3195,7 +3569,7 @@ const Dashboard = lazy(() => import('./Dashboard.lazy'));
 
 ---
 
-## 24. React 18+ Features
+## 25. React 18+ Features
 
 ### useTransition: Non-Blocking Updates
 
@@ -3378,6 +3752,138 @@ function TodoList({ todos, addTodo }) {
 }
 ```
 
+#### useFormStatus: Form Pending State in Children
+
+Access form submission state from any child component without prop drilling.
+
+```jsx
+'use client';
+
+import { useFormStatus } from 'react-dom';
+
+// Child component that needs to know form state
+function SubmitButton() {
+    const { pending, data, method, action } = useFormStatus();
+
+    return (
+        <button type="submit" disabled={pending}>
+            {pending ? 'Submitting...' : 'Submit'}
+        </button>
+    );
+}
+
+// Progress indicator anywhere in the form
+function FormProgress() {
+    const { pending } = useFormStatus();
+    return pending ? <div className="spinner" /> : null;
+}
+
+// Parent form component
+function ContactForm({ submitAction }) {
+    return (
+        <form action={submitAction}>
+            <input name="email" type="email" placeholder="Email" required />
+            <textarea name="message" placeholder="Message" required />
+            <FormProgress />
+            <SubmitButton />
+        </form>
+    );
+}
+```
+
+#### React Compiler (React Forget)
+
+React Compiler automatically memoizes your components - no more manual `useMemo`, `useCallback`, or `memo`.
+
+```jsx
+// Before React Compiler: Manual memoization
+function ProductList({ products, onSelect }) {
+    const sortedProducts = useMemo(() =>
+        [...products].sort((a, b) => a.name.localeCompare(b.name)),
+        [products]
+    );
+
+    const handleSelect = useCallback((id) => {
+        onSelect(id);
+    }, [onSelect]);
+
+    return <MemoizedList items={sortedProducts} onSelect={handleSelect} />;
+}
+
+// After React Compiler: Just write normal code!
+function ProductList({ products, onSelect }) {
+    const sortedProducts = [...products].sort((a, b) =>
+        a.name.localeCompare(b.name)
+    );
+
+    const handleSelect = (id) => {
+        onSelect(id);
+    };
+
+    // Compiler automatically optimizes re-renders
+    return <List items={sortedProducts} onSelect={handleSelect} />;
+}
+```
+
+**Status:** React Compiler is in beta (as of early 2025). It's used in production at Meta. To try it: `npm install babel-plugin-react-compiler`.
+
+#### Advanced use() Patterns
+
+```jsx
+import { use, Suspense } from 'react';
+
+// Pattern 1: Error handling with use()
+function UserProfile({ userPromise }) {
+    try {
+        const user = use(userPromise);
+        return <h1>{user.name}</h1>;
+    } catch (error) {
+        // Caught by nearest error boundary
+        throw error;
+    }
+}
+
+// Pattern 2: Multiple resources in sequence
+function Dashboard({ userPromise }) {
+    const user = use(userPromise);
+
+    // Can use resolved value to create dependent promise
+    const postsPromise = fetchPosts(user.id);
+    const posts = use(postsPromise);
+
+    return (
+        <div>
+            <h1>{user.name}'s Dashboard</h1>
+            <ul>{posts.map(p => <li key={p.id}>{p.title}</li>)}</ul>
+        </div>
+    );
+}
+
+// Pattern 3: Conditional context reading (impossible with useContext!)
+function ThemeDisplay({ showTheme }) {
+    if (!showTheme) {
+        return <p>Theme hidden</p>;
+    }
+
+    // use() can be called conditionally!
+    const theme = use(ThemeContext);
+    return <p>Current theme: {theme}</p>;
+}
+
+// Pattern 4: Promise caching (important!)
+function App() {
+    // Create promise OUTSIDE component or in useMemo
+    // Otherwise, new promise on every render = infinite loop!
+    const userPromise = useMemo(() => fetchUser(1), []);
+
+    return (
+        <Suspense fallback={<p>Loading...</p>}>
+            <UserProfile userPromise={userPromise} />
+        </Suspense>
+    );
+}
+```
+
 ### Watch It!
 ⚠️ **Don't wrap everything in `startTransition`!** Only use it for expensive, non-urgent updates (filtering large lists, complex re-renders). Wrapping simple state updates adds overhead without benefit. If the update is fast, just use regular `setState`.
 
@@ -3393,12 +3899,15 @@ function TodoList({ todos, addTodo }) {
 **Q: Do I need a framework for Server Actions?**
 **A:** Yes, currently. Server Actions require a bundler that supports the `'use server'` directive (Next.js 14+, or a custom setup with React's bundler plugins).
 
-**Q: What happened to `useFormStatus`?**
-**A:** It still exists! Use it in child components of a `<form>` to access the form's pending state without prop drilling.
+**Q: Why is `useFormStatus` a separate hook from `useActionState`?**
+**A:** They serve different purposes! `useActionState` manages the form's action and state at the form level. `useFormStatus` lets any nested child component access the pending state without prop drilling. This separation follows React's composition model.
+
+**Q: When will React Compiler be stable?**
+**A:** React Compiler is in beta and used in production at Meta. It's expected to become the default in future React versions. You can try it now with the Babel plugin, but it's optional - your existing code will continue to work.
 
 ---
 
-## 25. TypeScript with React
+## 26. TypeScript with React
 
 ### Why TypeScript?
 
@@ -3532,7 +4041,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 ---
 
-## 26. Styling: CSS Solutions
+## 27. Styling: CSS Solutions
 
 ### CSS Modules (Scoped Styles)
 
@@ -3615,6 +4124,90 @@ function Box({ color, size }) {
 }
 ```
 
+### Animation with Framer Motion
+
+The most popular React animation library. Declarative, spring-based animations.
+
+```bash
+npm install framer-motion
+```
+
+```jsx
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Basic animation
+function FadeIn({ children }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
+            {children}
+        </motion.div>
+    );
+}
+
+// Hover and tap animations
+function AnimatedButton({ children, onClick }) {
+    return (
+        <motion.button
+            onClick={onClick}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+        >
+            {children}
+        </motion.button>
+    );
+}
+
+// Exit animations (AnimatePresence required)
+function Modal({ isOpen, onClose, children }) {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    className="modal-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={onClose}
+                >
+                    <motion.div
+                        className="modal-content"
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {children}
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+}
+
+// List animations with stagger
+function AnimatedList({ items }) {
+    return (
+        <motion.ul>
+            {items.map((item, i) => (
+                <motion.li
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}  // Stagger
+                >
+                    {item.name}
+                </motion.li>
+            ))}
+        </motion.ul>
+    );
+}
+```
+
 ### Watch It!
 ⚠️ **Pick one approach per project!** Mixing CSS Modules, Tailwind, and styled-components creates confusion. Choose one and stick with it.
 
@@ -3636,7 +4229,7 @@ function Box({ color, size }) {
 
 ---
 
-## 27. Accessibility: Building for Everyone
+## 28. Accessibility: Building for Everyone
 
 ### Semantic HTML
 
@@ -3817,7 +4410,7 @@ function App() {
 
 ---
 
-## 28. Testing
+## 29. Testing
 
 ### React Testing Library + Vitest
 
@@ -3870,6 +4463,166 @@ it('loads and displays user data', async () => {
 });
 ```
 
+### Testing Custom Hooks
+
+```jsx
+import { renderHook, act } from '@testing-library/react';
+import { useCounter } from './useCounter';
+
+describe('useCounter', () => {
+    it('starts with initial value', () => {
+        const { result } = renderHook(() => useCounter(10));
+        expect(result.current.count).toBe(10);
+    });
+
+    it('increments the count', () => {
+        const { result } = renderHook(() => useCounter(0));
+
+        // Wrap state updates in act()
+        act(() => {
+            result.current.increment();
+        });
+
+        expect(result.current.count).toBe(1);
+    });
+
+    it('resets to initial value', () => {
+        const { result } = renderHook(() => useCounter(5));
+
+        act(() => {
+            result.current.increment();
+            result.current.increment();
+            result.current.reset();
+        });
+
+        expect(result.current.count).toBe(5);
+    });
+
+    // Testing hooks that depend on props
+    it('updates when initial value changes', () => {
+        const { result, rerender } = renderHook(
+            ({ initial }) => useCounter(initial),
+            { initialProps: { initial: 0 } }
+        );
+
+        expect(result.current.count).toBe(0);
+
+        rerender({ initial: 100 });
+        // Note: depends on hook implementation
+    });
+});
+```
+
+### Mocking Patterns
+
+```jsx
+import { render, screen, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import UserProfile from './UserProfile';
+
+// Mock an entire module
+vi.mock('./api', () => ({
+    fetchUser: vi.fn()
+}));
+
+import { fetchUser } from './api';
+
+describe('UserProfile', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('displays user data on successful fetch', async () => {
+        // Setup mock return value
+        fetchUser.mockResolvedValue({
+            id: 1,
+            name: 'John Doe',
+            email: 'john@example.com'
+        });
+
+        render(<UserProfile userId={1} />);
+
+        await waitFor(() => {
+            expect(screen.getByText('John Doe')).toBeInTheDocument();
+        });
+
+        expect(fetchUser).toHaveBeenCalledWith(1);
+    });
+
+    it('displays error message on failed fetch', async () => {
+        fetchUser.mockRejectedValue(new Error('Network error'));
+
+        render(<UserProfile userId={1} />);
+
+        await waitFor(() => {
+            expect(screen.getByText(/error/i)).toBeInTheDocument();
+        });
+    });
+
+    // Mock timers
+    it('auto-refreshes data every 30 seconds', async () => {
+        vi.useFakeTimers();
+        fetchUser.mockResolvedValue({ id: 1, name: 'John' });
+
+        render(<UserProfile userId={1} autoRefresh />);
+
+        expect(fetchUser).toHaveBeenCalledTimes(1);
+
+        // Fast-forward 30 seconds
+        await act(() => vi.advanceTimersByTime(30000));
+
+        expect(fetchUser).toHaveBeenCalledTimes(2);
+
+        vi.useRealTimers();
+    });
+});
+```
+
+### End-to-End Testing with Playwright
+
+For testing full user flows across your entire application:
+
+```bash
+npm install -D @playwright/test
+npx playwright install
+```
+
+```js
+// e2e/login.spec.js
+import { test, expect } from '@playwright/test';
+
+test.describe('Login Flow', () => {
+    test('user can log in successfully', async ({ page }) => {
+        await page.goto('/login');
+
+        // Fill in the form
+        await page.fill('[name="email"]', 'user@example.com');
+        await page.fill('[name="password"]', 'password123');
+        await page.click('button[type="submit"]');
+
+        // Verify redirect to dashboard
+        await expect(page).toHaveURL('/dashboard');
+        await expect(page.locator('h1')).toContainText('Welcome');
+    });
+
+    test('shows error for invalid credentials', async ({ page }) => {
+        await page.goto('/login');
+
+        await page.fill('[name="email"]', 'wrong@example.com');
+        await page.fill('[name="password"]', 'wrongpassword');
+        await page.click('button[type="submit"]');
+
+        await expect(page.locator('.error')).toContainText('Invalid credentials');
+        await expect(page).toHaveURL('/login');  // Stay on login page
+    });
+});
+```
+
+**When to use E2E tests:**
+- Critical user journeys (signup, checkout, core workflows)
+- Integration with external services
+- Multi-page flows that unit tests can't cover
+
 ### Watch It!
 ⚠️ **Don't test implementation details!** Avoid testing internal state, method names, or component structure. If you refactor a component but it looks the same to users, your tests shouldn't break. Test behavior: "when I click X, I see Y."
 
@@ -3889,9 +4642,13 @@ it('loads and displays user data', async () => {
 **Q: What's the difference between `getBy`, `queryBy`, and `findBy`?**
 **A:** `getBy` throws if not found (use for elements that should exist). `queryBy` returns null if not found (use for asserting absence). `findBy` waits asynchronously (use for elements that appear after loading).
 
+### Interview Checkpoint 🛑
+**Interviewer:** "How do you decide what to test in a React application?"
+**You:** "I follow the testing trophy: mostly integration tests, some unit tests, few E2E tests. I test user-facing behavior, not implementation details. Priority order: (1) critical user paths (login, checkout, core features), (2) components with complex logic or many states, (3) edge cases that have caused bugs before. I avoid testing: styling, third-party libraries, or internal component state. The goal is confidence that the app works, not 100% coverage."
+
 ---
 
-## 29. Strict Mode
+## 30. Strict Mode
 
 ### What is Strict Mode?
 
@@ -3987,7 +4744,7 @@ function ChatRoom({ roomId }) {
 
 ---
 
-## 30. React DevTools
+## 31. React DevTools
 
 ### Essential Debugging Tool
 
@@ -4069,7 +4826,7 @@ function onRender(id, phase, actualDuration) {
 
 ---
 
-## 31. Common Pitfalls
+## 32. Common Pitfalls
 
 ### Stale Closures
 
@@ -4177,7 +4934,7 @@ const addItem = () => {
 
 ---
 
-## 32. Server Components
+## 33. Server Components
 
 ### What Are Server Components?
 
@@ -4305,6 +5062,51 @@ function AddProductForm() {
 | Keep sensitive info server-side | Browser APIs |
 | Large dependencies (zero client JS) | Interactivity |
 | SEO-critical content | Real-time updates |
+
+### React Meta-Frameworks Comparison
+
+| Feature | Next.js | Remix | Astro |
+|---------|---------|-------|-------|
+| **Server Components** | Yes (App Router) | Partial (loaders) | Yes (islands) |
+| **Data Fetching** | fetch in RSC, Server Actions | Loaders + Actions | Astro.glob, fetch |
+| **Routing** | File-based | File-based | File-based |
+| **Rendering** | SSR, SSG, ISR | SSR only | SSG by default, SSR opt-in |
+| **Styling** | Any (CSS Modules, Tailwind) | Any | Any + scoped by default |
+| **Best For** | Full-stack apps, enterprise | Form-heavy apps, web standards | Content sites, blogs, docs |
+| **Learning Curve** | Medium | Medium | Low (if you know React) |
+
+**Quick Guide:**
+- **Next.js:** The default choice for most React apps. Full-featured, great DX, huge ecosystem.
+- **Remix:** Best for apps with lots of forms and mutations. Embraces web standards.
+- **Astro:** Best for content-heavy sites. Ships zero JS by default, add React where needed.
+
+```jsx
+// Next.js 14+ App Router
+// app/products/page.tsx
+export default async function ProductsPage() {
+    const products = await db.products.findMany();  // Server Component
+    return <ProductList products={products} />;
+}
+
+// Remix
+// routes/products.tsx
+export async function loader() {
+    return json(await db.products.findMany());
+}
+export default function Products() {
+    const products = useLoaderData();
+    return <ProductList products={products} />;
+}
+
+// Astro with React island
+// pages/products.astro
+---
+const products = await db.products.findMany();
+---
+<Layout>
+    <ProductList client:load products={products} />
+</Layout>
+```
 
 ### Watch It!
 ⚠️ **You can't import a Server Component into a Client Component!** The boundary flows one way. Pass Server Components as `children` props to Client Components instead.
