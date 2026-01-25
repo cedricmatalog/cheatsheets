@@ -2702,6 +2702,9 @@ function ProtectedRoute({ children }) {
 />
 ```
 
+### Watch It!
+⚠️ **Never call `navigate()` during render!** Calling it unconditionally in a component body causes infinite loops. Use it inside event handlers or `useEffect`. For declarative redirects, use the `<Navigate>` component instead.
+
 ### Brain Power
 🧠 Why use `<Link>` or `<NavLink>` instead of `<a href>`?
 
@@ -3091,6 +3094,9 @@ function TodoApp() {
 }
 ```
 
+### Watch It!
+⚠️ **Never mutate state in your reducer!** Always return a new object/array. `state.push(item)` mutates - use `[...state, item]` instead. Reducers must be pure functions: same input = same output, no side effects.
+
 ### Brain Power
 🧠 When should you use `useReducer` vs `useState`?
 
@@ -3371,6 +3377,9 @@ function TodoList({ todos, addTodo }) {
     );
 }
 ```
+
+### Watch It!
+⚠️ **Don't wrap everything in `startTransition`!** Only use it for expensive, non-urgent updates (filtering large lists, complex re-renders). Wrapping simple state updates adds overhead without benefit. If the update is fast, just use regular `setState`.
 
 ### Brain Power
 🧠 When should you use `useTransition` vs `useDeferredValue`?
@@ -3860,6 +3869,9 @@ it('loads and displays user data', async () => {
     expect(screen.getByText('John Doe')).toBeInTheDocument();
 });
 ```
+
+### Watch It!
+⚠️ **Don't test implementation details!** Avoid testing internal state, method names, or component structure. If you refactor a component but it looks the same to users, your tests shouldn't break. Test behavior: "when I click X, I see Y."
 
 ### Brain Power
 🧠 Why test "what the user sees" instead of internal state?

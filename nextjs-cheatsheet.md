@@ -4384,6 +4384,9 @@ export default function ProductPage() {
 **Q: What's the difference between params prop and useParams hook?**
 **A:** The `params` prop is for Server Components (passed from Next.js). The `useParams()` hook is for Client Components. Same data, different access methods.
 
+**Q: How do I update search params without a full page reload?**
+**A:** Use `useRouter().push()` or `useRouter().replace()` with the new URL. Or use the native `URLSearchParams` API to construct the new query string and navigate programmatically.
+
 ### Brain Power
 🧠 Why does Next.js separate navigation into `useParams`, `usePathname`, and `useSearchParams` instead of one unified hook?
 
