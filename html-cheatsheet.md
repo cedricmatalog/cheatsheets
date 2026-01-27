@@ -34,6 +34,37 @@
 
 ## 1. Introduction: How the Web Really Works
 
+### What are markup languages?
+
+Think of a markup language like a highlighter and sticky notes for your text. You're not changing the words - you're adding annotations that say "this is a heading," "this is a paragraph," "this is important."
+
+HTML isn't the only markup language out there:
+- **SGML** - The grandparent of HTML (very complex, mostly historical)
+- **XML** - A strict, flexible markup language used for data (think config files and APIs)
+- **HTML** - Built for web pages (what we're learning!)
+- **Markdown** - A lightweight markup for writing (fun fact: this cheatsheet is written in it!)
+
+The key idea? Markup languages *describe* content. They don't *execute* logic. You're telling the computer "what this is," not "what to do."
+
+### Frontend Development: The Big Three
+
+Every webpage you see is built with three technologies working together - think of them as a band:
+
+| Technology | Role | Analogy |
+|-----------|------|---------|
+| **HTML** | Structure & content | The skeleton |
+| **CSS** | Styling & layout | The skin & clothes |
+| **JavaScript** | Behavior & interactivity | The muscles & brain |
+
+```
+HTML (structure) + CSS (style) + JavaScript (behavior) = Complete Webpage
+```
+
+Here's the thing: you can have HTML without CSS or JavaScript (it'll look ugly, but it works!). But you *can't* have a webpage without HTML. It's always the starting point.
+
+### Brain Power
+🧠 Open any website, right-click, and hit "View Source." Can you spot where HTML ends and CSS/JavaScript begin? What patterns do you notice?
+
 ### What's HTML, anyway?
 
 HTML stands for **HyperText Markup Language**, but what does that actually mean? Think of HTML as the skeleton of every webpage you've ever visited. It's not a programming language (it can't make decisions or do math), but it's incredibly powerful for *structuring* content.
@@ -57,6 +88,61 @@ HTML stands for **HyperText Markup Language**, but what does that actually mean?
 You type URL → DNS lookup → HTTP Request → Server responds → Browser renders
 ```
 
+### Domain names: Your website's address
+
+Imagine if every time you wanted to visit a website, you had to type `172.217.164.110` instead of `google.com`. Yikes! That's why we have domain names - they're human-friendly addresses for websites.
+
+Here's how a URL breaks down:
+
+```
+https://blog.example.com/page
+  ↑       ↑      ↑      ↑  ↑
+protocol subdomain domain TLD path
+```
+
+- **TLD (Top-Level Domain):** `.com`, `.org`, `.net`, `.io`, etc.
+- **Domain:** The name you buy from a registrar (GoDaddy, Namecheap, etc.)
+- **Subdomain:** Optional prefix (like `www`, `blog`, `api`)
+
+You buy domain names from **registrars**, and they cost around $10-50/year. Think of it like renting a street address for your online house.
+
+### Browsers: Your HTML interpreter
+
+You write the HTML, but the **browser** is the one reading it and turning it into something visual. Each browser has its own **rendering engine** (the thing that actually paints pixels on screen):
+
+| Browser | Engine | Notes |
+|---------|--------|-------|
+| Chrome | Blink | Most popular (~65% market share) |
+| Firefox | Gecko | Privacy-focused |
+| Safari | WebKit | Apple devices |
+| Edge | Blink | Microsoft's browser |
+
+### Sharpen your pencil
+
+Try this right now! Press **F12** (or right-click → "Inspect") on any webpage. You just opened **DevTools** - your new best friend:
+- **Elements tab** - See and edit HTML/CSS live (try changing some text!)
+- **Console tab** - JavaScript errors and output
+- **Network tab** - See every file being loaded
+- **Lighthouse tab** - Performance and accessibility audits
+
+Go ahead, break something. You can't hurt anything - just refresh to undo!
+
+### Hosting: Where your website lives
+
+So you've written an amazing HTML page. Now what? It's just sitting on your computer! For the world to see it, your files need to live on a **server** - a computer that's always on and connected to the internet. This is called **hosting**.
+
+| Type | Good For | Examples |
+|------|----------|---------|
+| **Static hosting** | HTML/CSS/JS only sites | GitHub Pages, Netlify, Vercel |
+| **Shared hosting** | Small sites, beginners | Bluehost, HostGator |
+| **VPS** | More control, medium traffic | DigitalOcean, Linode |
+| **Cloud hosting** | Scalable, high traffic | AWS, Google Cloud, Azure |
+
+**For learning HTML:** Use static hosting! GitHub Pages is free - just push your HTML files to a repository and boom, you have a live website.
+
+### Brain Power
+🧠 What's the difference between a domain name and hosting? Think of it this way: if your website were a physical store, which one is the street address and which one is the actual building?
+
 ### There are NO Dumb Questions
 
 **Q: What's the difference between HTTP and HTTPS?**
@@ -67,6 +153,12 @@ You type URL → DNS lookup → HTTP Request → Server responds → Browser ren
 
 **Q: Is HTML case-sensitive?**
 **A:** Nope! `<DIV>`, `<Div>`, and `<div>` are all the same. But the convention is lowercase, so stick with that.
+
+**Q: What's the difference between a domain and hosting?**
+**A:** A domain is your address (where people find you). Hosting is the actual building (where your files live). You need both for a live website.
+
+**Q: Does my HTML look different in different browsers?**
+**A:** Sometimes! Browsers have slightly different default styles. That's why developers use "CSS resets" to start from a consistent baseline. Always test in multiple browsers.
 
 ### Watch It!
 ⚠️ **Markup languages ≠ Programming languages**. HTML can't make decisions, can't loop, can't do calculations. For that, you need JavaScript. HTML is about structure and content, not logic.
@@ -242,6 +334,8 @@ What's wrong with this code?
 
 ## 3. Basic Tags: The Building Blocks
 
+Before you build anything complex, you need to know the basic bricks. These tags are the ones you'll use on every single page you ever build - headings for titles, paragraphs for text, and a handful of formatting tags to add emphasis.
+
 ### Headings: Size matters
 
 HTML has six levels of headings, from `<h1>` (biggest, most important) to `<h6>` (smallest, least important).
@@ -324,6 +418,17 @@ E. Subscript
 
 **Answers:** 1-B, 2-D, 3-C, 4-A, 5-E
 
+### There are NO Dumb Questions
+
+**Q: Can I use `<h1>` just to make text bigger?**
+**A:** No! Headings convey document structure, not font size. Use CSS for sizing. Screen readers and search engines rely on heading hierarchy to understand your page.
+
+**Q: What's the difference between `<br>` and starting a new `<p>`?**
+**A:** `<br>` is a line break within a block of text (like in a poem or address). `<p>` starts a new paragraph with spacing. Don't use `<br><br>` to fake paragraph spacing - use actual `<p>` tags.
+
+**Q: Does formatting like `<strong>` actually help SEO?**
+**A:** Slightly! Search engines give a small weight boost to text in `<strong>` and `<em>` tags. But don't abuse it - marking everything as strong helps nothing.
+
 ---
 
 ## 4. Working with Text: Making Words Come Alive
@@ -362,6 +467,45 @@ E. Subscript
 
 ### Watch It!
 ⚠️ **IDs must be unique!** You can't have two elements with `id="header"`. But you can have a million elements with `class="highlight"`.
+
+### Standard (global) attributes: The universal toolkit
+
+Here's something cool: some attributes work on *any* HTML element. These are called **global attributes**, and they're like a Swiss Army knife you always have in your pocket.
+
+You already know `id`, `class`, and `style`. But check out these other handy ones:
+
+| Attribute | What It Does | Example |
+|-----------|-------------|---------|
+| `title` | Shows a tooltip on hover | `title="More info"` |
+| `hidden` | Hides element completely | `<div hidden>` |
+| `tabindex` | Controls keyboard tab order | `tabindex="0"` |
+| `contenteditable` | Lets users edit the content! | `contenteditable="true"` |
+| `draggable` | Makes element draggable | `draggable="true"` |
+| `lang` | Declares element's language | `lang="fr"` |
+| `dir` | Text direction (LTR/RTL) | `dir="rtl"` |
+| `translate` | Should translators skip this? | `translate="no"` |
+| `spellcheck` | Enable browser spell check | `spellcheck="true"` |
+
+```html
+<!-- title gives a tooltip - hover over this! -->
+<abbr title="HyperText Markup Language">HTML</abbr>
+
+<!-- hidden removes element from view AND accessibility tree -->
+<div hidden>This won't show up at all</div>
+
+<!-- contenteditable lets users type right in the element -->
+<p contenteditable="true">Click me and start typing!</p>
+
+<!-- tabindex="0" makes any element keyboard-focusable -->
+<div tabindex="0">I can receive keyboard focus now</div>
+```
+
+### Sharpen your pencil
+
+Try adding `contenteditable="true"` to a `<p>` tag in your HTML file and open it in the browser. Click on it and start typing. Mind blown? Now try `draggable="true"` on an image. What happens when you drag it?
+
+### Watch It!
+⚠️ **`hidden` is not security!** It hides elements visually and from screen readers, but anyone can see hidden elements in the source code. Don't hide sensitive data this way.
 
 ### Data attributes: Your own custom attributes
 
@@ -441,6 +585,8 @@ let userId = element.dataset.userId; // "12345"
 ---
 
 ## 5. Lists: Organizing Information
+
+Lists are everywhere on the web - navigation menus, feature lists, step-by-step instructions, even this cheatsheet's table of contents. If you can think of it as "a collection of related items," it's probably a list.
 
 ### Three types of lists (but you'll use two of them)
 
@@ -572,6 +718,17 @@ Create a nested list showing:
     </li>
 </ul>
 ```
+
+### There are NO Dumb Questions
+
+**Q: Should navigation menus use `<ul>` or `<ol>`?**
+**A:** `<ul>` (unordered list)! Navigation items don't have a sequence. Screen readers announce "list with 5 items," which helps users understand the menu structure.
+
+**Q: Can I put anything inside an `<li>`?**
+**A:** Yes! List items can contain paragraphs, images, links, even other lists. That's how nested lists work - a `<ul>` or `<ol>` inside an `<li>`.
+
+**Q: Why not just use `<br>` tags to make a list?**
+**A:** Semantics! A real list tells browsers and screen readers "these items are related." Line breaks are just visual - they carry no meaning. Plus, lists are way easier to style with CSS.
 
 ---
 
@@ -838,6 +995,53 @@ Create a nested list showing:
 ### Watch It!
 ⚠️ **iframes are a security risk!** Only embed content you trust. Use CSP (Content Security Policy) headers to restrict what iframes can do.
 
+### CSP (Content Security Policy): Your page's bouncer
+
+Imagine your webpage is a party. CSP is the bouncer at the door - it decides who gets in (which resources can load) and who gets turned away. Without CSP, *anyone* can sneak scripts, styles, or iframes onto your page. Scary, right?
+
+You set CSP via a meta tag or HTTP header:
+
+```html
+<!-- Via meta tag -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src https:; script-src 'self' https://trusted-cdn.com;">
+```
+
+**Think of each directive as a rule for the bouncer:**
+
+| Directive | "Only let in..." |
+|-----------|-----------------|
+| `default-src` | ...these sources for everything (fallback rule) |
+| `script-src` | ...JavaScript from these places |
+| `style-src` | ...CSS from these places |
+| `img-src` | ...images from these places |
+| `frame-src` | ...iframes from these places |
+| `font-src` | ...fonts from these places |
+| `connect-src` | ...AJAX/fetch requests to these places |
+
+```html
+<!-- Only allow scripts from your own domain -->
+<meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+
+<!-- Allow images from anywhere over HTTPS -->
+<meta http-equiv="Content-Security-Policy" content="img-src https:;">
+
+<!-- Block all iframes (no one gets in!) -->
+<meta http-equiv="Content-Security-Policy" content="frame-src 'none';">
+```
+
+**Why should you care?**
+- Prevents XSS (Cross-Site Scripting) attacks - the #1 web vulnerability
+- Stops unauthorized scripts from running on your page
+- Controls which external resources can load
+- Your users are safer, even if your server gets compromised
+
+### Brain Power
+🧠 Why would you want to restrict where scripts can load from? Think about what happens if an attacker injects a `<script src="https://evil.com/steal-passwords.js">` tag into your page...
+
+### Watch It!
+⚠️ **CSP can break your own site!** If you set a strict policy, your own scripts might get blocked. Start with `Content-Security-Policy-Report-Only` to test without breaking anything.
+
 ### There are NO Dumb Questions
 
 **Q: Why provide multiple `<source>` elements?**
@@ -848,6 +1052,12 @@ Create a nested list showing:
 
 **Q: Can I style the video player controls?**
 **A:** Not easily. Native controls vary by browser. For custom controls, you'll need JavaScript.
+
+**Q: Do I really need CSP for a simple static site?**
+**A:** It's a good habit! Even static sites can be targets. CSP is like wearing a seatbelt - you hope you never need it, but you're glad it's there when something goes wrong.
+
+**Q: What's the difference between the CSP meta tag and the HTTP header?**
+**A:** The HTTP header is more powerful (supports more directives). The meta tag is easier to add but has some limitations. For production, use the HTTP header.
 
 ---
 
@@ -1089,6 +1299,45 @@ Forms are how users send data to your server. Every login, search box, comment s
 </form>
 ```
 
+### Form limitations: What HTML forms CAN'T do
+
+HTML forms are awesome for getting data from users. But they're not magic. Here's where they hit a wall - and where you'll eventually need JavaScript to pick up the slack:
+
+**The page-reload problem:**
+```html
+<!-- Every time someone clicks Submit, the ENTIRE page reloads -->
+<form action="/submit" method="POST">
+    <button type="submit">Submit</button>
+</form>
+<!-- Want smooth, no-reload submission? You need JavaScript (fetch/AJAX) -->
+```
+
+**Validation only goes so far:**
+- Can't check if two password fields match (confirm password? nope)
+- Can't verify a username is available (that needs a server round-trip)
+- Can't do "if you checked X, field Y is required" logic
+- `pattern` gives you regex, but no friendly custom error messages
+
+**Styling? Good luck.**
+- `<select>`, `<input type="file">`, and `<input type="date">` look different on every browser and OS
+- You can't fully restyle native controls with CSS alone
+- Most custom-looking form elements are actually rebuilt from scratch with JavaScript
+
+**No multi-step wizards:**
+- HTML alone can't show step 1, then step 2, then step 3
+- No way to save progress between steps
+
+**No data transformation:**
+- Can't format a phone number as the user types
+- Can't conditionally show/hide fields based on another field's value
+- Can't encrypt data before sending
+
+### Brain Power
+🧠 Given these limitations, why do you think HTML forms still matter? Why not just build everything in JavaScript from the start? (Hint: think about accessibility, progressive enhancement, and what happens when JavaScript fails to load...)
+
+### Watch It!
+⚠️ **Never rely on HTML validation alone!** Users can open DevTools, delete the `required` attribute, and submit garbage. Or they can skip the browser entirely and send requests directly to your server. *Always* validate on the server too.
+
 ### There are NO Dumb Questions
 
 **Q: What's the difference between `<button>` and `<input type="submit">`?**
@@ -1099,6 +1348,9 @@ Forms are how users send data to your server. Every login, search box, comment s
 
 **Q: Can I style form elements?**
 **A:** Yes, but some elements (like file inputs and select dropdowns) are tricky to style. CSS frameworks help.
+
+**Q: So do I need JavaScript for forms?**
+**A:** For basic forms (contact, simple signup), HTML alone works fine! For anything dynamic (live validation, AJAX submit, conditional fields), yes, you'll need JavaScript.
 
 ---
 
@@ -1390,6 +1642,17 @@ Convert this div soup into semantic HTML:
     <p>&copy; 2026</p>
 </footer>
 ```
+
+### There are NO Dumb Questions
+
+**Q: Does semantic HTML actually affect how the page looks?**
+**A:** Barely! Most semantic elements have little or no default styling. The value is in meaning - accessibility, SEO, and code readability. You still use CSS for visual design.
+
+**Q: When should I use `<section>` vs `<div>`?**
+**A:** `<section>` is for a thematic grouping of content (usually with its own heading). `<div>` is for styling or layout when no semantic element fits. If you can't think of a meaningful heading for it, it's probably a `<div>`.
+
+**Q: Is it wrong to use `<div>` at all?**
+**A:** Not at all! Divs are fine for layout containers and CSS hooks. The problem is using them *instead of* semantic elements. `<div class="nav">` should be `<nav>`, but a `<div class="card-grid">` wrapper is perfectly valid.
 
 ---
 
@@ -1895,6 +2158,17 @@ Helps screen readers pronounce words correctly.
 - [ ] HTML language is declared
 - [ ] Semantic HTML used appropriately
 - [ ] Forms have clear error messages
+
+### There are NO Dumb Questions
+
+**Q: Do I really need to worry about accessibility?**
+**A:** Yes! About 15-20% of the population has some form of disability. Plus, accessibility helps everyone - captions help in noisy environments, keyboard navigation helps power users, good contrast helps in bright sunlight.
+
+**Q: What's the minimum I should do for accessibility?**
+**A:** Start with the checklist above. Alt text on images, labels on form inputs, logical heading hierarchy, and keyboard navigation cover the most common issues.
+
+**Q: How do I test accessibility?**
+**A:** Use your keyboard to navigate (Tab, Enter, Escape). Try a screen reader (VoiceOver on Mac, NVDA on Windows). Run Lighthouse in Chrome DevTools. These catch most problems.
 
 ---
 

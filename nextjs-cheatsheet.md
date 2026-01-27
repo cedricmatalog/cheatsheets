@@ -2,6 +2,8 @@
 
 > Your brain on Next.js. Here you'll learn to build production-ready React apps the way your brain likes to learn - with conversational style, practical examples, and concepts that stick.
 
+**📦 Updated for Next.js 16** (React 19.2, Turbopack default, Cache Components, proxy.ts)
+
 ---
 
 ## How to Use This Cheatsheet
@@ -25,28 +27,51 @@
 
 If you need a refresher, check out the React cheatsheet first!
 
+**System Requirements (Next.js 16):**
+- Node.js 20.9+ (18 no longer supported)
+- TypeScript 5.1+ (recommended)
+- Modern browsers (Chrome/Edge/Firefox 111+, Safari 16.4+)
+
 ---
 
 ## Table of Contents
 
+### Part I: Fundamentals
 1. [Introduction: Why Next.js?](#1-introduction-why-nextjs)
 2. [Getting Started: Your First App](#2-getting-started-your-first-app)
 3. [Routing: File-Based Routes](#3-routing-file-based-routes)
 4. [App Router vs Pages Router](#4-app-router-vs-pages-router)
 5. [Advanced Routing Patterns](#5-advanced-routing-patterns)
+
+### Part II: Rendering & Data
 6. [Rendering: Server and Client](#6-rendering-server-and-client)
-7. [Advanced Data Fetching](#7-advanced-data-fetching)
-8. [Server Actions: Mutations](#8-server-actions-mutations)
-9. [Runtimes: Node.js vs Edge](#9-runtimes-nodejs-vs-edge)
-10. [Layouts and Templates](#10-layouts-and-templates)
-11. [Styling: Writing CSS](#11-styling-writing-css)
-12. [Optimizations: Images, Fonts, Scripts](#12-optimizations-images-fonts-scripts)
-13. [API Routes: Building APIs](#13-api-routes-building-apis)
-14. [Middleware: Request Processing](#14-middleware-request-processing)
-15. [Caching: Performance](#15-caching-performance)
-16. [Configuration: Setting Up Your App](#16-configuration-setting-up-your-app)
-17. [Testing Your Next.js App](#17-testing-your-nextjs-app)
-18. [Deployment: Going Live](#18-deployment-going-live)
+7. [Data Fetching: Getting Data](#7-data-fetching-getting-data)
+8. [Advanced Data Fetching](#8-advanced-data-fetching)
+9. [Server Actions: Mutations](#9-server-actions-mutations)
+
+### Part III: Architecture
+10. [Runtimes: Node.js vs Edge](#10-runtimes-nodejs-vs-edge)
+11. [Layouts and Templates](#11-layouts-and-templates)
+12. [Styling: Writing CSS](#12-styling-writing-css)
+13. [Testing Your Next.js App](#13-testing-your-nextjs-app)
+14. [Optimizations: Images, Fonts, Scripts](#14-optimizations-images-fonts-scripts)
+
+### Part IV: APIs & Proxy
+15. [Metadata & SEO](#15-metadata--seo)
+16. [API Routes: Building APIs](#16-api-routes-building-apis)
+17. [Proxy: Request Processing](#17-proxy-request-processing)
+18. [Caching: Performance](#18-caching-performance)
+19. [Configuration: Setting Up Your App](#19-configuration-setting-up-your-app)
+20. [Environment Variables](#20-environment-variables)
+
+### Part V: Production
+21. [Authentication: Protecting Your App](#21-authentication-protecting-your-app)
+22. [Navigation Hooks](#22-navigation-hooks-useparams-usepathname-usesearchparams)
+23. [Special Files: File Conventions](#23-special-files-file-conventions)
+24. [Security Best Practices](#24-security-best-practices)
+25. [Turbopack: The Default Bundler](#25-turbopack-the-default-bundler)
+26. [Cache Components & Partial Prerendering](#26-cache-components--partial-prerendering)
+27. [Deployment: Going Live](#27-deployment-going-live)
 
 ---
 
@@ -181,11 +206,21 @@ my-app/
 
 ```tsx
 // app/page.tsx
-export default function Home() {
+import Link from 'next/link';
+
+export default function LandingPage() {
     return (
-        <main>
-            <h1>Welcome to Next.js!</h1>
-            <p>This is your home page</p>
+        <main className="flex flex-col items-center justify-center min-h-screen">
+            <h1 className="text-5xl font-bold">Build Your Dream SaaS</h1>
+            <p className="mt-4 text-xl">The best platform for managing your business.</p>
+            <div className="mt-8 flex gap-4">
+                <Link href="/signup" className="bg-blue-600 text-white px-6 py-3 rounded">
+                    Get Started
+                </Link>
+                <Link href="/demo" className="border border-gray-300 px-6 py-3 rounded">
+                    View Demo
+                </Link>
+            </div>
         </main>
     );
 }
@@ -196,18 +231,20 @@ That's it! File in `app/page.tsx` = route at `/`
 ### Adding Another Page
 
 ```tsx
-// app/about/page.tsx
-export default function About() {
+// app/pricing/page.tsx
+export default function Pricing() {
     return (
         <main>
-            <h1>About Us</h1>
-            <p>Learn more about our company</p>
+            <h1>Pricing Plans</h1>
+            <div className="grid grid-cols-3 gap-4">
+                {/* Pricing cards... */}
+            </div>
         </main>
     );
 }
 ```
 
-File in `app/about/page.tsx` = route at `/about`
+File in `app/pricing/page.tsx` = route at `/pricing`
 
 ### Brain Power
 🧠 How does Next.js know what route a page should be? What's the pattern?
@@ -216,6 +253,17 @@ File in `app/about/page.tsx` = route at `/about`
 
 ### Watch It!
 ⚠️ **File must be named `page.tsx` (or `page.jsx`)!** Other filenames won't create routes. `about.tsx` won't work, `about/page.tsx` will.
+
+### There are NO Dumb Questions
+
+**Q: Do I need to restart the server when I add a new page?**
+**A:** No! Next.js detects new files automatically in development mode. Just create the file and navigate to the route.
+
+**Q: What's the difference between `app/` and `src/app/`?**
+**A:** Both work! `src/app/` keeps your project root cleaner by putting all source code in `src/`. Next.js supports both conventions.
+
+**Q: Can I use JavaScript instead of TypeScript?**
+**A:** Yes! Use `.jsx` instead of `.tsx`. But TypeScript is strongly recommended for the better developer experience and error catching.
 
 ---
 
@@ -241,32 +289,44 @@ app/
 ### Dynamic Routes: With Parameters
 
 ```tsx
-// app/blog/[slug]/page.tsx
-export default function BlogPost({ params }: { params: { slug: string } }) {
+// app/shop/[sku]/page.tsx
+export default async function ProductPage({
+    params
+}: {
+    params: Promise<{ sku: string }>
+}) {
+    const { sku } = await params;
+
     return (
         <article>
-            <h1>Blog Post: {params.slug}</h1>
-            <p>This is the blog post for {params.slug}</p>
+            <h1>Product SKU: {sku}</h1>
+            <p>Details for product {sku}...</p>
+            <AddToCart sku={sku} />
         </article>
     );
 }
 ```
 
-Visiting `/blog/hello-world` → `params.slug = 'hello-world'`
+Visiting `/shop/123-abc` → `sku = '123-abc'`
+
+### Watch It!
+⚠️ **In Next.js 15, `params` is a Promise!** You must `await` it in Server Components or use React's `use()` hook in Client Components. This enables better streaming and Suspense support.
 
 ### Multiple Dynamic Segments
 
 ```tsx
 // app/shop/[category]/[product]/page.tsx
-export default function Product({
+export default async function Product({
     params
 }: {
-    params: { category: string; product: string }
+    params: Promise<{ category: string; product: string }>
 }) {
+    const { category, product } = await params;
+
     return (
         <div>
-            <h1>{params.product}</h1>
-            <p>Category: {params.category}</p>
+            <h1>{product}</h1>
+            <p>Category: {category}</p>
         </div>
     );
 }
@@ -278,11 +338,17 @@ export default function Product({
 
 ```tsx
 // app/docs/[...slug]/page.tsx
-export default function Docs({ params }: { params: { slug: string[] } }) {
+export default async function Docs({
+    params
+}: {
+    params: Promise<{ slug: string[] }>
+}) {
+    const { slug } = await params;
+
     return (
         <div>
             <h1>Documentation</h1>
-            <p>Path: {params.slug.join('/')}</p>
+            <p>Path: {slug.join('/')}</p>
         </div>
     );
 }
@@ -375,6 +441,11 @@ app/
         └── page.tsx                     → /docs/any/number/of/segments
 ```
 
+### Brain Power
+🧠 How does file-based routing compare to React Router? What are the trade-offs?
+
+**Answer:** File-based routing means the file structure IS the URL structure. Pros: no route config files, easier to understand, automatic code splitting. Cons: less flexible than programmatic routing, folder structure must match URL design.
+
 ### There are NO Dumb Questions
 
 **Q: What's the difference between `[slug]` and `[...slug]`?**
@@ -384,7 +455,20 @@ app/
 **A:** Yes! `/blog` matches exactly `/blog`. `/blog/[slug]` matches `/blog/anything-else`.
 
 **Q: What about query parameters like `/search?q=hello`?**
-**A:** Use `useSearchParams()` hook:
+**A:** In Server Components, `searchParams` is also a Promise:
+```tsx
+// app/search/page.tsx
+export default async function Search({
+    searchParams
+}: {
+    searchParams: Promise<{ q?: string }>
+}) {
+    const { q } = await searchParams;
+    return <p>Searching for: {q}</p>;
+}
+```
+
+In Client Components, use the `useSearchParams()` hook:
 ```tsx
 'use client';
 import { useSearchParams } from 'next/navigation';
@@ -445,6 +529,17 @@ app/
 🧠 Why do you think Next.js created a new router instead of updating the old one?
 
 **Answer:** React Server Components needed fundamental changes that couldn't be added to Pages Router without breaking changes. App Router was built from scratch for the new React features.
+
+### There are NO Dumb Questions
+
+**Q: Can I use both routers in the same app?**
+**A:** Yes! Pages in `/pages` use Pages Router, pages in `/app` use App Router. They can coexist during migration. Just don't have the same route in both.
+
+**Q: Should I migrate my existing Pages Router app?**
+**A:** Only if you need App Router features (Server Components, streaming, parallel routes). Pages Router is stable and will be maintained. Migrate incrementally, route by route.
+
+**Q: Do I lose anything by using App Router?**
+**A:** App Router has a steeper learning curve and more complex caching behavior. Some libraries haven't fully adapted yet. But the performance and developer experience benefits outweigh these for new projects.
 
 ---
 
@@ -728,14 +823,26 @@ Add `'use client'` directive to make it a Client Component:
 
 import { useState } from 'react';
 
-export default function Counter() {
-    const [count, setCount] = useState(0);
+export default function LikeButton({ initialLikes }: { initialLikes: number }) {
+    const [likes, setLikes] = useState(initialLikes);
+    const [isLiked, setIsLiked] = useState(false);
+
+    const handleLike = () => {
+        if (isLiked) {
+            setLikes(likes - 1);
+        } else {
+            setLikes(likes + 1);
+        }
+        setIsLiked(!isLiked);
+    };
 
     return (
-        <div>
-            <p>Count: {count}</p>
-            <button onClick={() => setCount(count + 1)}>+</button>
-        </div>
+        <button 
+            onClick={handleLike}
+            className={isLiked ? 'text-red-500' : 'text-gray-500'}
+        >
+            ♥ {likes}
+        </button>
     );
 }
 ```
@@ -765,32 +872,36 @@ export default function Counter() {
 
 ```tsx
 // app/page.tsx (Server Component)
-import Counter from '@/components/Counter';
+import LikeButton from '@/components/LikeButton';
 
-export default function Home() {
+export default async function Feed() {
     // Server-side code
     const posts = await fetchPosts();
 
     return (
         <div>
-            <h1>Welcome</h1>
+            <h1>Your Feed</h1>
             {/* Server-rendered list */}
             <ul>
-                {posts.map(post => <li key={post.id}>{post.title}</li>)}
+                {posts.map(post => (
+                    <li key={post.id}>
+                        <h2>{post.title}</h2>
+                        {/* Client component for interactivity */}
+                        <LikeButton initialLikes={post.likes} />
+                    </li>
+                ))}
             </ul>
-            {/* Client component for interactivity */}
-            <Counter />
         </div>
     );
 }
 
-// components/Counter.tsx (Client Component)
+// components/LikeButton.tsx (Client Component)
 'use client';
 import { useState } from 'react';
 
-export default function Counter() {
-    const [count, setCount] = useState(0);
-    return <button onClick={() => setCount(count + 1)}>{count}</button>;
+export default function LikeButton({ initialLikes }) {
+    const [likes, setLikes] = useState(initialLikes);
+    return <button onClick={() => setLikes(likes + 1)}>♥ {likes}</button>;
 }
 ```
 
@@ -812,32 +923,42 @@ import ServerComponent from './Server'; // Stays server
 
 **Answer:** Their code never goes to the browser! Less JavaScript to download and execute. Server Components render to HTML on the server, so the browser just displays it - no React runtime needed for those parts.
 
+### There are NO Dumb Questions
+
+**Q: Can a Server Component render a Client Component?**
+**A:** Yes! Server Components can import and render Client Components. But Client Components cannot import Server Components - pass them as `children` instead.
+
+**Q: How do I know if my component is a Server or Client Component?**
+**A:** If it has `'use client'` at the top, it's a Client Component. Otherwise, it's a Server Component by default in the App Router.
+
+**Q: Can I use server-only code (like database queries) in a Client Component?**
+**A:** No! Client Components run in the browser. Fetch data in a Server Component parent and pass it as props, or use Server Actions for mutations.
+
 ---
 
-## 6. Data Fetching: Getting Data
+## 7. Data Fetching: Getting Data
 
 ### Fetching in Server Components
 
 Server Components can `await` data directly:
 
 ```tsx
-// app/posts/page.tsx (Server Component)
-async function getPosts() {
-    const res = await fetch('https://api.example.com/posts');
-    return res.json();
+// app/dashboard/page.tsx (Server Component)
+async function getDashboardMetrics() {
+    // Simulate database call
+    const revenue = await db.orders.aggregate({ _sum: { total: true } });
+    const users = await db.users.count();
+    
+    return { revenue, users };
 }
 
-export default async function PostsPage() {
-    const posts = await getPosts();
+export default async function DashboardPage() {
+    const metrics = await getDashboardMetrics();
 
     return (
-        <div>
-            <h1>Blog Posts</h1>
-            <ul>
-                {posts.map(post => (
-                    <li key={post.id}>{post.title}</li>
-                ))}
-            </ul>
+        <div className="grid grid-cols-2 gap-4">
+            <Card title="Total Revenue" value={`$${metrics.revenue}`} />
+            <Card title="Total Users" value={metrics.users} />
         </div>
     );
 }
@@ -854,26 +975,26 @@ Client Components use traditional React patterns:
 
 import { useEffect, useState } from 'react';
 
-export default function Posts() {
-    const [posts, setPosts] = useState([]);
+export default function LiveStockTicker() {
+    const [price, setPrice] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('https://api.example.com/posts')
-            .then(res => res.json())
-            .then(data => {
-                setPosts(data);
-                setLoading(false);
-            });
+        const interval = setInterval(() => {
+            fetch('https://api.finance.com/stock/AAPL')
+                .then(res => res.json())
+                .then(data => {
+                    setPrice(data.price);
+                    setLoading(false);
+                });
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, []);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Loading market data...</p>;
 
-    return (
-        <ul>
-            {posts.map(post => <li key={post.id}>{post.title}</li>)}
-        </ul>
-    );
+    return <div>AAPL: ${price}</div>;
 }
 ```
 
@@ -922,27 +1043,30 @@ async function PostPage({ params }) {
 }
 ```
 
-### Caching: Automatic Performance
+### Caching: Opt-In Performance
 
 ```tsx
-// Cached by default (revalidate every hour)
+// NOT cached by default in Next.js 15 (dynamic)
+fetch('https://api.example.com/posts');
+
+// Opt into caching with revalidation
 fetch('https://api.example.com/posts', {
-    next: { revalidate: 3600 }
+    next: { revalidate: 3600 }  // Cache for 1 hour
 });
 
-// Never cache (always fresh)
-fetch('https://api.example.com/posts', {
-    cache: 'no-store'
-});
-
-// Force cache (until manually revalidated)
+// Force cache (cached indefinitely until revalidated)
 fetch('https://api.example.com/posts', {
     cache: 'force-cache'
+});
+
+// Explicit no-store (same as default, but explicit)
+fetch('https://api.example.com/posts', {
+    cache: 'no-store'
 });
 ```
 
 ### Watch It!
-⚠️ **Next.js extends fetch() with caching!** Regular `fetch()` doesn't cache. Next.js adds caching and revalidation options automatically.
+⚠️ **Next.js 15 changed caching defaults!** Fetch is now **uncached by default** (was cached in v14). You must opt into caching with `cache: 'force-cache'` or `next: { revalidate: N }`.
 
 ### Loading States
 
@@ -1034,6 +1158,13 @@ export default function Error({ error, reset }) {
 }
 ```
 
+### Brain Power
+🧠 In Next.js, you can fetch data in Server Components OR Client Components. When would you choose each?
+
+**Answer:**
+- **Server Components:** For initial data (SEO, no waterfall, direct DB access, no loading spinners)
+- **Client Components (React Query/SWR):** For interactive data (polling, optimistic updates, user-triggered refetches, real-time)
+
 ### There are NO Dumb Questions
 
 **Q: Do I always need loading.tsx and error.tsx?**
@@ -1047,26 +1178,38 @@ export default function Error({ error, reset }) {
 
 ---
 
-## 7. Advanced Data Fetching
+## 8. Advanced Data Fetching
 
 ### Preloading Data
 
-Preload data before it's needed to improve performance:
+Start fetching data early so it's ready when needed. Combine `cache()` with a preload pattern:
+
+```tsx
+// lib/data.ts
+import { cache } from 'react';
+
+// cache() deduplicates: calling getPost('1') twice only fetches once
+export const getPost = cache(async (id: string) => {
+    const res = await fetch(`https://api.example.com/posts/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch post');
+    return res.json();
+});
+
+// Preload function: kicks off fetch without awaiting
+export function preloadPost(id: string) {
+    void getPost(id);  // Start fetching, don't block
+}
+```
 
 ```tsx
 // app/posts/[id]/page.tsx
-import { preload } from 'react-dom';
-
-async function getPost(id: string) {
-    const res = await fetch(`https://api.example.com/posts/${id}`);
-    return res.json();
-}
+import { getPost, preloadPost } from '@/lib/data';
 
 export default async function Post({ params }: { params: { id: string } }) {
-    // Preload before awaiting
-    preload(getPost(params.id));
+    // Start fetching immediately (runs in parallel with other work)
+    preloadPost(params.id);
 
-    // Await later
+    // By the time we await, data may already be cached
     const post = await getPost(params.id);
 
     return (
@@ -1280,7 +1423,7 @@ export default async function Page() {
 
 ---
 
-## 8. Server Actions: Mutations
+## 9. Server Actions: Mutations
 
 ### What are Server Actions?
 
@@ -1290,29 +1433,41 @@ Server Actions are **async functions that run on the server**. They're great for
 // app/actions.ts
 'use server';
 
-export async function createPost(formData: FormData) {
-    const title = formData.get('title');
-    const content = formData.get('content');
+import { revalidatePath } from 'next/cache';
+
+export async function updateUserProfile(formData: FormData) {
+    const userId = formData.get('userId');
+    const name = formData.get('name');
+    const bio = formData.get('bio');
 
     // Server-side code (can access database)
-    await db.posts.create({
-        data: { title, content }
+    await db.users.update({
+        where: { id: userId },
+        data: { name, bio }
     });
+
+    revalidatePath('/profile');
 }
 ```
 
 ### Using Server Actions in Forms
 
 ```tsx
-// app/new-post/page.tsx
-import { createPost } from '../actions';
+// app/profile/page.tsx
+import { updateUserProfile } from '../actions';
 
-export default function NewPost() {
+export default function ProfilePage({ user }) {
     return (
-        <form action={createPost}>
-            <input name="title" placeholder="Title" required />
-            <textarea name="content" placeholder="Content" required />
-            <button type="submit">Create Post</button>
+        <form action={updateUserProfile}>
+            <input type="hidden" name="userId" value={user.id} />
+            
+            <label>Name</label>
+            <input name="name" defaultValue={user.name} required />
+            
+            <label>Bio</label>
+            <textarea name="bio" defaultValue={user.bio} />
+            
+            <button type="submit">Save Changes</button>
         </form>
     );
 }
@@ -1587,6 +1742,201 @@ export default function NewPost() {
 }
 ```
 
+### useActionState: Form State Management (React 19)
+
+Manage form state, errors, and pending status in one hook:
+
+```tsx
+'use client';
+
+import { useActionState } from 'react';
+import { createPost } from './actions';
+
+// Initial state
+const initialState = {
+    message: '',
+    errors: {},
+};
+
+export default function PostForm() {
+    const [state, formAction, isPending] = useActionState(
+        createPost,
+        initialState
+    );
+
+    return (
+        <form action={formAction}>
+            <input
+                name="title"
+                aria-describedby="title-error"
+            />
+            {state.errors?.title && (
+                <p id="title-error" className="text-red-500">
+                    {state.errors.title}
+                </p>
+            )}
+
+            <textarea name="content" />
+            {state.errors?.content && (
+                <p className="text-red-500">{state.errors.content}</p>
+            )}
+
+            <button type="submit" disabled={isPending}>
+                {isPending ? 'Creating...' : 'Create Post'}
+            </button>
+
+            {state.message && (
+                <p className="text-green-500">{state.message}</p>
+            )}
+        </form>
+    );
+}
+```
+
+```tsx
+// app/actions.ts
+'use server';
+
+export async function createPost(prevState: any, formData: FormData) {
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+
+    // Validation
+    const errors: Record<string, string> = {};
+    if (!title) errors.title = 'Title is required';
+    if (!content) errors.content = 'Content is required';
+
+    if (Object.keys(errors).length > 0) {
+        return { errors, message: '' };
+    }
+
+    await db.posts.create({ data: { title, content } });
+    revalidatePath('/posts');
+
+    return { errors: {}, message: 'Post created!' };
+}
+```
+
+### useFormStatus: Pending State in Child Components
+
+Access form pending state from any component inside the form:
+
+```tsx
+'use client';
+
+import { useFormStatus } from 'react-dom';
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+
+    return (
+        <button type="submit" disabled={pending}>
+            {pending ? (
+                <span className="flex items-center gap-2">
+                    <Spinner /> Submitting...
+                </span>
+            ) : (
+                'Submit'
+            )}
+        </button>
+    );
+}
+
+// Usage: Must be INSIDE a form
+export default function MyForm() {
+    return (
+        <form action={myAction}>
+            <input name="email" type="email" />
+            <SubmitButton /> {/* Has access to form's pending state */}
+        </form>
+    );
+}
+```
+
+### useOptimistic: Instant UI Updates
+
+Show optimistic updates before the server responds:
+
+```tsx
+'use client';
+
+import { useOptimistic } from 'react';
+import { likePost } from './actions';
+
+export default function LikeButton({
+    postId,
+    initialLikes
+}: {
+    postId: string;
+    initialLikes: number;
+}) {
+    const [optimisticLikes, addOptimisticLike] = useOptimistic(
+        initialLikes,
+        (currentLikes, _) => currentLikes + 1
+    );
+
+    async function handleLike() {
+        addOptimisticLike(null); // Instantly update UI
+        await likePost(postId);   // Then sync with server
+    }
+
+    return (
+        <form action={handleLike}>
+            <button type="submit">
+                ♥ {optimisticLikes}
+            </button>
+        </form>
+    );
+}
+```
+
+**More complex example with rollback:**
+
+```tsx
+'use client';
+
+import { useOptimistic, useTransition } from 'react';
+import { addTodo, Todo } from './actions';
+
+export default function TodoList({ todos }: { todos: Todo[] }) {
+    const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+        todos,
+        (state, newTodo: Todo) => [...state, newTodo]
+    );
+    const [isPending, startTransition] = useTransition();
+
+    async function handleAdd(formData: FormData) {
+        const text = formData.get('text') as string;
+
+        // Optimistic: Add to UI immediately
+        const optimisticTodo = {
+            id: crypto.randomUUID(),
+            text,
+            completed: false,
+        };
+
+        startTransition(async () => {
+            addOptimisticTodo(optimisticTodo);
+            await addTodo(text); // If this fails, React reverts
+        });
+    }
+
+    return (
+        <div>
+            <form action={handleAdd}>
+                <input name="text" />
+                <button>Add Todo</button>
+            </form>
+            <ul>
+                {optimisticTodos.map(todo => (
+                    <li key={todo.id}>{todo.text}</li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+```
+
 ### Brain Power
 🧠 What's the advantage of Server Actions over traditional API routes for forms?
 
@@ -1595,9 +1945,20 @@ export default function NewPost() {
 ### Watch It!
 ⚠️ **Server Actions can only be used in Server Components or Client Components that import them!** They're marked with `'use server'` directive. Also, always validate input - never trust client data!
 
+### There are NO Dumb Questions
+
+**Q: Can I call a Server Action from a Client Component?**
+**A:** Yes! Import the action and use it in `form action={...}` or call it directly in event handlers. The action still runs on the server.
+
+**Q: How do I show loading state during a Server Action?**
+**A:** Use `useFormStatus()` in a child component of the form, or `useActionState()` which provides an `isPending` state.
+
+**Q: Can Server Actions return data?**
+**A:** Yes! Return values from Server Actions are passed to the client. Use `useActionState` to capture the return value and display success/error messages.
+
 ---
 
-## 9. Runtimes: Node.js vs Edge
+## 10. Runtimes: Node.js vs Edge
 
 ### What are Runtimes?
 
@@ -1719,15 +2080,15 @@ export default async function Page() {
 }
 ```
 
-### Edge Middleware
+### Edge Proxy
 
-Middleware ALWAYS runs on Edge:
+Proxy ALWAYS runs on Edge (or Node.js in Next.js 16+):
 
 ```tsx
-// middleware.ts (automatically Edge runtime)
+// proxy.ts (automatically Edge runtime)
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request) {
     // Runs at the edge!
     const country = request.geo?.country || 'US';
 
@@ -1797,7 +2158,7 @@ export default function BlogPost({ params }) {
 
 ---
 
-## 10. Layouts and Templates
+## 11. Layouts and Templates
 
 ### Root Layout: Wraps Everything
 
@@ -1812,7 +2173,7 @@ export default function RootLayout({ children }) {
                     <Link href="/about">About</Link>
                 </nav>
                 <main>{children}</main>
-                <footer>&copy; 2024</footer>
+                <footer>&copy; {new Date().getFullYear()}</footer>
             </body>
         </html>
     );
@@ -1840,20 +2201,103 @@ export default function DashboardLayout({ children }) {
 // This layout wraps all /dashboard/* pages
 ```
 
-### Templates: Re-render on Navigation
+### Layout Hierarchy
+
+```
+app/
+├── layout.tsx          ← Root Layout (wraps everything)
+├── page.tsx            ← Home page
+├── dashboard/
+│   ├── layout.tsx      ← Dashboard Layout (persists across dashboard pages)
+│   ├── page.tsx        ← /dashboard
+│   ├── settings/
+│   │   └── page.tsx    ← /dashboard/settings (uses BOTH layouts)
+│   └── analytics/
+│       └── page.tsx    ← /dashboard/analytics (uses BOTH layouts)
+└── auth/
+    ├── layout.tsx      ← Auth Layout (different from dashboard)
+    └── login/
+        └── page.tsx    ← /auth/login
+```
+
+Navigating between `/dashboard/settings` and `/dashboard/analytics` keeps the Dashboard Layout mounted (sidebar stays, no re-render).
+
+### Layout with Data Fetching
 
 ```tsx
-// app/template.tsx
-export default function Template({ children }) {
+// app/dashboard/layout.tsx
+import { getUser } from '@/lib/data';
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+    // Layouts can be async Server Components!
+    const user = await getUser();
+
+    return (
+        <div className="dashboard">
+            <aside>
+                <p>Welcome, {user.name}</p>
+                <nav>
+                    <Link href="/dashboard">Overview</Link>
+                    <Link href="/dashboard/settings">Settings</Link>
+                </nav>
+            </aside>
+            <section>{children}</section>
+        </div>
+    );
+}
+```
+
+### Templates: Re-render on Navigation
+
+Templates are like layouts but **re-mount on every navigation** (fresh state, effects re-run).
+
+```tsx
+// app/dashboard/template.tsx
+'use client';
+
+import { useEffect } from 'react';
+
+export default function Template({ children }: { children: React.ReactNode }) {
+    useEffect(() => {
+        // Runs on EVERY navigation (unlike layout)
+        logPageView();
+    }, []);
+
     return <div className="animate-in">{children}</div>;
 }
 ```
 
-**Difference:** Layouts persist, templates re-mount on navigation.
+| Feature | Layout | Template |
+|---------|--------|----------|
+| Re-mounts on navigation | No (persists) | Yes (fresh) |
+| Maintains state | Yes | No |
+| Effects re-run | No | Yes |
+| Use case | Shared UI, nav, sidebar | Animations, analytics, form resets |
+
+### Watch It!
+⚠️ **Layouts cannot access the current route!** They don't know which child page is active. Use `usePathname()` in a Client Component child if you need to highlight active nav links.
+
+⚠️ **Don't pass data from layout to children via props!** Layouts don't re-render when children change. Use React Context or fetch data independently in each page.
+
+### Brain Power
+🧠 You have a multi-step form wizard at `/onboarding/step-1`, `/onboarding/step-2`, etc. Should you use a layout or template for the shared wrapper?
+
+**Answer:** Use a **layout** if you want to preserve form state between steps (user navigates back without losing data). Use a **template** if each step should start fresh (reset form, re-run validation effects).
+
+### There are NO Dumb Questions
+
+**Q: Can I have multiple root layouts?**
+**A:** Yes! Route groups let you have different root layouts: `(marketing)/layout.tsx` and `(app)/layout.tsx` each with their own `<html>` and `<body>`.
+
+**Q: Why doesn't my layout re-render when I navigate?**
+**A:** That's the point! Layouts persist to avoid unnecessary work. Only the `page.tsx` inside changes. Use a template if you need re-mounting behavior.
+
+**Q: Can I access route params in a layout?**
+**A:** Yes! Layouts receive a `params` prop: `function Layout({ children, params }: { children: ReactNode, params: { slug: string } })`.
 
 ---
 
-## 9. Styling: Writing CSS
+## 12. Styling: Writing CSS
 
 ### Global CSS
 
@@ -2040,9 +2484,28 @@ export default function Page() {
 }
 ```
 
+### Watch It!
+⚠️ **CSS-in-JS libraries (styled-components, Emotion) require `'use client'`!** They use React context and hooks internally, so they can't run in Server Components. This adds client-side JavaScript. Prefer CSS Modules or Tailwind for Server Components.
+
+### Brain Power
+🧠 Why does Next.js recommend CSS Modules or Tailwind over CSS-in-JS?
+
+**Answer:** CSS Modules and Tailwind extract CSS at build time (zero runtime cost). CSS-in-JS generates styles at runtime, adding JavaScript to the client bundle and requiring hydration. For Server Components, build-time CSS is the only option that works without `'use client'`.
+
+### There are NO Dumb Questions
+
+**Q: Which styling approach should I choose for a new Next.js project?**
+**A:** Tailwind CSS is the most popular choice in the Next.js ecosystem (used by Vercel's own templates). CSS Modules are great if you prefer writing traditional CSS with scoping.
+
+**Q: Can I use global CSS files?**
+**A:** Yes, but only import them in `layout.tsx` or `page.tsx` files. Importing global CSS in components causes ordering issues.
+
+**Q: How do I handle dynamic styles in Server Components?**
+**A:** Use CSS custom properties (variables) set via inline `style` prop, or conditional class names with CSS Modules/Tailwind. No runtime CSS-in-JS allowed in Server Components.
+
 ---
 
-## 16. Testing Your Next.js App
+## 13. Testing Your Next.js App
 
 ### Unit Testing with Vitest
 
@@ -2247,6 +2710,7 @@ import Page from '@/app/page';
 // Mock fetch for server components
 global.fetch = jest.fn(() =>
     Promise.resolve({
+        ok: true,
         json: () => Promise.resolve({ data: 'test' }),
     })
 ) as jest.Mock;
@@ -2296,6 +2760,133 @@ describe('/api/hello', () => {
 });
 ```
 
+### Mocking Next.js Functions
+
+Mock `redirect`, `revalidatePath`, and other Next.js functions:
+
+```tsx
+// __tests__/actions.test.ts
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+
+// Mock next/navigation
+vi.mock('next/navigation', () => ({
+    redirect: vi.fn(),
+}));
+
+// Mock next/cache
+vi.mock('next/cache', () => ({
+    revalidatePath: vi.fn(),
+    revalidateTag: vi.fn(),
+}));
+
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { createPost, deletePost } from '@/app/actions';
+
+describe('Server Actions', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('creates post and revalidates', async () => {
+        const formData = new FormData();
+        formData.append('title', 'Test');
+
+        await createPost(formData);
+
+        expect(revalidatePath).toHaveBeenCalledWith('/posts');
+    });
+
+    it('redirects after delete', async () => {
+        await deletePost('123');
+
+        expect(redirect).toHaveBeenCalledWith('/posts');
+    });
+});
+```
+
+### Testing Auth-Protected Components
+
+```tsx
+// __tests__/dashboard.test.tsx
+import { vi, describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+
+// Mock auth
+vi.mock('@/auth', () => ({
+    auth: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+    redirect: vi.fn(),
+}));
+
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import Dashboard from '@/app/dashboard/page';
+
+describe('Dashboard', () => {
+    it('redirects unauthenticated users', async () => {
+        vi.mocked(auth).mockResolvedValue(null);
+
+        await Dashboard();
+
+        expect(redirect).toHaveBeenCalledWith('/login');
+    });
+
+    it('renders for authenticated users', async () => {
+        vi.mocked(auth).mockResolvedValue({
+            user: { name: 'John', email: 'john@example.com' },
+        });
+
+        const Component = await Dashboard();
+        render(Component);
+
+        expect(screen.getByText(/Welcome, John/)).toBeInTheDocument();
+    });
+});
+```
+
+### Testing with MSW (Mock Service Worker)
+
+For more realistic API mocking:
+
+```tsx
+// mocks/handlers.ts
+import { http, HttpResponse } from 'msw';
+
+export const handlers = [
+    http.get('/api/posts', () => {
+        return HttpResponse.json([
+            { id: '1', title: 'First Post' },
+            { id: '2', title: 'Second Post' },
+        ]);
+    }),
+
+    http.post('/api/posts', async ({ request }) => {
+        const body = await request.json();
+        return HttpResponse.json(
+            { id: '3', ...body },
+            { status: 201 }
+        );
+    }),
+];
+
+// mocks/server.ts
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+
+// vitest.setup.ts
+import { beforeAll, afterEach, afterAll } from 'vitest';
+import { server } from './mocks/server';
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
 ### Brain Power
 🧠 Why would you use both unit tests (Vitest/Jest) AND E2E tests (Playwright)?
 
@@ -2317,7 +2908,7 @@ describe('/api/hello', () => {
 
 ---
 
-## 10. Optimizations: Images, Fonts, Scripts
+## 14. Optimizations: Images, Fonts, Scripts
 
 ### Image Optimization
 
@@ -2763,6 +3354,45 @@ export async function GET() {
 - Use pagination for large lists
 - Implement proper garbage collection
 
+### Instrumentation & OpenTelemetry
+
+Monitor your app's performance deeply with Instrumentation!
+
+**What is it?**
+A way to run code **before** your app starts and hook into Next.js internals to track performance, errors, and behavior.
+
+**Setup:**
+Create `instrumentation.ts` (or `.js`) in your root (or `src/`) directory.
+
+```ts
+// instrumentation.ts
+export async function register() {
+    if (process.env.NEXT_RUNTIME === 'nodejs') {
+        await import('./instrumentation-node');
+    }
+
+    if (process.env.NEXT_RUNTIME === 'edge') {
+        await import('./instrumentation-edge');
+    }
+}
+```
+
+**OpenTelemetry:**
+Standardize your logging and tracing.
+
+```bash
+npm install @vercel/otel
+```
+
+```js
+// next.config.js
+module.exports = {
+    experimental: {
+        instrumentationHook: true,
+    },
+};
+```
+
 ### Brain Power
 🧠 Why would you lazy load a component instead of importing it normally?
 
@@ -2771,36 +3401,274 @@ export async function GET() {
 ### Watch It!
 ⚠️ **Don't lazy load everything!** Only lazy load heavy components that aren't immediately needed. Lazy loading adds complexity and a small delay. Use it strategically for components like modals, charts, or below-the-fold content.
 
+### There are NO Dumb Questions
+
+**Q: Do I need to configure image domains?**
+**A:** Yes! For external images, add allowed domains in `next.config.js`: `images: { remotePatterns: [{ hostname: 'example.com' }] }`. This prevents misuse of your image optimization.
+
+**Q: Can I use `next/font` with Tailwind CSS?**
+**A:** Yes! Assign the font to a CSS variable and reference it in your Tailwind config: `fontFamily: { sans: ['var(--font-inter)'] }`.
+
+**Q: What's the difference between `priority` and lazy loading for images?**
+**A:** `priority` preloads the image (for above-the-fold hero images). Without it, images lazy load by default (only load when scrolled into view).
+
 ---
 
-## 11. API Routes: Building APIs
+## 15. Metadata & SEO
+
+### Why Metadata Matters
+
+Search engines and social platforms use metadata to understand and display your pages. Good metadata = better SEO + beautiful social shares.
+
+### Static Metadata
+
+Export a `metadata` object for pages with fixed metadata:
+
+```tsx
+// app/about/page.tsx
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'About Us | My App',
+    description: 'Learn about our company and mission.',
+    keywords: ['about', 'company', 'mission'],
+    openGraph: {
+        title: 'About Us | My App',
+        description: 'Learn about our company and mission.',
+        images: ['/og-about.jpg'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'About Us | My App',
+        images: ['/twitter-about.jpg'],
+    },
+};
+
+export default function AboutPage() {
+    return <h1>About Us</h1>;
+}
+```
+
+### Dynamic Metadata with generateMetadata
+
+For pages with dynamic content (blog posts, products):
+
+```tsx
+// app/blog/[slug]/page.tsx
+import type { Metadata } from 'next';
+
+type Props = {
+    params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params;
+    const post = await getPost(slug);
+
+    return {
+        title: post.title,
+        description: post.excerpt,
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            images: [post.coverImage],
+            type: 'article',
+            publishedTime: post.publishedAt,
+            authors: [post.author.name],
+        },
+    };
+}
+
+export default async function BlogPost({ params }: Props) {
+    const { slug } = await params;
+    const post = await getPost(slug);
+    return <article>{post.content}</article>;
+}
+```
+
+### Template Titles
+
+Avoid repeating your brand name in every page:
+
+```tsx
+// app/layout.tsx
+export const metadata: Metadata = {
+    title: {
+        template: '%s | My App',  // %s replaced by child page title
+        default: 'My App',         // Fallback if no child title
+    },
+};
+
+// app/about/page.tsx
+export const metadata: Metadata = {
+    title: 'About Us',  // Becomes "About Us | My App"
+};
+```
+
+### robots.ts: Control Crawlers
+
+```tsx
+// app/robots.ts
+import type { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+    return {
+        rules: [
+            {
+                userAgent: '*',
+                allow: '/',
+                disallow: ['/admin/', '/api/', '/private/'],
+            },
+        ],
+        sitemap: 'https://myapp.com/sitemap.xml',
+    };
+}
+```
+
+### sitemap.ts: Help Search Engines
+
+```tsx
+// app/sitemap.ts
+import type { MetadataRoute } from 'next';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    const posts = await getPosts();
+
+    const blogUrls = posts.map((post) => ({
+        url: `https://myapp.com/blog/${post.slug}`,
+        lastModified: post.updatedAt,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+    }));
+
+    return [
+        {
+            url: 'https://myapp.com',
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 1,
+        },
+        {
+            url: 'https://myapp.com/about',
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.5,
+        },
+        ...blogUrls,
+    ];
+}
+```
+
+### Dynamic OpenGraph Images
+
+Generate OG images on-the-fly:
+
+```tsx
+// app/blog/[slug]/opengraph-image.tsx
+import { ImageResponse } from 'next/og';
+
+export const runtime = 'edge';
+export const alt = 'Blog post image';
+export const size = { width: 1200, height: 630 };
+export const contentType = 'image/png';
+
+export default async function OGImage({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}) {
+    const { slug } = await params;
+    const post = await getPost(slug);
+
+    return new ImageResponse(
+        (
+            <div
+                style={{
+                    fontSize: 48,
+                    background: 'linear-gradient(to bottom, #1a1a2e, #16213e)',
+                    color: 'white',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 48,
+                }}
+            >
+                {post.title}
+            </div>
+        ),
+        { ...size }
+    );
+}
+```
+
+### Brain Power
+🧠 Why generate OG images dynamically instead of creating them manually?
+
+**Answer:** Scale! A blog with 1000 posts would need 1000 manually created images. Dynamic generation creates them automatically. Plus, they update when content changes - no manual maintenance.
+
+### Watch It!
+⚠️ **Metadata in layouts applies to all child pages!** Be careful with layout metadata - it cascades. Child pages can override parent metadata, but only for specific fields.
+
+⚠️ **OpenGraph images have size requirements!** Recommended: 1200x630px. Too small = blurry on social media. Too large = slow to load.
+
+### There are NO Dumb Questions
+
+**Q: Do I need both `metadata` and `generateMetadata`?**
+**A:** No, use one or the other! Use static `metadata` for pages where values don't change. Use `generateMetadata` when metadata depends on data (dynamic routes, database content).
+
+**Q: What's the difference between OpenGraph and Twitter metadata?**
+**A:** OpenGraph is used by Facebook, LinkedIn, Discord, etc. Twitter has its own card format. Next.js lets you specify both. If you only set OpenGraph, Twitter will fall back to it.
+
+**Q: How do I test my metadata?**
+**A:** Use these tools:
+- Facebook: https://developers.facebook.com/tools/debug/
+- Twitter: https://cards-dev.twitter.com/validator
+- LinkedIn: https://www.linkedin.com/post-inspector/
+
+---
+
+## 16. API Routes: Building APIs
 
 ### Creating API Routes
 
 ```tsx
-// app/api/hello/route.ts
-export async function GET() {
-    return Response.json({ message: 'Hello!' });
-}
+// app/api/webhooks/stripe/route.ts
+import { headers } from 'next/headers';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: Request) {
-    const data = await request.json();
-    return Response.json({ received: data });
-}
+    const body = await request.text();
+    const signature = headers().get('stripe-signature');
 
-export async function PATCH(request: Request) {
-    const data = await request.json();
-    // Update logic
-    return Response.json({ updated: true });
-}
+    let event;
 
-export async function DELETE(request: Request) {
-    // Delete logic
-    return Response.json({ deleted: true });
+    try {
+        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (err) {
+        return Response.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+    }
+
+    // Handle the event
+    switch (event.type) {
+        case 'checkout.session.completed':
+            const session = event.data.object;
+            // Fulfill the purchase...
+            await db.orders.updateStatus(session.metadata.orderId, 'paid');
+            break;
+        default:
+            console.log(`Unhandled event type ${event.type}`);
+    }
+
+    return Response.json({ received: true });
 }
 ```
 
-Visit `/api/hello` → JSON response
+Visit `/api/webhooks/stripe` → (Handled by Stripe)
 
 ### Dynamic API Routes
 
@@ -2990,19 +3858,31 @@ export async function GET() {
 ### Watch It!
 ⚠️ **API Routes run on the server!** You can access databases, file system, and secrets. But make sure to validate all input and handle errors properly.
 
+### There are NO Dumb Questions
+
+**Q: Should I use API Routes or Server Actions for my backend?**
+**A:** Server Actions for form mutations and internal data changes. API Routes for public APIs, webhooks, third-party integrations, or when you need specific HTTP methods/headers.
+
+**Q: Can I use API Routes with the Edge Runtime?**
+**A:** Yes! Add `export const runtime = 'edge'` to your route file. Great for fast, globally distributed endpoints that don't need Node.js APIs.
+
+**Q: How do I handle CORS in API Routes?**
+**A:** Set CORS headers manually in your response: `headers: { 'Access-Control-Allow-Origin': '*' }`. Or use middleware for global CORS handling.
+
 ---
 
-## 12. Middleware: Request Processing
+## 17. Proxy: Request Processing
 
-### Global Middleware
+### What is proxy.ts?
 
-Middleware runs BEFORE requests are processed. Perfect for auth, redirects, and more!
+In Next.js 16, `middleware.ts` was renamed to `proxy.ts`. The proxy runs BEFORE requests are processed - perfect for auth, redirects, and headers.
 
 ```tsx
-// middleware.ts (root)
+// proxy.ts (root of your project)
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request: NextRequest) {
     // Redirect if not authenticated
     if (!request.cookies.get('token')) {
         return NextResponse.redirect(new URL('/login', request.url));
@@ -3016,15 +3896,18 @@ export const config = {
 };
 ```
 
+### Watch It!
+⚠️ **Renamed in Next.js 16!** `middleware.ts` → `proxy.ts`, `middleware()` → `proxy()`. If upgrading, rename your file and function.
+
 ### Setting Headers
 
 Add custom headers to responses:
 
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request) {
     // Clone the response
     const response = NextResponse.next();
 
@@ -3046,10 +3929,10 @@ export function middleware(request) {
 Read and set cookies in middleware:
 
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     // Read cookies
     const token = request.cookies.get('token');
     const theme = request.cookies.get('theme');
@@ -3076,10 +3959,10 @@ export function middleware(request: NextRequest) {
 ### Conditional Redirects
 
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request) {
     const { pathname } = request.nextUrl;
 
     // Redirect old URLs
@@ -3113,10 +3996,10 @@ export const config = {
 Serve different content without changing the URL:
 
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request) {
     const { pathname } = request.nextUrl;
 
     // Show /maintenance page for all routes during maintenance
@@ -3142,10 +4025,10 @@ export function middleware(request) {
 Add headers to the request before it reaches your app:
 
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request) {
     // Clone request with modified headers
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-user-ip', request.ip || 'unknown');
@@ -3185,7 +4068,7 @@ export default function Page() {
 Control which routes run middleware:
 
 ```tsx
-// middleware.ts
+// proxy.ts
 export const config = {
     // Single path
     matcher: '/dashboard',
@@ -3213,10 +4096,10 @@ export const config = {
 ### Brain Power
 🧠 Why does middleware run on the Edge Runtime instead of Node.js?
 
-**Answer:** Speed! Middleware needs to run for EVERY request before the page loads. Edge Runtime starts instantly and runs globally, adding minimal latency. Node.js cold starts would slow down every request.
+**Answer:** Speed! The proxy needs to run for EVERY request before the page loads. In Next.js 16, proxy.ts runs on Node.js by default for a single, predictable runtime. You can still use Edge if needed.
 
 ### Watch It!
-⚠️ **Middleware runs on EVERY matched request!** Keep it fast. Avoid heavy operations, database calls, or complex logic. Use it for quick checks and redirects only.
+⚠️ **Proxy runs on EVERY matched request!** Keep it fast. Avoid heavy operations, database calls, or complex logic. Use it for quick checks and redirects only.
 
 ### There are NO Dumb Questions
 
@@ -3224,44 +4107,230 @@ export const config = {
 **A:** Yes! But only NEXT_PUBLIC_ variables and server-side variables. Database credentials work, but be careful with timing.
 
 **Q: Can I fetch data in middleware?**
-**A:** Yes, but keep it fast! Middleware adds latency to every request. Only fetch if absolutely necessary (like checking a session with an external service).
+**A:** Yes, but keep it fast! The proxy adds latency to every request. Only fetch if absolutely necessary (like checking a session with an external service).
 
 **Q: What's the difference between redirect and rewrite?**
 **A:** redirect() changes the URL (user sees new URL). rewrite() keeps the same URL but serves different content (internal routing).
 
 ---
 
-## 13. Caching: Performance
+## 18. Caching: Performance
 
-### Automatic Caching
+### How Next.js Caching Works
+
+Next.js has **four caching layers** that work together:
+
+```
+Request → Router Cache (client) → Full Route Cache (server) → Data Cache (server) → Data Source
+```
+
+| Cache Layer | Location | Purpose | Duration |
+|-------------|----------|---------|----------|
+| **Request Memoization** | Server | Dedup same fetch in one render | Per request |
+| **Data Cache** | Server | Store fetch responses | Persistent (until revalidated) |
+| **Full Route Cache** | Server | Cache rendered HTML/RSC | Persistent (until revalidated) |
+| **Router Cache** | Client | Cache visited routes | Session (30s dynamic, 5min static) |
+
+### fetch() Cache Options
 
 ```tsx
-// Cached for 1 hour
-fetch('https://api.example.com/data', {
-    next: { revalidate: 3600 }
+// DEFAULT in Next.js 15: NOT cached (dynamic)
+const data = await fetch('https://api.example.com/data');
+
+// Opt into caching: cache indefinitely
+const data = await fetch('https://api.example.com/data', {
+    cache: 'force-cache'
 });
 
-// Never cache
-fetch('https://api.example.com/data', {
+// Time-based revalidation: cache then refetch after 1 hour
+const data = await fetch('https://api.example.com/data', {
+    next: { revalidate: 3600 }  // seconds
+});
+
+// Explicit no-store (same as default, but explicit)
+const data = await fetch('https://api.example.com/data', {
     cache: 'no-store'
 });
+
+// Tag-based: label fetches for targeted revalidation
+const posts = await fetch('https://api.example.com/posts', {
+    next: { tags: ['posts'], revalidate: 3600 }
+});
+
+const user = await fetch(`https://api.example.com/users/${id}`, {
+    next: { tags: ['users', `user-${id}`], revalidate: 3600 }
+});
 ```
 
-### Revalidating Cache
+### Route Segment Cache Config
+
+Control caching at the page/layout level:
 
 ```tsx
-import { revalidatePath, revalidateTag } from 'next/cache';
+// app/dashboard/page.tsx
 
-// Revalidate specific path
-revalidatePath('/posts');
+// Make entire route dynamic (no caching)
+export const dynamic = 'force-dynamic';
 
-// Revalidate by tag
-revalidateTag('posts');
+// Or set revalidation for all fetches in this route
+export const revalidate = 60;  // Revalidate every 60 seconds
+
+// Other options:
+export const dynamic = 'auto';           // Default: Next.js decides
+export const dynamic = 'force-static';   // Force static (error if dynamic)
+export const fetchCache = 'force-no-store';  // No caching for all fetches
 ```
+
+### On-Demand Revalidation (Next.js 16)
+
+Next.js 16 refined the caching APIs with clearer semantics:
+
+```tsx
+// app/actions.ts
+'use server';
+
+import { revalidatePath, revalidateTag, updateTag, refresh } from 'next/cache';
+
+export async function createPost(formData: FormData) {
+    await db.posts.create({
+        data: { title: formData.get('title') as string }
+    });
+
+    // Revalidate a specific path
+    revalidatePath('/posts');
+
+    // Revalidate by tag with stale-while-revalidate
+    // Second argument is cacheLife profile: 'max', 'hours', 'days', or custom
+    revalidateTag('posts', 'max');
+}
+
+export async function updateUser(id: string, formData: FormData) {
+    await db.users.update({ where: { id }, data: { ... } });
+
+    // NEW in Next.js 16: updateTag() - immediate refresh
+    // Use in Server Actions for read-your-writes semantics
+    updateTag(`user-${id}`);  // Expires AND refreshes immediately
+}
+
+export async function markNotificationRead(notificationId: string) {
+    await db.notifications.markAsRead(notificationId);
+
+    // NEW in Next.js 16: refresh() - refresh uncached data
+    refresh();  // Refreshes the client router
+}
+```
+
+### Revalidation API Comparison
+
+| API | Use Case | Behavior |
+|-----|----------|----------|
+| `revalidatePath('/path')` | Path changed | Revalidates specific route |
+| `revalidateTag('tag', 'max')` | Stale-while-revalidate | Marks stale, serves old then refreshes |
+| `updateTag('tag')` | Immediate refresh | Expires and refetches immediately |
+| `refresh()` | Full refresh | Refreshes all uncached data |
+
+### Cache Components (`'use cache'` directive)
+
+Cache database queries, computations, or any async function using the `'use cache'` directive:
+
+```tsx
+// lib/data.ts
+import { cacheLife, cacheTag } from 'next/cache';
+
+export async function getCachedPosts(authorId: string) {
+    'use cache';
+    cacheLife('hours');           // Built-in profiles: 'max', 'hours', 'days'
+    cacheTag('posts', authorId);  // Tags for revalidation
+
+    return await db.posts.findMany({
+        where: { authorId },
+        orderBy: { createdAt: 'desc' }
+    });
+}
+```
+
+**Enable in next.config.ts:**
+```ts
+const nextConfig: NextConfig = {
+    cacheComponents: true,  // Enable 'use cache' directive
+};
+```
+
+**Cache entire pages or components:**
+```tsx
+// app/blog/[slug]/page.tsx
+import { cacheLife, cacheTag } from 'next/cache';
+
+export default async function BlogPost({ params }) {
+    'use cache';  // Cache this entire page
+    cacheLife('days');
+    cacheTag('blog-posts');
+
+    const { slug } = await params;
+    const post = await getPost(slug);
+    return <article>{post.content}</article>;
+}
+```
+
+// Usage in a Server Component
+export default async function AuthorPosts({ authorId }: { authorId: string }) {
+    const posts = await getCachedPosts(authorId);
+    return <PostList posts={posts} />;
+}
+
+### Cache Strategies by Use Case
+
+```tsx
+// Blog posts: Cache forever, revalidate on publish
+const post = await fetch(`/api/posts/${id}`, {
+    next: { tags: [`post-${id}`] }
+});
+
+// User dashboard: Short cache, frequent updates
+const stats = await fetch('/api/stats', {
+    next: { revalidate: 30 }  // Fresh every 30 seconds
+});
+
+// Auth/session: Never cache
+const session = await fetch('/api/auth/session', {
+    cache: 'no-store'
+});
+
+// Product catalog: Medium cache, revalidate on inventory change
+const products = await fetch('/api/products', {
+    next: { revalidate: 300, tags: ['products'] }
+});
+```
+
+### Watch It!
+⚠️ **POST requests are never cached!** Only GET requests in fetch() use the Data Cache. For non-fetch data, use `'use cache'` directive or `unstable_cache`.
+
+⚠️ **Dynamic functions opt out of caching!** Using `cookies()`, `headers()`, or `searchParams` in a Server Component makes the entire route dynamic. Move these calls to the specific components that need them.
+
+⚠️ **`'use cache'` is experimental!** Enable it in `next.config.ts` with `experimental: { dynamicIO: true }`. The `unstable_cache` API still works as a stable alternative.
+
+### Brain Power
+🧠 You have a product page showing price and reviews. Price changes rarely but reviews update constantly. How would you cache them differently?
+
+**Answer:** Use different revalidation strategies:
+- Price: `next: { revalidate: 3600, tags: ['product-price'] }` (cache 1 hour)
+- Reviews: `next: { revalidate: 30, tags: ['product-reviews'] }` (refresh every 30s)
+- Or: Make reviews a Client Component with React Query, and keep the price in the cached Server Component
+
+### There are NO Dumb Questions
+
+**Q: How do I completely disable all caching?**
+**A:** In Next.js 15+, fetch requests are uncached by default everywhere (dev and production). For explicit control, add `cache: 'no-store'` to individual fetches or set `export const dynamic = 'force-dynamic'` on pages.
+
+**Q: When should I use `revalidatePath` vs `revalidateTag`?**
+**A:** Use `revalidatePath` when a mutation affects an entire page. Use `revalidateTag` when you want granular control - one mutation might invalidate data used across multiple pages.
+
+**Q: Does the Router Cache cause stale data problems?**
+**A:** It can! The client-side Router Cache means navigating back to a page shows the cached version. Call `router.refresh()` after mutations, or use Server Actions (they auto-invalidate the Router Cache).
 
 ---
 
-## 14. Configuration: Setting Up Your App
+## 19. Configuration: Setting Up Your App
 
 ### Environment Variables
 
@@ -3355,6 +4424,68 @@ import Link from 'next/link';
 <Link<Route> href="/invalid-route" /> // ❌ Error
 ```
 
+### Linting (ESLint) & Formatting (Prettier)
+
+Keep your code clean and consistent!
+
+**ESLint Setup (Next.js 16):**
+
+In Next.js 16, `next lint` was removed. Use ESLint directly:
+
+```bash
+npm install -D eslint eslint-config-next
+npx eslint . --ext .js,.jsx,.ts,.tsx
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  }
+}
+```
+
+**ESLint Flat Config (Recommended):**
+```js
+// eslint.config.mjs
+import { FlatCompat } from '@eslint/eslintrc';
+
+const compat = new FlatCompat();
+
+export default [
+    ...compat.extends('next/core-web-vitals', 'next/typescript'),
+];
+```
+
+**Prettier (Formatting):**
+ESLint finds errors, Prettier fixes style.
+
+```bash
+npm install -D prettier eslint-config-prettier
+```
+
+```js
+// eslint.config.mjs
+export default [
+    ...compat.extends('next/core-web-vitals', 'prettier'),
+];
+```
+
+**Watch It!**
+⚠️ **`next lint` removed in Next.js 16!** Use ESLint CLI directly. The `eslint-config-next` package still works.
+⚠️ **Migrate to ESLint Flat Config!** The `.eslintrc.*` format is deprecated.
+
+**Prettier Config:**
+```json
+// .prettierrc
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5"
+}
+```
+
 ### Internationalization (i18n)
 
 Support multiple languages!
@@ -3396,13 +4527,13 @@ export default async function Page({ params: { lang } }) {
 
 **Language detection middleware:**
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextResponse } from 'next/server';
 
 const locales = ['en', 'es', 'fr'];
 const defaultLocale = 'en';
 
-export function middleware(request) {
+export default function proxy(request) {
     // Check if locale is in pathname
     const pathname = request.nextUrl.pathname;
     const pathnameHasLocale = locales.some(
@@ -3422,6 +4553,138 @@ export const config = {
 };
 ```
 
+### Next.js Configuration File
+
+Next.js 15 supports TypeScript config files!
+
+```ts
+// next.config.ts (TypeScript - recommended)
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+    experimental: {
+        ppr: true,          // Partial Prerendering
+        dynamicIO: true,    // 'use cache' directive
+    },
+    images: {
+        remotePatterns: [
+            { hostname: 'images.example.com' },
+        ],
+    },
+};
+
+export default nextConfig;
+```
+
+```js
+// next.config.js (JavaScript - still supported)
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    // same options
+};
+
+module.exports = nextConfig;
+```
+
+### React Compiler (Stable in Next.js 16)
+
+The React Compiler automatically memoizes components - no more manual `useMemo`, `useCallback`, or `React.memo`!
+
+```ts
+// next.config.ts
+const nextConfig: NextConfig = {
+    reactCompiler: true,  // Enable React Compiler
+};
+```
+
+**Before (manual memoization):**
+```tsx
+'use client';
+
+import { useMemo, useCallback, memo } from 'react';
+
+const ExpensiveComponent = memo(function ExpensiveComponent({ data }) {
+    const processedData = useMemo(() =>
+        expensiveOperation(data), [data]
+    );
+
+    const handleClick = useCallback(() => {
+        console.log(processedData);
+    }, [processedData]);
+
+    return <button onClick={handleClick}>{processedData}</button>;
+});
+```
+
+**After (with React Compiler):**
+```tsx
+'use client';
+
+// React Compiler handles memoization automatically!
+function ExpensiveComponent({ data }) {
+    const processedData = expensiveOperation(data);
+
+    const handleClick = () => {
+        console.log(processedData);
+    };
+
+    return <button onClick={handleClick}>{processedData}</button>;
+}
+```
+
+### React 19.2 Features
+
+Next.js 16 includes React 19.2 with new features:
+
+**View Transitions:**
+```tsx
+'use client';
+
+import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+
+export function NavigationLink({ href, children }) {
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+
+    return (
+        <a
+            href={href}
+            onClick={(e) => {
+                e.preventDefault();
+                startTransition(() => {
+                    // View Transition API animates the navigation
+                    router.push(href);
+                });
+            }}
+            style={{ opacity: isPending ? 0.7 : 1 }}
+        >
+            {children}
+        </a>
+    );
+}
+```
+
+**useEffectEvent (extract non-reactive logic):**
+```tsx
+'use client';
+
+import { useEffect, useEffectEvent } from 'react';
+
+function ChatRoom({ roomId, onMessage }) {
+    // This doesn't re-run effect when onMessage changes
+    const onMessageEvent = useEffectEvent((message) => {
+        onMessage(message);
+    });
+
+    useEffect(() => {
+        const connection = createConnection(roomId);
+        connection.on('message', onMessageEvent);
+        return () => connection.disconnect();
+    }, [roomId]); // Only roomId in dependencies!
+}
+```
+
 ### Markdown and MDX
 
 Write content-driven pages with MDX!
@@ -3430,13 +4693,15 @@ Write content-driven pages with MDX!
 npm install @next/mdx @mdx-js/loader @mdx-js/react
 ```
 
-```js
-// next.config.js
-const withMDX = require('@next/mdx')({
+```ts
+// next.config.ts
+import createMDX from '@next/mdx';
+
+const withMDX = createMDX({
     extension: /\.mdx?$/,
 });
 
-module.exports = withMDX({
+export default withMDX({
     pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
 });
 ```
@@ -3445,7 +4710,7 @@ module.exports = withMDX({
 // app/blog/hello-world.mdx
 ---
 title: "Hello World"
-date: "2024-01-01"
+date: "2026-01-15"
 ---
 
 # Hello World
@@ -3534,7 +4799,1122 @@ app.prepare().then(() => {
 
 ---
 
-## 15. Deployment: Going Live
+## 20. Environment Variables
+
+### Understanding Environment Variables
+
+Environment variables store configuration that changes between environments (development, staging, production). Next.js has special handling for them.
+
+### The .env Files Hierarchy
+
+```
+my-app/
+├── .env                 # Loaded in all environments
+├── .env.local           # Loaded in all environments, gitignored
+├── .env.development     # Loaded in dev only
+├── .env.development.local # Loaded in dev only, gitignored
+├── .env.production      # Loaded in production only
+├── .env.production.local # Loaded in production only, gitignored
+└── .env.test            # Loaded when running tests
+```
+
+**Loading order (later overrides earlier):**
+1. `.env`
+2. `.env.local`
+3. `.env.[environment]`
+4. `.env.[environment].local`
+
+### Server-Only vs Public Variables
+
+```bash
+# .env.local
+
+# Server-only (NOT exposed to browser)
+DATABASE_URL="postgresql://..."
+API_SECRET="super-secret-key"
+STRIPE_SECRET_KEY="sk_live_..."
+
+# Public (exposed to browser via NEXT_PUBLIC_ prefix)
+NEXT_PUBLIC_API_URL="https://api.myapp.com"
+NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_..."
+```
+
+### Using Environment Variables
+
+```tsx
+// Server Component or API Route - can access ALL env vars
+export default async function Dashboard() {
+    const dbUrl = process.env.DATABASE_URL;        // ✅ Works
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL; // ✅ Works
+
+    const data = await fetchFromDB(dbUrl);
+    return <div>{data}</div>;
+}
+```
+
+```tsx
+// Client Component - only NEXT_PUBLIC_ vars
+'use client';
+
+export default function Analytics() {
+    const gaId = process.env.NEXT_PUBLIC_GA_ID;     // ✅ Works
+    const secret = process.env.DATABASE_URL;        // ❌ undefined!
+
+    return <Script src={`https://...?id=${gaId}`} />;
+}
+```
+
+### Runtime vs Build-time Variables
+
+```tsx
+// Build-time: Inlined at build, can't change after deploy
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+// Becomes: const apiUrl = "https://api.myapp.com";
+
+// Runtime: Read on each request (Server Components only)
+const dbUrl = process.env.DATABASE_URL;
+// Actually reads from environment at runtime
+```
+
+### Validating Environment Variables
+
+Use Zod to validate required variables at startup:
+
+```tsx
+// lib/env.ts
+import { z } from 'zod';
+
+const envSchema = z.object({
+    DATABASE_URL: z.string().url(),
+    API_SECRET: z.string().min(32),
+    NEXT_PUBLIC_API_URL: z.string().url(),
+    NODE_ENV: z.enum(['development', 'production', 'test']),
+});
+
+// Validate at startup - fail fast if missing
+export const env = envSchema.parse({
+    DATABASE_URL: process.env.DATABASE_URL,
+    API_SECRET: process.env.API_SECRET,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NODE_ENV: process.env.NODE_ENV,
+});
+```
+
+```tsx
+// Usage
+import { env } from '@/lib/env';
+
+const db = connectToDatabase(env.DATABASE_URL);
+```
+
+### TypeScript Support
+
+```tsx
+// env.d.ts (create at project root)
+namespace NodeJS {
+    interface ProcessEnv {
+        DATABASE_URL: string;
+        API_SECRET: string;
+        NEXT_PUBLIC_API_URL: string;
+        NODE_ENV: 'development' | 'production' | 'test';
+    }
+}
+```
+
+Now TypeScript knows about your env vars!
+
+### Brain Power
+🧠 Why does Next.js use the `NEXT_PUBLIC_` prefix instead of exposing all variables?
+
+**Answer:** Security by default! Environment variables often contain secrets (API keys, database passwords). Requiring an explicit prefix prevents accidentally leaking secrets to the browser. You must consciously choose what to expose.
+
+### Watch It!
+⚠️ **Never commit `.env.local` to git!** It contains secrets. Add it to `.gitignore`. Use `.env.example` to document required variables without values.
+
+⚠️ **NEXT_PUBLIC_ variables are baked into the build!** They can't be changed without rebuilding. For truly dynamic config, fetch from an API or use runtime env vars in Server Components.
+
+### There are NO Dumb Questions
+
+**Q: Why is my env variable undefined in the browser?**
+**A:** You forgot the `NEXT_PUBLIC_` prefix! Only variables starting with `NEXT_PUBLIC_` are available in Client Components.
+
+**Q: How do I use different values for staging vs production?**
+**A:** Set them in your hosting platform's environment settings (Vercel, Railway, etc.). Don't rely on `.env.production` for secrets - that file gets committed to git.
+
+**Q: Can I use .env files in production?**
+**A:** Technically yes, but it's not recommended. Use your hosting platform's environment variable settings instead - they're more secure and easier to manage.
+
+---
+
+## 21. Authentication: Protecting Your App
+
+### What is Auth.js?
+
+Auth.js (formerly NextAuth.js v5) is the most popular authentication library for Next.js. It handles:
+- OAuth providers (Google, GitHub, etc.)
+- Email/password authentication
+- Session management
+- JWT tokens
+
+### Installation
+
+```bash
+npm install next-auth@beta
+```
+
+### Setting Up Auth.js v5
+
+Auth.js v5 uses a central config file at the project root:
+
+```tsx
+// auth.ts (project root)
+import NextAuth from 'next-auth';
+import Google from 'next-auth/providers/google';
+import GitHub from 'next-auth/providers/github';
+import Credentials from 'next-auth/providers/credentials';
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+    providers: [
+        Google,  // Uses GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars
+        GitHub,  // Uses GITHUB_ID and GITHUB_SECRET env vars
+        Credentials({
+            credentials: {
+                email: { label: 'Email', type: 'email' },
+                password: { label: 'Password', type: 'password' }
+            },
+            async authorize(credentials) {
+                const user = await verifyUser(
+                    credentials.email as string,
+                    credentials.password as string
+                );
+                return user ?? null;
+            }
+        })
+    ],
+    pages: {
+        signIn: '/login',
+        error: '/auth/error',
+    },
+    callbacks: {
+        async session({ session, token }) {
+            if (token.sub) {
+                session.user.id = token.sub;
+            }
+            return session;
+        },
+    },
+});
+```
+
+### API Route Handler
+
+```tsx
+// app/api/auth/[...nextauth]/route.ts
+import { handlers } from '@/auth';
+
+export const { GET, POST } = handlers;
+```
+
+### Session Provider (Client Components)
+
+```tsx
+// app/providers.tsx
+'use client';
+
+import { SessionProvider } from 'next-auth/react';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+    return <SessionProvider>{children}</SessionProvider>;
+}
+
+// app/layout.tsx
+import { Providers } from './providers';
+
+export default function RootLayout({ children }) {
+    return (
+        <html>
+            <body>
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    );
+}
+```
+
+### Using Sessions in Client Components
+
+```tsx
+'use client';
+
+import { useSession, signIn, signOut } from 'next-auth/react';
+
+export default function AuthButton() {
+    const { data: session, status } = useSession();
+
+    if (status === 'loading') {
+        return <p>Loading...</p>;
+    }
+
+    if (session) {
+        return (
+            <div>
+                <p>Welcome, {session.user?.name}!</p>
+                <img src={session.user?.image} alt="Avatar" />
+                <button onClick={() => signOut()}>Sign out</button>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <button onClick={() => signIn('google')}>Sign in with Google</button>
+            <button onClick={() => signIn('github')}>Sign in with GitHub</button>
+        </div>
+    );
+}
+```
+
+### Using auth() in Server Components
+
+The new `auth()` helper replaces `getServerSession()`:
+
+```tsx
+// app/dashboard/page.tsx
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+
+export default async function Dashboard() {
+    const session = await auth();
+
+    if (!session) {
+        redirect('/login');
+    }
+
+    return (
+        <div>
+            <h1>Welcome, {session.user?.name}!</h1>
+            <p>Email: {session.user?.email}</p>
+        </div>
+    );
+}
+```
+
+### Protecting API Routes
+
+```tsx
+// app/api/protected/route.ts
+import { auth } from '@/auth';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+    const session = await auth();
+
+    if (!session) {
+        return NextResponse.json(
+            { error: 'Unauthorized' },
+            { status: 401 }
+        );
+    }
+
+    return NextResponse.json({
+        message: 'Protected data',
+        user: session.user
+    });
+}
+```
+
+### Proxy Authentication
+
+```tsx
+// proxy.ts
+import { auth } from '@/auth';
+
+export default auth((req) => {
+    const isLoggedIn = !!req.auth;
+    const isOnDashboard = req.nextUrl.pathname.startsWith('/dashboard');
+
+    if (isOnDashboard && !isLoggedIn) {
+        return Response.redirect(new URL('/login', req.nextUrl));
+    }
+});
+
+export const config = {
+    matcher: ['/dashboard/:path*', '/admin/:path*'],
+};
+```
+
+### Server Actions with Auth
+
+```tsx
+// app/actions.ts
+'use server';
+
+import { auth } from '@/auth';
+
+export async function createPost(formData: FormData) {
+    const session = await auth();
+
+    if (!session) {
+        throw new Error('Unauthorized');
+    }
+
+    // User is authenticated, proceed with action
+    await db.posts.create({
+        data: {
+            title: formData.get('title') as string,
+            authorId: session.user.id,
+        },
+    });
+}
+```
+
+### Brain Power
+🧠 Why use Auth.js instead of building your own auth?
+
+**Answer:** Security is hard! Auth.js handles CSRF protection, secure cookies, token rotation, and more. Building secure auth from scratch is error-prone. Let the experts handle it!
+
+### Watch It!
+⚠️ **Never store sensitive auth secrets in client components!** Use environment variables without NEXT_PUBLIC_ prefix for OAuth secrets. They should only be accessible on the server.
+
+⚠️ **Auth.js v5 is a major rewrite!** If migrating from v4, check the migration guide. Key changes: central `auth.ts` config, new `auth()` helper, simplified middleware.
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between NextAuth.js v4 and Auth.js v5?**
+**A:** Auth.js v5 is a major rewrite with a simpler API. Key differences: config in `auth.ts` (not API route), `auth()` helper (not `getServerSession()`), and better Edge Runtime support.
+
+**Q: How do I protect Server Components?**
+**A:** Call `auth()` from your `@/auth` export at the top of your Server Component. If no session, redirect to login. The proxy (`proxy.ts`) is faster for route-level protection.
+
+**Q: Should I use JWT or database sessions?**
+**A:** JWT for stateless/serverless (no DB needed per request, faster). Database sessions for more control (revocation, session listing). JWT is simpler for most apps.
+
+---
+
+## 22. Navigation Hooks: useParams, usePathname, useSearchParams
+
+### useParams: Get Route Parameters
+
+```tsx
+'use client';
+
+import { useParams } from 'next/navigation';
+
+// URL: /blog/hello-world
+// app/blog/[slug]/page.tsx
+export default function BlogPost() {
+    const params = useParams();
+    // params = { slug: 'hello-world' }
+
+    return <h1>Post: {params.slug}</h1>;
+}
+```
+
+**Multiple parameters:**
+```tsx
+// URL: /shop/electronics/laptop
+// app/shop/[category]/[product]/page.tsx
+export default function Product() {
+    const params = useParams();
+    // params = { category: 'electronics', product: 'laptop' }
+
+    return (
+        <div>
+            <p>Category: {params.category}</p>
+            <p>Product: {params.product}</p>
+        </div>
+    );
+}
+```
+
+### usePathname: Get Current Path
+
+```tsx
+'use client';
+
+import { usePathname } from 'next/navigation';
+
+export default function Navigation() {
+    const pathname = usePathname();
+    // pathname = '/dashboard/settings'
+
+    return (
+        <nav>
+            <a
+                href="/dashboard"
+                className={pathname === '/dashboard' ? 'active' : ''}
+            >
+                Dashboard
+            </a>
+            <a
+                href="/dashboard/settings"
+                className={pathname === '/dashboard/settings' ? 'active' : ''}
+            >
+                Settings
+            </a>
+        </nav>
+    );
+}
+```
+
+### useSearchParams: Get Query Parameters
+
+```tsx
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+
+// URL: /search?q=nextjs&page=2
+export default function SearchPage() {
+    const searchParams = useSearchParams();
+
+    const query = searchParams.get('q'); // 'nextjs'
+    const page = searchParams.get('page'); // '2'
+    const missing = searchParams.get('foo'); // null
+
+    return (
+        <div>
+            <p>Search: {query}</p>
+            <p>Page: {page}</p>
+        </div>
+    );
+}
+```
+
+**Updating search params:**
+```tsx
+'use client';
+
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+
+export default function Filters() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const updateFilter = (key: string, value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(key, value);
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    return (
+        <div>
+            <button onClick={() => updateFilter('sort', 'price')}>
+                Sort by Price
+            </button>
+            <button onClick={() => updateFilter('sort', 'date')}>
+                Sort by Date
+            </button>
+        </div>
+    );
+}
+```
+
+### Combining Hooks
+
+```tsx
+'use client';
+
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+
+// URL: /products/shoes?color=red&size=10
+export default function ProductPage() {
+    const params = useParams();       // { category: 'shoes' }
+    const pathname = usePathname();   // '/products/shoes'
+    const searchParams = useSearchParams();
+
+    return (
+        <div>
+            <p>Category: {params.category}</p>
+            <p>Path: {pathname}</p>
+            <p>Color: {searchParams.get('color')}</p>
+            <p>Size: {searchParams.get('size')}</p>
+        </div>
+    );
+}
+```
+
+### Watch It!
+⚠️ **These hooks only work in Client Components!** Add `'use client'` directive. For Server Components, use the `params` and `searchParams` props passed to the page (remember: they're Promises in Next.js 15, so use `await`).
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between params prop and useParams hook?**
+**A:** The `params` prop is for Server Components (it's a Promise you must `await`). The `useParams()` hook is for Client Components (returns params synchronously). Same data, different access patterns based on component type.
+
+**Q: How do I update search params without a full page reload?**
+**A:** Use `useRouter().push()` or `useRouter().replace()` with the new URL. Or use the native `URLSearchParams` API to construct the new query string and navigate programmatically.
+
+### Brain Power
+🧠 Why does Next.js separate navigation into `useParams`, `usePathname`, and `useSearchParams` instead of one unified hook?
+
+**Answer:** Separation of concerns and re-rendering efficiency. If search params change, only components using `useSearchParams` re-render. Components using `usePathname` stay untouched. One big hook would cause unnecessary re-renders everywhere.
+
+---
+
+## 23. Special Files: File Conventions
+
+### not-found.tsx: Custom 404 Page
+
+```tsx
+// app/not-found.tsx (root level)
+import Link from 'next/link';
+
+export default function NotFound() {
+    return (
+        <div>
+            <h1>404 - Page Not Found</h1>
+            <p>The page you're looking for doesn't exist.</p>
+            <Link href="/">Go back home</Link>
+        </div>
+    );
+}
+```
+
+**Trigger programmatically:**
+```tsx
+import { notFound } from 'next/navigation';
+
+export default async function BlogPost({ params }) {
+    const post = await getPost(params.slug);
+
+    if (!post) {
+        notFound(); // Shows not-found.tsx
+    }
+
+    return <article>{post.content}</article>;
+}
+```
+
+**Nested not-found:**
+```tsx
+// app/blog/not-found.tsx
+// Only shown for /blog/* 404s
+export default function BlogNotFound() {
+    return <p>Blog post not found. Check our latest posts!</p>;
+}
+```
+
+### generateStaticParams: Static Dynamic Routes
+
+Pre-render dynamic routes at build time!
+
+```tsx
+// app/blog/[slug]/page.tsx
+
+// Generate static pages for these slugs
+export async function generateStaticParams() {
+    const posts = await getPosts();
+
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
+}
+
+// Page component
+export default async function BlogPost({ params }) {
+    const post = await getPost(params.slug);
+    return <article>{post.content}</article>;
+}
+```
+
+**Multiple parameters:**
+```tsx
+// app/products/[category]/[id]/page.tsx
+export async function generateStaticParams() {
+    const products = await getProducts();
+
+    return products.map((product) => ({
+        category: product.category,
+        id: product.id,
+    }));
+}
+// Generates: /products/electronics/123, /products/clothing/456, etc.
+```
+
+**With fetch:**
+```tsx
+export async function generateStaticParams() {
+    const res = await fetch('https://api.example.com/posts');
+    const posts = await res.json();
+
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
+}
+```
+
+### global-error.tsx: Root Error Boundary
+
+```tsx
+// app/global-error.tsx
+'use client';
+
+export default function GlobalError({
+    error,
+    reset,
+}: {
+    error: Error;
+    reset: () => void;
+}) {
+    return (
+        <html>
+            <body>
+                <h2>Something went wrong!</h2>
+                <button onClick={() => reset()}>Try again</button>
+            </body>
+        </html>
+    );
+}
+```
+
+### route.ts: Route Handlers
+
+Supported HTTP methods:
+
+```tsx
+// app/api/resource/route.ts
+export async function GET(request: Request) {}
+export async function POST(request: Request) {}
+export async function PUT(request: Request) {}
+export async function PATCH(request: Request) {}
+export async function DELETE(request: Request) {}
+export async function HEAD(request: Request) {}
+export async function OPTIONS(request: Request) {}
+```
+
+### File Convention Summary
+
+```
+app/
+├── layout.tsx          # Shared UI wrapper
+├── page.tsx            # Route UI
+├── loading.tsx         # Loading UI
+├── error.tsx           # Error UI
+├── not-found.tsx       # 404 UI
+├── global-error.tsx    # Root error UI
+├── route.ts            # API endpoint
+├── template.tsx        # Re-renders on navigation
+├── default.tsx         # Parallel route fallback
+└── middleware.ts       # Request middleware (root only)
+```
+
+### Brain Power
+🧠 Why use generateStaticParams instead of letting pages render on-demand?
+
+**Answer:** Performance! Static pages are pre-built and served from CDN instantly. No server rendering needed. Perfect for blogs, docs, and content that doesn't change often.
+
+### Watch It!
+⚠️ **`error.tsx` must be a Client Component!** It uses `'use client'` because error boundaries need to catch errors on the client side too. Always include a `reset` button so users can retry.
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between `error.tsx` and `global-error.tsx`?**
+**A:** `error.tsx` catches errors in its segment and below. `global-error.tsx` catches errors in the root layout itself (the only way to handle root-level errors). It must include its own `<html>` and `<body>` tags.
+
+**Q: When would I use `default.tsx`?**
+**A:** Only with parallel routes. It's the fallback shown when a parallel slot doesn't match the current URL (like navigating to a route that doesn't have content for that slot).
+
+**Q: Can I have `loading.tsx` at every route level?**
+**A:** Yes! Each segment can have its own loading state. Deeper loading files override parent ones for that segment, creating granular loading UIs.
+
+---
+
+## 24. Security Best Practices
+
+### Content Security Policy (CSP)
+
+```tsx
+// proxy.ts
+import { NextResponse } from 'next/server';
+
+export default function proxy(request) {
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+
+    const cspHeader = `
+        default-src 'self';
+        script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' blob: data:;
+        font-src 'self';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'none';
+        upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
+    const response = NextResponse.next();
+    response.headers.set('Content-Security-Policy', cspHeader);
+    response.headers.set('x-nonce', nonce);
+
+    return response;
+}
+```
+
+### Security Headers
+
+```tsx
+// next.config.js
+module.exports = {
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    {
+                        key: 'X-DNS-Prefetch-Control',
+                        value: 'on'
+                    },
+                    {
+                        key: 'Strict-Transport-Security',
+                        value: 'max-age=63072000; includeSubDomains; preload'
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'SAMEORIGIN'
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff'
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'origin-when-cross-origin'
+                    },
+                    {
+                        key: 'Permissions-Policy',
+                        value: 'camera=(), microphone=(), geolocation=()'
+                    }
+                ]
+            }
+        ];
+    }
+};
+```
+
+### Input Validation with Zod
+
+```tsx
+'use server';
+
+import { z } from 'zod';
+
+const userSchema = z.object({
+    email: z.string().email('Invalid email'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    name: z.string().min(2).max(50),
+});
+
+export async function createUser(formData: FormData) {
+    const rawData = {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        name: formData.get('name'),
+    };
+
+    const result = userSchema.safeParse(rawData);
+
+    if (!result.success) {
+        return { errors: result.error.flatten().fieldErrors };
+    }
+
+    // Safe to use result.data
+    await db.users.create({ data: result.data });
+}
+```
+
+### Environment Variable Validation
+
+```tsx
+// lib/env.ts
+import { z } from 'zod';
+
+const envSchema = z.object({
+    DATABASE_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string().min(32),
+    NEXTAUTH_URL: z.string().url(),
+});
+
+export const env = envSchema.parse(process.env);
+```
+
+### Rate Limiting
+
+```tsx
+// lib/rate-limit.ts
+const rateLimit = new Map();
+
+export function rateLimiter(ip: string, limit = 10, window = 60000) {
+    const now = Date.now();
+    const windowStart = now - window;
+
+    const requestTimestamps = rateLimit.get(ip) || [];
+    const requestsInWindow = requestTimestamps.filter(
+        (timestamp: number) => timestamp > windowStart
+    );
+
+    if (requestsInWindow.length >= limit) {
+        return false; // Rate limited
+    }
+
+    requestsInWindow.push(now);
+    rateLimit.set(ip, requestsInWindow);
+    return true; // Allowed
+}
+```
+
+```tsx
+// app/api/submit/route.ts
+import { rateLimiter } from '@/lib/rate-limit';
+
+export async function POST(request: Request) {
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+
+    if (!rateLimiter(ip)) {
+        return Response.json(
+            { error: 'Too many requests' },
+            { status: 429 }
+        );
+    }
+
+    // Process request...
+}
+```
+
+### Brain Power
+🧠 Why is server-side validation not enough? Why do we also need CSP headers?
+
+**Answer:** Validation prevents malicious data from being stored. CSP prevents malicious scripts from executing even if they slip through (defense in depth). A stored XSS payload might bypass validation but CSP blocks it from running in the browser.
+
+### Watch It!
+⚠️ **Never trust client input!** Always validate on the server. Client-side validation is for UX, server-side validation is for security. Use libraries like Zod for both.
+
+### There are NO Dumb Questions
+
+**Q: Do I need CSP for every app?**
+**A:** For production apps with user content, YES! CSP prevents XSS attacks. Start strict and loosen as needed.
+
+**Q: Why validate environment variables?**
+**A:** Fail fast! If a required env var is missing, you want to know at startup, not when a user hits that code path.
+
+---
+
+## 25. Turbopack: The Default Bundler
+
+### What is Turbopack?
+
+Turbopack is Next.js's Rust-based bundler that **replaced Webpack as the default in Next.js 16**. It's significantly faster!
+
+**Benefits:**
+- 2-5× faster production builds
+- Up to 10× faster Fast Refresh (HMR)
+- Incremental compilation
+- Built in Rust for speed
+
+### Turbopack is Now Default
+
+In Next.js 16, Turbopack is used automatically - no flags needed:
+
+```bash
+# Both use Turbopack by default in Next.js 16
+next dev
+next build
+```
+
+```json
+// package.json - Remove old --turbo flags!
+{
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start"
+    }
+}
+```
+
+### Opting Out to Webpack
+
+If you need Webpack (for legacy plugins), explicitly opt out:
+
+```bash
+next build --webpack
+```
+
+### Configuration
+
+```ts
+// next.config.ts - turbopack is now top-level (not experimental)
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+    turbopack: {
+        rules: {
+            '*.svg': {
+                loaders: ['@svgr/webpack'],
+                as: '*.js',
+            },
+        },
+    },
+};
+
+export default nextConfig;
+```
+
+### File System Caching (Beta)
+
+Enable caching for even faster restarts:
+
+```ts
+const nextConfig: NextConfig = {
+    experimental: {
+        turbopackFileSystemCacheForDev: true,
+    },
+};
+```
+
+### Watch It!
+⚠️ **Turbopack config moved!** In Next.js 16, `turbopack` is a top-level config option, not under `experimental`. Update your `next.config.ts` if upgrading.
+
+### Brain Power
+🧠 Why is Turbopack written in Rust instead of JavaScript?
+
+**Answer:** Bundling is CPU-intensive work (parsing, transforming, linking). Rust is orders of magnitude faster than JavaScript for computation-heavy tasks. Webpack runs in Node.js (single-threaded JS), while Turbopack leverages Rust's zero-cost abstractions and parallelism.
+
+### There are NO Dumb Questions
+
+**Q: Do I need to change my code for Turbopack?**
+**A:** No! It's a drop-in replacement. Your components, imports, and most config work the same.
+
+**Q: Can I still use Webpack plugins with Turbopack?**
+**A:** Not directly. Turbopack has its own system (`turbopack.rules`). Many Webpack loaders work, but complex plugins need alternatives.
+
+**Q: How do I use Webpack if Turbopack doesn't work for my project?**
+**A:** Use `next build --webpack` to opt out. But most projects should work with Turbopack now - it's been stable since Next.js 16.
+
+---
+
+## 26. Cache Components & Partial Prerendering
+
+### What are Cache Components?
+
+In Next.js 16, Cache Components replace the `experimental.ppr` flag. Use the `'use cache'` directive to explicitly opt components into caching, enabling Partial Prerendering automatically.
+
+```
+┌─────────────────────────────┐
+│ Cached Header (instant)     │
+├─────────────────────────────┤
+│ Cached Content (instant)    │
+├─────────────────────────────┤
+│ [Loading...] → Dynamic Data │
+├─────────────────────────────┤
+│ Cached Footer (instant)     │
+└─────────────────────────────┘
+```
+
+### Enabling Cache Components
+
+```ts
+// next.config.ts
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+    cacheComponents: true,  // Replaces experimental.ppr
+};
+
+export default nextConfig;
+```
+
+### Using Cache Components
+
+```tsx
+// app/dashboard/page.tsx
+import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
+
+// Cached component - rendered at build/request time, then cached
+async function CachedHeader() {
+    'use cache';
+    cacheLife('days');
+
+    return (
+        <header>
+            <h1>Dashboard</h1>
+            <nav>...</nav>
+        </header>
+    );
+}
+
+// Dynamic component - always fresh
+async function DynamicStats() {
+    // No 'use cache' = always dynamic
+    const stats = await fetch('/api/stats', { cache: 'no-store' });
+    return <StatsDisplay data={stats} />;
+}
+
+export default function Dashboard() {
+    return (
+        <div>
+            {/* Cached - served instantly */}
+            <CachedHeader />
+
+            {/* Dynamic - streams in */}
+            <Suspense fallback={<p>Loading stats...</p>}>
+                <DynamicStats />
+            </Suspense>
+
+            {/* Static JSX - always instant */}
+            <footer>© 2026 My App</footer>
+        </div>
+    );
+}
+
+async function DynamicStats() {
+    const stats = await fetch('https://api.example.com/stats', {
+        cache: 'no-store' // Makes this dynamic
+    });
+
+    return <StatsDisplay data={stats} />;
+}
+```
+
+### How Cache Components Work
+
+1. **Build/First request:** Components with `'use cache'` are rendered and cached
+2. **Subsequent requests:** Cached components served instantly from cache
+3. **Streaming:** Components without `'use cache'` stream in dynamically
+
+### Benefits
+
+- **Explicit caching:** You control what's cached with `'use cache'`
+- **Fastest initial load:** Cached shell served instantly
+- **Fresh dynamic data:** Non-cached parts always fresh
+- **Automatic cache keys:** Compiler generates keys based on inputs
+
+### Brain Power
+🧠 How are Cache Components different from the old `experimental.ppr`?
+
+**Answer:** Cache Components give you explicit control! Instead of Next.js guessing what's static, you mark cacheable components with `'use cache'`. This is more predictable and the compiler automatically handles cache keys.
+
+### Watch It!
+⚠️ **`experimental.ppr` is removed in Next.js 16!** Use `cacheComponents: true` instead, and add `'use cache'` to components you want cached.
+
+### There are NO Dumb Questions
+
+**Q: Do I need to add `'use cache'` to every component?**
+**A:** No! Only add it to components that benefit from caching (expensive computations, data that doesn't change often). Components without it are always fresh.
+
+**Q: What's the difference between `'use cache'` and `cache: 'force-cache'` on fetch?**
+**A:** `'use cache'` caches the entire component output (including JSX). `cache: 'force-cache'` only caches the fetch response. Use `'use cache'` for component-level caching.
+
+**Q: Can I use Cache Components with any hosting provider?**
+**A:** Best supported on Vercel. Self-hosting requires Node.js infrastructure that supports streaming and edge caching.
+
+---
+
+## 27. Deployment: Going Live
 
 ### Deploy to Vercel (Easiest)
 
@@ -3562,7 +5942,8 @@ npm run start
 ### Docker Container
 
 ```dockerfile
-FROM node:18-alpine
+# Next.js 16 requires Node.js 20.9+
+FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -3585,6 +5966,42 @@ module.exports = {
 npm run build
 # Generates static HTML in out/
 ```
+
+### Output Modes & Adapters
+
+Customize your build for your hosting platform.
+
+**Standalone Mode (Docker/Self-hosting):**
+Automatically traces dependencies and creates a minimal server folder. Huge space saver!
+
+```js
+// next.config.js
+module.exports = {
+    output: 'standalone'
+};
+```
+
+**Result:**
+Creates `.next/standalone`. You can run this folder with just `node server.js` without `node_modules` (mostly)!
+
+### Brain Power
+🧠 Why is "standalone" mode better for Docker?
+
+**Answer:** It copies only the necessary files from `node_modules` into the output folder. Your Docker image becomes significantly smaller because you don't need the entire 500MB+ `node_modules` folder, just the parts you actually use.
+
+### Watch It!
+⚠️ **Static export (`output: 'export'`) disables server features!** No Server Components, no API routes, no middleware, no ISR. Only use it for purely static sites (docs, marketing pages). For most apps, use `standalone` or deploy to Vercel.
+
+### There are NO Dumb Questions
+
+**Q: Can I deploy Next.js anywhere, or only Vercel?**
+**A:** Anywhere! Vercel is easiest (zero config), but Next.js works on AWS, GCP, Railway, Docker, or any Node.js host. Use `standalone` output for self-hosting.
+
+**Q: Do I need a Node.js server for Next.js?**
+**A:** For full features (SSR, API routes, Server Actions), yes. For static export, any CDN/static host works (Netlify, GitHub Pages, S3).
+
+**Q: How do I handle environment variables in production?**
+**A:** Set them in your hosting platform's dashboard (Vercel, Railway, etc.) or in your Docker container. Never commit `.env.local` to git. Build-time vars (`NEXT_PUBLIC_`) are baked into the bundle.
 
 ---
 
@@ -3614,10 +6031,11 @@ You've learned Next.js fundamentals! But there's so much more.
 
 ## Quick Reference Card
 
-**Create App:**
+**Create App (Next.js 16):**
 ```bash
 npx create-next-app@latest
-npm run dev  # Start development server
+npm run dev   # Uses Turbopack by default
+npm run build # Uses Turbopack by default
 ```
 
 **Routing:**
@@ -3666,19 +6084,21 @@ export default function Counter() {
 }
 ```
 
-**Data Fetching:**
+**Data Fetching (Next.js 15):**
 ```tsx
-// With caching
+// NOT cached by default (dynamic)
+fetch('https://...');
+
+// Opt into caching
 fetch('https://...', {
-    next: { revalidate: 3600 }
+    next: { revalidate: 3600 }  // Time-based
 });
 
-// Without caching
 fetch('https://...', {
-    cache: 'no-store'
+    cache: 'force-cache'  // Indefinite
 });
 
-// React cache
+// React cache (deduplication)
 import { cache } from 'react';
 const getData = cache(async (id) => {
     return await fetch(`https://.../${id}`);
@@ -3738,9 +6158,10 @@ export const metadata = {
     }
 };
 
-// Dynamic
+// Dynamic (Next.js 15: params is Promise)
 export async function generateMetadata({ params }) {
-    const post = await getPost(params.id);
+    const { id } = await params;
+    const post = await getPost(id);
     return { title: post.title };
 }
 ```
@@ -3759,16 +6180,17 @@ export async function POST(request: Request) {
 
 // app/api/posts/[id]/route.ts
 export async function GET(req, { params }) {
-    return Response.json({ id: params.id });
+    const { id } = await params;  // Next.js 15: params is Promise
+    return Response.json({ id });
 }
 ```
 
-**Middleware:**
+**Proxy (was Middleware):**
 ```tsx
-// middleware.ts
+// proxy.ts
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export default function proxy(request) {
     // Auth check
     if (!request.cookies.get('token')) {
         return NextResponse.redirect(new URL('/login', request.url));
@@ -3833,8 +6255,86 @@ npx playwright test
 npx cypress run
 ```
 
+**Authentication (NextAuth.js):**
+```tsx
+// app/api/auth/[...nextauth]/route.ts
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+
+const handler = NextAuth({
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
+    ],
+});
+export { handler as GET, handler as POST };
+
+// Check session (server)
+import { getServerSession } from 'next-auth';
+const session = await getServerSession();
+
+// Check session (client)
+'use client';
+import { useSession } from 'next-auth/react';
+const { data: session } = useSession();
+```
+
+**Navigation Hooks:**
+```tsx
+'use client';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
+
+const params = useParams();           // { slug: 'hello' }
+const pathname = usePathname();       // '/blog/hello'
+const searchParams = useSearchParams();
+const query = searchParams.get('q');  // 'nextjs'
+```
+
+**Special Files:**
+```tsx
+// not-found.tsx - Custom 404
+import { notFound } from 'next/navigation';
+if (!post) notFound();
+
+// generateStaticParams - Pre-render dynamic routes
+export async function generateStaticParams() {
+    const posts = await getPosts();
+    return posts.map((post) => ({ slug: post.slug }));
+}
+```
+
+**Security:**
+```tsx
+// Input validation with Zod
+import { z } from 'zod';
+const schema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+});
+const result = schema.safeParse(data);
+```
+
+**Turbopack:**
+```bash
+# Fast dev server with Turbopack
+next dev --turbo
+```
+
+**Partial Prerendering (PPR):**
+```tsx
+// next.config.js
+module.exports = { experimental: { ppr: true } };
+
+// Static shell + dynamic streaming
+<Suspense fallback={<Loading />}>
+    <DynamicComponent />
+</Suspense>
+```
+
 ---
 
 **Created in the style of Head First books**
 
-*Now go build the next big thing with Next.js!* 🚀
+*Now go build the next big thing with Next.js!*

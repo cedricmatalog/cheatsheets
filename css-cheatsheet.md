@@ -243,6 +243,17 @@ D. A property-value pair
 
 **Answers:** 1-B, 2-A, 3-C, 4-D
 
+### There are NO Dumb Questions
+
+**Q: Do I need to memorize all CSS properties?**
+**A:** No way! There are hundreds. Learn the most common ones (color, font, margin, padding, display) and look up the rest. Even pros use references daily.
+
+**Q: What happens if I misspell a property or value?**
+**A:** The browser silently ignores it. No error message, no crash - just nothing happens. This makes typos hard to debug! Use browser DevTools to catch them.
+
+**Q: Can I write CSS without semicolons?**
+**A:** The last declaration in a block doesn't need one, but ALWAYS use semicolons. If you add a property later and forget the semicolon, your previous property breaks too.
+
 ---
 
 ## 3. Selectors: Targeting Elements
@@ -1914,6 +1925,62 @@ span, a, strong, em {
 - `display: none` = Element doesn't exist (no space)
 - `visibility: hidden` = Element is invisible ghost (takes space)
 
+### Opacity: Transparency control
+
+Opacity makes elements see-through. Think of it like tinted glass - you can make anything from fully transparent to fully solid.
+
+```css
+.full {
+    opacity: 1; /* Fully visible (default) */
+}
+
+.half {
+    opacity: 0.5; /* 50% transparent */
+}
+
+.ghost {
+    opacity: 0; /* Fully invisible (but still takes space and is clickable!) */
+}
+
+/* Hover effect */
+.card:hover {
+    opacity: 0.8;
+}
+
+/* Image on hover */
+.thumbnail {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.thumbnail:hover {
+    opacity: 1;
+}
+```
+
+### Watch It!
+⚠️ **Opacity affects ALL children!** If you set `opacity: 0.5` on a parent, everything inside becomes 50% transparent too - text, images, everything. Want transparent backgrounds without affecting children? Use `rgba()` or `hsla()` instead.
+
+```css
+/* Bad: Makes text transparent too */
+.card {
+    opacity: 0.5;
+}
+
+/* Good: Only background is transparent */
+.card {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+```
+
+### Brain Power
+🧠 What's the difference between `opacity: 0`, `visibility: hidden`, and `display: none`? Think about which ones still take up space, which ones are clickable, and which ones are announced by screen readers.
+
+**Answer:**
+- `opacity: 0` = Invisible, takes space, IS clickable, announced by screen readers
+- `visibility: hidden` = Invisible, takes space, NOT clickable, NOT announced
+- `display: none` = Gone. No space, no clicks, no announcements.
+
 ### Flex: Modern layout
 
 ```css
@@ -2016,6 +2083,241 @@ nav a {
 
 **Q: What's the difference between `display: none` and `opacity: 0`?**
 **A:** `display: none` removes from layout. `opacity: 0` is invisible but still takes space and can be clicked!
+
+### Styling Tables: Making data look good
+
+Remember HTML tables? They look ugly by default. CSS to the rescue!
+
+```css
+/* The essential table reset */
+table {
+    border-collapse: collapse; /* Merge cell borders */
+    width: 100%;
+    table-layout: fixed; /* Predictable column widths */
+}
+
+th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Striped rows */
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Hover effect */
+tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Header styling */
+thead th {
+    background-color: #333;
+    color: white;
+    font-weight: 600;
+}
+```
+
+**Key table properties:**
+
+| Property | What It Does | Values |
+|----------|-------------|--------|
+| `border-collapse` | Merge or separate borders | `collapse`, `separate` |
+| `border-spacing` | Gap between cells (when separate) | `5px`, `10px 20px` |
+| `table-layout` | How columns are sized | `auto`, `fixed` |
+| `caption-side` | Where caption goes | `top`, `bottom` |
+| `empty-cells` | Show/hide empty cell borders | `show`, `hide` |
+
+### Brain Power
+🧠 What's the difference between `border-collapse: collapse` and `border-collapse: separate`? Try both with a bordered table and see what happens!
+
+### Styling Lists: Beyond boring bullets
+
+Default list bullets are about as exciting as watching paint dry. The good news? CSS gives you total control over list markers - from basic shapes to custom images to emoji bullets.
+
+```css
+/* Change bullet type */
+ul {
+    list-style-type: disc; /* Default */
+}
+
+.squares {
+    list-style-type: square;
+}
+
+.roman {
+    list-style-type: upper-roman; /* I, II, III */
+}
+
+.letters {
+    list-style-type: lower-alpha; /* a, b, c */
+}
+
+/* No bullets */
+.clean-list {
+    list-style: none;
+    padding: 0;
+}
+
+/* Custom emoji bullets */
+.custom-bullets {
+    list-style: none;
+    padding: 0;
+}
+
+.custom-bullets li::before {
+    content: "🔥 ";
+}
+
+/* Bullet position */
+.inside {
+    list-style-position: inside; /* Bullet inside content box */
+}
+
+.outside {
+    list-style-position: outside; /* Bullet outside (default) */
+}
+
+/* Image as bullet */
+.image-bullets {
+    list-style-image: url('bullet.png');
+}
+
+/* The ::marker pseudo-element (modern!) */
+li::marker {
+    color: red;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* List shorthand */
+ul {
+    list-style: square inside url('bullet.png');
+    /* type position image */
+}
+```
+
+### Watch It!
+⚠️ **Navigation menus need `list-style: none`!** When using `<ul>` for nav menus, always reset the list styles and padding. Otherwise you get bullets and indentation.
+
+### Images and Filters: Beyond `max-width: 100%`
+
+Ever wonder how to make images fit their containers perfectly? Or how Instagram-style filters work in CSS?
+
+```css
+/* Object-fit: How the image fills its box */
+.cover-image {
+    width: 300px;
+    height: 200px;
+    object-fit: cover; /* Fills box, may crop */
+}
+
+.contain-image {
+    width: 300px;
+    height: 200px;
+    object-fit: contain; /* Fits inside box, may letterbox */
+}
+
+.fill-image {
+    object-fit: fill; /* Stretches to fill (distorts!) */
+}
+
+.none-image {
+    object-fit: none; /* Original size, may overflow */
+}
+
+/* Object-position: Where to anchor the image */
+.top-crop {
+    object-fit: cover;
+    object-position: top; /* Show top of image */
+}
+
+.center-crop {
+    object-fit: cover;
+    object-position: center; /* Show center (default) */
+}
+
+.custom-position {
+    object-fit: cover;
+    object-position: 25% 75%; /* Custom position */
+}
+```
+
+### CSS Filters: Instagram in pure CSS
+
+```css
+/* Individual filters */
+.blur {
+    filter: blur(5px);
+}
+
+.bright {
+    filter: brightness(1.5); /* 1 = normal, >1 = brighter */
+}
+
+.dim {
+    filter: brightness(0.5);
+}
+
+.high-contrast {
+    filter: contrast(1.5);
+}
+
+.gray {
+    filter: grayscale(100%);
+}
+
+.sepia-tone {
+    filter: sepia(80%);
+}
+
+.saturated {
+    filter: saturate(2); /* 2x color intensity */
+}
+
+.hue-shifted {
+    filter: hue-rotate(90deg); /* Shift all colors */
+}
+
+.inverted {
+    filter: invert(100%); /* Negative image */
+}
+
+/* Drop shadow (works on transparent PNGs!) */
+.icon-shadow {
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* Combine multiple filters */
+.vintage {
+    filter: sepia(60%) contrast(1.1) brightness(0.9) saturate(0.8);
+}
+
+/* Hover effect */
+.photo {
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+}
+
+.photo:hover {
+    filter: grayscale(0%);
+}
+```
+
+### Brain Power
+🧠 What's the difference between `box-shadow` and `filter: drop-shadow()`? Try both on a transparent PNG image and see which one follows the shape!
+
+**Answer:** `box-shadow` creates a shadow around the element's *box* (rectangle). `drop-shadow()` creates a shadow around the element's *shape* (follows transparency). For icons and PNGs, `drop-shadow()` looks way better!
+
+### There are NO Dumb Questions
+
+**Q: What's the difference between `object-fit: cover` and `background-size: cover`?**
+**A:** Same concept, different elements! `object-fit` is for `<img>`, `<video>`, etc. `background-size` is for background images. Both fill the container and may crop.
+
+**Q: Do CSS filters affect performance?**
+**A:** Yes, especially `blur()`. Use them sparingly on large elements, and prefer GPU-accelerated properties when animating. `will-change: filter` can help.
 
 ---
 
@@ -2298,9 +2600,177 @@ Can't use top/right/bottom/left offsets. Rarely specified explicitly.
 Before Flexbox and Grid, layouts were HARD (floats, tables, positioning hacks). Now they're... actually pretty easy!
 
 **When to use:**
+- **Flow:** Default behavior (blocks stack, inlines flow)
+- **Float:** Text wrapping around images (that's about it)
+- **Multicolumn:** Newspaper-style text columns
 - **Flexbox:** One-dimensional layouts (rows OR columns)
 - **Grid:** Two-dimensional layouts (rows AND columns)
-- **Float:** Almost never (legacy technique)
+
+### Flow Layout: The default you already know
+
+Before you learn fancy layout techniques, understand what's happening *without* any layout CSS. This is **normal flow** (or "flow layout"):
+
+```css
+/* Block elements stack vertically */
+div, p, h1, section {
+    display: block; /* Full width, stacks top to bottom */
+}
+
+/* Inline elements flow horizontally */
+span, a, strong {
+    display: inline; /* Flows like text, left to right */
+}
+```
+
+**Normal flow rules:**
+1. Block elements take full width and stack vertically
+2. Inline elements flow left-to-right, wrapping when needed
+3. Margins between blocks collapse (remember the Box Model!)
+4. Content determines height (unless you set it explicitly)
+
+### Block Formatting Context (BFC): A layout boundary
+
+A **BFC** is like a mini layout universe - stuff inside doesn't affect stuff outside. You create one with:
+
+```css
+.bfc {
+    overflow: hidden; /* Creates BFC */
+    /* OR */
+    display: flow-root; /* Modern way - explicitly creates BFC */
+}
+```
+
+**When you need a BFC:**
+- Containing floated children (prevents parent collapse)
+- Preventing margin collapse between parent and child
+- Stopping content from wrapping around floats
+
+### Floating Elements: The OG layout hack
+
+Floats were *the* layout technique before Flexbox. They pull an element to one side and let content wrap around it. Today, they're mostly used for wrapping text around images - their original purpose!
+
+```css
+/* Float an image */
+.float-left {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.float-right {
+    float: right;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+/* Text wraps around the floated element */
+```
+
+```html
+<img src="photo.jpg" class="float-left" alt="Photo">
+<p>This text will wrap around the image on the right side.
+   It flows naturally next to the floated element.</p>
+```
+
+### The float problem: Parent collapse
+
+When all children float, the parent collapses to zero height. Yikes!
+
+```css
+/* The problem */
+.parent {
+    /* Height: 0px! Children escaped! */
+}
+
+.parent .child {
+    float: left;
+}
+
+/* Solution 1: Clearfix (classic) */
+.parent::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Solution 2: overflow (quick fix) */
+.parent {
+    overflow: hidden; /* Creates BFC, contains floats */
+}
+
+/* Solution 3: display: flow-root (modern) */
+.parent {
+    display: flow-root; /* Best modern solution */
+}
+```
+
+### Clearing floats
+
+```css
+/* Clear: don't let me sit next to floats */
+.clear-both {
+    clear: both; /* No floats on either side */
+}
+
+.clear-left {
+    clear: left; /* No floats on the left */
+}
+
+.clear-right {
+    clear: right; /* No floats on the right */
+}
+```
+
+### Watch It!
+⚠️ **Don't use floats for page layouts!** Use Flexbox or Grid instead. Floats are still useful for one thing: wrapping text around images. That's it.
+
+### Multicolumn Layout: Newspaper-style columns
+
+Want text to flow into multiple columns like a newspaper? CSS has a built-in way to do this - no Flexbox or Grid needed!
+
+```css
+/* Set number of columns */
+.article {
+    column-count: 3;
+}
+
+/* Or set column width (browser decides count) */
+.article {
+    column-width: 250px; /* At least 250px per column */
+}
+
+/* Shorthand: columns */
+.article {
+    columns: 3 250px; /* count width */
+}
+
+/* Gap between columns */
+.article {
+    column-count: 3;
+    column-gap: 40px; /* Default is usually 1em */
+}
+
+/* Divider line between columns */
+.article {
+    column-count: 3;
+    column-rule: 1px solid #ddd; /* Like border-left on each column */
+}
+
+/* Prevent element from breaking across columns */
+.keep-together {
+    break-inside: avoid; /* Don't split this across columns */
+}
+
+/* Span all columns (like a headline) */
+.full-width-heading {
+    column-span: all; /* Stretches across all columns */
+}
+```
+
+### Brain Power
+🧠 When would you use multicolumn layout instead of Grid? Think about flowing text content vs. structured card layouts...
+
+**Answer:** Multicolumn is for *content that flows* - like long articles or lists of links. Grid is for *structured items* where each item is a distinct unit. Text naturally flows from column to column with multicolumn; with Grid, each cell is independent.
 
 ### Flexbox: One dimension at a time
 
@@ -3959,6 +4429,140 @@ const Button = styled.button`
     Click me
 </button>
 ```
+
+#### Sass/SCSS: CSS with superpowers
+
+Sass is a **preprocessor** - you write enhanced CSS, then it compiles to regular CSS. SCSS syntax is the most popular (looks like CSS with extras).
+
+```scss
+// Variables (Sass variables are compile-time, unlike CSS variables)
+$primary: #007bff;
+$spacing: 1rem;
+$breakpoint-tablet: 768px;
+
+// Nesting (matches HTML structure)
+.card {
+    padding: $spacing;
+    border: 1px solid #ddd;
+
+    &__title {  // & = parent selector = .card__title
+        font-size: 1.5rem;
+        color: $primary;
+    }
+
+    &__content {
+        line-height: 1.6;
+    }
+
+    &:hover {  // .card:hover
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &--featured {  // .card--featured
+        border-color: $primary;
+    }
+}
+
+// Mixins (reusable chunks of CSS)
+@mixin respond-to($breakpoint) {
+    @media (min-width: $breakpoint) {
+        @content;
+    }
+}
+
+.container {
+    width: 100%;
+
+    @include respond-to($breakpoint-tablet) {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+// Partials and imports
+// _variables.scss, _mixins.scss, _base.scss
+@use 'variables';
+@use 'mixins';
+
+// Functions
+@function spacing($multiplier) {
+    @return $spacing * $multiplier;
+}
+
+.section {
+    padding: spacing(2); // 2rem
+}
+
+// Extend (share styles)
+%button-base {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-primary {
+    @extend %button-base;
+    background: $primary;
+    color: white;
+}
+```
+
+**Sass vs CSS Variables:**
+- Sass variables = compile-time (disappear in output). Good for breakpoints, static values.
+- CSS variables = runtime (live in the browser). Good for themes, dynamic values.
+- Use both! They complement each other.
+
+#### PostCSS: CSS transformation tool
+
+PostCSS is different from Sass - it's a *tool* that transforms CSS using plugins. Think of it as Babel, but for CSS.
+
+```css
+/* With postcss-preset-env: Use future CSS today! */
+
+/* Nesting (CSS Nesting spec) */
+.card {
+    padding: 1rem;
+
+    & .title {
+        font-size: 1.5rem;
+    }
+
+    &:hover {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Custom media queries */
+@custom-media --tablet (min-width: 768px);
+
+@media (--tablet) {
+    .container {
+        max-width: 1200px;
+    }
+}
+```
+
+**Popular PostCSS plugins:**
+
+| Plugin | What It Does |
+|--------|-------------|
+| `autoprefixer` | Adds vendor prefixes automatically |
+| `postcss-preset-env` | Use future CSS features today |
+| `cssnano` | Minify CSS for production |
+| `postcss-import` | Inline `@import` rules |
+| `tailwindcss` | The Tailwind framework IS a PostCSS plugin! |
+
+### Watch It!
+⚠️ **Sass and PostCSS solve different problems!** Sass adds language features (variables, mixins, loops). PostCSS transforms standard CSS (prefixing, minification, future syntax). You can use both together!
+
+### There are NO Dumb Questions
+
+**Q: Should I learn Sass or stick with vanilla CSS?**
+**A:** Modern CSS has variables, nesting (coming soon everywhere), and `calc()`. But Sass still offers mixins, functions, and better file organization. Learn CSS first, then add Sass when you need it.
+
+**Q: Is PostCSS a preprocessor?**
+**A:** Not exactly. It's a tool that runs plugins on your CSS. Some plugins make it act like a preprocessor, but it can also do things preprocessors can't (like autoprefixing or minification).
 
 ### Modern CSS Reset
 
